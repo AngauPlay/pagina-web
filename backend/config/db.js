@@ -1,7 +1,3 @@
-const path = require("path");
-// Esto busca el .env subiendo un nivel desde la carpeta config
-require("dotenv").config({ path: path.join(__dirname, "../.env") });
-
 const { Sequelize } = require("sequelize");
 
 // Creamos la conexión usando las variables del .env
@@ -22,7 +18,7 @@ const sequelize = new Sequelize(
 // Probar la conexión
 sequelize
   .authenticate()
-  .then(() => console.log(" Conectado a la base de datos de Angau (DonWeb)"))
+  .then(() => console.log(" Conectado a la base de datos de Angau"))
   .catch((err) => console.error(" Error de conexión a la DB:", err));
 
 module.exports = sequelize;

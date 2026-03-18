@@ -13,7 +13,7 @@ const sequelize = require("./config/db");
 // Importar Rutas
 const newsRoutes = require("./routes/newsRoutes");
 // const authRoutes = require('./routes/authRoutes');
-
+const Noticia = require("./models/Noticia");
 const app = express();
 const parser = new Parser();
 
@@ -31,7 +31,17 @@ app.use(
 );
 
 // 3. Definición de Rutas de la API
-app.use("/api/noticias", newsRoutes);
+app.get("/api/noticias", async (req, res) => {
+  try {
+    console.log("Intentando buscar noticias en la DB...");
+    const noticias = await Noticia.findAll();
+    console.log("Noticias encontradas:", noticias.length);
+    res.json(noticias);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ "error en la base de datos": error.message });
+  }
+});
 
 // Ruta para noticias externas (Agenfor)
 app.get("/api/noticias-externas", async (req, res) => {
@@ -98,15 +108,15 @@ async function startServer() {
   try {
     // Usamos sequelize.authenticate() y sequelize.sync() directamente
     await sequelize.authenticate();
-    console.log("✅ Conexión a la base de datos de DonWeb establecida.");
+    console.log(" Conexión a la base de datos establecida.");
 
     await sequelize.sync({ alter: false });
 
     app.listen(PORT, () => {
-      console.log(`🚀 Servidor Angau corriendo en: http://localhost:${PORT}`);
+      console.log(` Servidor Angau corriendo en: http://localhost:${PORT}`);
     });
   } catch (error) {
-    console.error("❌ No se pudo conectar a la base de datos:", error);
+    console.error(" No se pudo conectar a la base de datos:", error);
   }
 }
 
