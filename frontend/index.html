@@ -450,5 +450,56 @@
       }
       updateDate();
     </script>
+    <script>
+      async function cargarNoticias() {
+        const contenedor = document.getElementById("noticias-container");
+
+        try {
+          // Llamamos a la API que creamos en el backend
+          const respuesta = await fetch("/api/noticias");
+          const noticias = await respuesta.json();
+
+          if (noticias.length === 0) {
+            contenedor.innerHTML =
+              "<p class='text-center col-span-3'>No hay noticias publicadas todavía.</p>";
+            return;
+          }
+
+          // Limpiamos el contenedor y cargamos las reales
+          contenedor.innerHTML = "";
+
+          noticias.forEach((noticia) => {
+            contenedor.innerHTML += `
+                  <article class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all border border-slate-100 group">
+                      <div class="relative overflow-hidden">
+                          <img src="${noticia.imagen_url}" alt="${noticia.titulo}" class="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500" />
+                          <span class="absolute top-4 left-4 bg-pink-accent text-white text-[10px] font-black px-2 py-1 rounded uppercase">
+                              ${noticia.Categoria ? noticia.Categoria.nombre : "General"}
+                          </span>
+                      </div>
+                      <div class="p-6">
+                          <h3 class="text-xl font-black leading-tight text-slate-800 group-hover:text-pink-accent transition-colors">
+                              ${noticia.titulo}
+                          </h3>
+                          <p class="text-slate-500 mt-3 text-sm line-clamp-2">
+                              ${noticia.copete}
+                          </p>
+                          <a href="/noticia/${noticia.slug}" class="inline-block mt-4 text-pink-accent font-black text-xs tracking-widest hover:translate-x-2 transition-transform">
+                              LEER MÁS →
+                          </a>
+                      </div>
+                  </article>
+              `;
+          });
+        } catch (error) {
+          console.error("Error cargando noticias:", error);
+          contenedor.innerHTML =
+            "<p class='text-red-500'>Error al conectar con el servidor.</p>";
+        }
+      }
+
+      // Ejecutar al cargar la página
+      document.addEventListener("DOMContentLoaded", cargarNoticias);
+    </script>
   </body>
 </html>
