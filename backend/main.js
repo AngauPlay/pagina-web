@@ -1,106 +1,113 @@
 const express = require("express");
-const mysql = require("mysql2");
-const path = require("path");
+const { json, urlencoded } = require("express");
+const { join } = require("path");
+const RSS = require("rss");
 const Parser = require("rss-parser");
-require("dotenv").config(); // Para leer las credenciales del .env
+const cors = require("cors");
+const cookieParser = require("cookie-parser");
+const dotenv = require("dotenv");
+dotenv.config({ path: join(__dirname, "../.env") });
+// IMPORTANTE: Importar el objeto sequelize directamente
+const sequelize = require("./config/db");
+
+// Importar Rutas
+const newsRoutes = require("./routes/newsRoutes");
+// const authRoutes = require('./routes/authRoutes');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 const parser = new Parser();
 
-// 1. Configuración de la conexión a la Base de Datos (DonWeb)
-const db = mysql.createConnection({
-  host: process.env.DB_HOST || "localhost",
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-});
+// 1. Middlewares Globales
+app.use(cors());
+app.use(json());
+app.use(urlencoded({ extended: true }));
+app.use(cookieParser());
 
-db.connect((err) => {
-  if (err) {
-    console.error("Error conectando a la base de datos:", err);
-    return;
-  }
-  console.log("Conectado a la base de datos");
-});
+// 2. Servir Archivos Estáticos
+app.use(express.static(join(__dirname, "../frontend")));
+app.use(
+  "/uploads",
+  express.static(join(__dirname, "../frontend/assets/uploads")),
+);
 
-// 2. Middlewares
-app.use(express.json()); // Para recibir datos en formato JSON
-// Servimos la carpeta frontend para que sea accesible desde el navegador
-app.use(express.static(path.join(__dirname, "../frontend")));
+// 3. Definición de Rutas de la API
+app.use("/api/noticias", newsRoutes);
 
+// Ruta para noticias externas (Agenfor)
 app.get("/api/noticias-externas", async (req, res) => {
   try {
     let feed = await parser.parseURL("https://agenfor.com.ar/feed/");
-
-    // Devolvemos solo lo que nos interesa
     const noticias = feed.items.map((item) => ({
       titulo: item.title,
       link: item.link,
       fecha: item.pubDate,
       resumen: item.contentSnippet,
     }));
-
     res.json(noticias);
   } catch (error) {
     res.status(500).json({ error: "No se pudo obtener el feed" });
   }
 });
 
-app.get("/rss", (req, res) => {
+// Ruta para generar el RSS de Angau
+app.get("/rss", async (req, res) => {
   const feed = new RSS({
     title: "Angau Play",
     description: "Las mejores noticias en tiempo real",
     feed_url: "https://angauplay.com.ar/rss",
     site_url: "https://angauplay.com.ar",
+    language: "es",
   });
 
-  // Consultamos la base de datos
-  db.query(
-    "SELECT * FROM noticias ORDER BY fecha DESC LIMIT 20",
-    (err, results) => {
-      if (err) return res.status(500).send("Error");
+  try {
+    // Buscamos las últimas 20 noticias publicadas
+    const noticias = await Noticia.findAll({
+      where: { estado: "publicado" },
+      order: [["fecha_publicacion", "DESC"]],
+      limit: 20,
+    });
 
-      results.forEach((n) => {
-        feed.item({
-          title: n.titulo,
-          description: n.copete,
-          url: `https://angauplay.com.ar/noticia/${n.id}`,
-          date: n.fecha,
-        });
+    // Las agregamos al feed una por una
+    noticias.forEach((post) => {
+      feed.item({
+        title: post.titulo,
+        description: post.copete,
+        url: `https://angauplay.com.ar/noticia/${post.slug}`,
+        author: post.autor,
+        date: post.fecha_publicacion,
       });
+    });
 
-      res.set("Content-Type", "text/xml");
-      res.send(feed.xml());
-    },
-  );
-});
-// 3. Rutas de la API de Noticias
-// Obtener todas las noticias
-app.get("/api/noticias", (req, res) => {
-  const query = "SELECT * FROM noticias ORDER BY fecha DESC";
-  db.query(query, (err, results) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json(results);
-  });
+    res.set("Content-Type", "text/xml");
+    res.send(feed.xml());
+  } catch (error) {
+    console.error("Error generando RSS:", error);
+    res.status(500).send("Error al generar el feed");
+  }
 });
 
-// Obtener una noticia específica por ID
-app.get("/api/noticias/:id", (req, res) => {
-  const query = "SELECT * FROM noticias WHERE id = ?";
-  db.query(query, [req.params.id], (err, result) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json(result[0]);
-  });
+// 4. EL FALLBACK SIEMPRE AL FINAL DE LAS RUTAS
+app.get(/.*/, (req, res) => {
+  res.sendFile(join(__dirname, "../frontend/index.html"));
 });
 
-// 4. Manejo de rutas del Frontend (SPA)
-// Si el usuario entra a una ruta que no es de la API, le enviamos el index.html
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/index.html"));
-});
+// 5. Sincronizar Base de Datos y Arrancar Servidor
+const PORT = process.env.PORT || 3000;
 
-// 5. Iniciar Servidor
-app.listen(PORT, () => {
-  console.log(`Servidor de noticias corriendo en puerto ${PORT}`);
-});
+async function startServer() {
+  try {
+    // Usamos sequelize.authenticate() y sequelize.sync() directamente
+    await sequelize.authenticate();
+    console.log("✅ Conexión a la base de datos de DonWeb establecida.");
+
+    await sequelize.sync({ alter: false });
+
+    app.listen(PORT, () => {
+      console.log(`🚀 Servidor Angau corriendo en: http://localhost:${PORT}`);
+    });
+  } catch (error) {
+    console.error("❌ No se pudo conectar a la base de datos:", error);
+  }
+}
+
+startServer();
