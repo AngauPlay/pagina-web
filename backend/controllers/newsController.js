@@ -1,10 +1,13 @@
-const { Noticia, findAll, findOne, _update } = require("../models/Noticia");
+const Noticia = require("../models/Noticia");
+const cloudinary = require("../config/cloudinary"); // Importamos tu config de Cloudinary
+const fs = require("fs-extra"); // Para limpiar archivos temporales
 
 const newsController = {
-  // Listar todas las noticias publicadas (para la Home)
+  // Listar todas las noticias publicadas
   getAll: async (req, res) => {
     try {
-      const noticias = await findAll({
+      // USAMOS EL MODELO: Noticia.findAll
+      const noticias = await Noticia.findAll({
         where: { estado: "publicado" },
         order: [["fecha_publicacion", "DESC"]],
       });
@@ -16,10 +19,10 @@ const newsController = {
     }
   },
 
-  // Detalle de una noticia por su Slug (para SEO)
+  // Detalle por Slug
   getBySlug: async (req, res) => {
     try {
-      const noticia = await findOne({
+      const noticia = await Noticia.findOne({
         where: { slug: req.params.slug, estado: "publicado" },
       });
       if (!noticia)
@@ -30,19 +33,27 @@ const newsController = {
     }
   },
 
-  // Crear una noticia (Admin)
+  // Crear una noticia con Cloudinary
   create: async (req, res) => {
     try {
-      // Los datos de texto vienen en req.body
-      // La info del archivo viene en req.file (gracias a Multer)
-      const noticiaData = {
-        ...req.body,
-        imagen_url: req.file
-          ? `/assets/uploads/${req.file.filename}`
-          : "/assets/uploads/default.jpg",
-      };
+      let imageUrl = "/assets/uploads/default.jpg";
 
-      const nuevaNoticia = await Noticia.create(noticiaData);
+      // Si Multer recibió un archivo, lo subimos a Cloudinary
+      if (req.file) {
+        const result = await cloudinary.uploader.upload(req.file.path, {
+          folder: "angau_play/noticias",
+        });
+        imageUrl = result.secure_url; // Guardamos la URL de la nube
+
+        // OPCIONAL: Borrar el archivo temporal de tu servidor para no llenar el disco
+        await fs.unlink(req.file.path);
+      }
+
+      const nuevaNoticia = await Noticia.create({
+        ...req.body,
+        imagen_url: imageUrl,
+      });
+
       res.status(201).json(nuevaNoticia);
     } catch (error) {
       res.status(400).json({ error: error.message });
@@ -52,11 +63,13 @@ const newsController = {
   // Editar una noticia
   update: async (req, res) => {
     try {
-      const [actualizado] = await _update(req.body, {
+      // USAMOS EL MODELO: Noticia.update
+      const [actualizado] = await Noticia.update(req.body, {
         where: { id: req.params.id },
       });
+
       if (!actualizado)
-        return res.status(404).json({ mensaje: "No se encontró la noticia" });
+        return res.status(404).json({ mensaje: "No se encontró" });
       res.json({ mensaje: "Noticia actualizada" });
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -64,4 +77,4 @@ const newsController = {
   },
 };
 
-exports = module.exports = newsController;
+module.exports = newsController;
