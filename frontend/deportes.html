@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Deportes | ANGAU PLAY</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+
+  <style>
+    body.menu-open { overflow: hidden; }
+
+    :root {
+      --pink-accent: rgb(224, 35, 117);
+      --purple-main: rgb(104, 89, 165);
+      --blue-dark: rgb(68, 99, 174);
+      --yellow-neon: rgb(229, 235, 53);
+      --green-light: rgb(140, 199, 73);
+    }
+
+    .bg-purple-main { background-color: var(--purple-main); }
+    .bg-pink-accent { background-color: var(--pink-accent); }
+    .bg-blue-dark { background-color: var(--blue-dark); }
+    .text-pink-accent { color: var(--pink-accent); }
+    .text-yellow-neon { color: var(--yellow-neon); }
+    .text-green-light { color: var(--green-light); }
+  </style>
+</head>
+
+<body class="bg-gray-50 font-sans text-slate-900">
+
+<!-- HEADER -->
+<header class="bg-purple-main text-white p-4 sticky top-0 z-[100] shadow-xl">
+  <div class="container mx-auto grid grid-cols-3 items-center">
+
+    <button id="menu-btn" class="text-2xl">
+      <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="text-center text-pink-accent font-black text-3xl">
+      ANGAU <span class="text-green-light">PLAY</span>
+    </div>
+
+    <div id="current-date" class="hidden md:block text-right text-xs"></div>
+
+  </div>
+
+  <!-- MENU -->
+  <div id="mobile-menu" class="fixed top-0 left-0 w-72 bg-blue-dark h-screen p-6 transform -translate-x-full transition z-[110]">
+
+    <div class="flex justify-between mb-10">
+      <span class="text-yellow-neon font-bold">MENÚ</span>
+      <button id="close-menu"><i class="fas fa-times"></i></button>
+    </div>
+
+    <nav class="flex flex-col gap-6 text-white font-bold">
+      <a href="index.html">PORTADA</a>
+      <a href="politica.html">Política</a>
+      <a href="tecnologia.html">Tecnología</a>
+      <a href="deportes.html" class="text-yellow-neon">Deportes</a>
+      <a href="Economia.html">Economía</a>
+      <a href="cultura.html">Cultura</a>
+    </nav>
+
+  </div>
+
+  <div id="overlay" class="fixed inset-0 bg-black/60 hidden"></div>
+
+</header>
+
+<!-- TITULO -->
+<section class="container mx-auto px-4 mt-8">
+  <h2 class="text-4xl font-black border-l-8 pl-4 border-green-500">
+    DEPORTES
+  </h2>
+</section>
+
+<!-- DESTACADA -->
+<section class="container mx-auto px-4 mt-8">
+  <div id="destacada" class="relative rounded-2xl overflow-hidden shadow-2xl"></div>
+</section>
+
+<!-- PUBLICIDAD -->
+<div class="container mx-auto px-4 mt-10">
+  <div class="h-24 bg-yellow-300 flex items-center justify-center font-bold rounded-xl">
+    PUBLICIDAD
+  </div>
+</div>
+
+<!-- LISTADO -->
+<section class="container mx-auto px-4 py-10">
+
+  <h3 class="text-2xl font-black mb-6">Últimas en Deportes</h3>
+
+  <div id="noticias-container" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+</section>
+
+<!-- FOOTER -->
+<footer
+      class="bg-gradient-to-r from-[rgb(198,29,102)] via-[rgb(104,89,165)] to-[rgb(68,99,174)] text-white mt-16"
+    >
+      <div class="container mx-auto px-4 py-10 grid md:grid-cols-2 gap-10">
+        <div>
+          <h3 class="text-xl font-bold mb-4">Contacto</h3>
+          <ul class="space-y-2 text-white/80">
+            <li><i class="fas fa-envelope mr-2"></i> contacto@angauplay.com</li>
+            <li>
+              <i class="fas fa-map-marker-alt mr-2"></i> Formosa, Argentina
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-xl font-bold mb-4">Seguinos</h3>
+          <div class="flex gap-4 text-2xl">
+            <i
+              class="fab fa-instagram hover:text-yellow-neon cursor-pointer"
+            ></i>
+            <i class="fab fa-youtube hover:text-yellow-neon cursor-pointer"></i>
+            <i class="fab fa-twitter hover:text-yellow-neon cursor-pointer"></i>
+          </div>
+        </div>
+      </div>
+      <div
+        class="text-center text-sm py-4 border-t border-white/20 uppercase tracking-widest font-bold"
+      >
+        © 2026 Angau Play
+      </div>
+    </footer>
+
+<script src="js/deportes.js"></script>
+
+</body>
+</html>

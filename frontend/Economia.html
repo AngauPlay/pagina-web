@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Economía | ANGAU PLAY</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+
+  <style>
+      @keyframes marquee {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+      }
+
+      .animate-marquee {
+        display: inline-flex;
+        animation: marquee 25s linear infinite;
+      }
+
+      body.menu-open { overflow: hidden; }
+
+      :root {
+        --pink-accent: rgb(224, 35, 117);
+        --purple-main: rgb(104, 89, 165);
+        --blue-dark: rgb(68, 99, 174);
+        --blue-light: rgb(122, 167, 211);
+        --yellow-neon: rgb(229, 235, 53);
+        --green-light: rgb(140, 199, 73);
+      }
+
+      .bg-purple-main { background-color: var(--purple-main); }
+      .bg-pink-accent { background-color: var(--pink-accent); }
+      .bg-blue-dark { background-color: var(--blue-dark); }
+      .bg-yellow-neon { background-color: var(--yellow-neon); }
+      .text-pink-accent { color: var(--pink-accent); }
+      .text-green-light { color: var(--green-light); }
+    </style>
+</head>
+
+<body class="bg-gray-50 font-sans text-slate-900">
+
+<!-- HEADER -->
+<body class="bg-gray-50 font-sans text-slate-900">
+    <header
+      class="bg-purple-main text-white p-4 sticky top-0 z-[100] shadow-xl border-b border-white/10"
+    >
+      <div class="container mx-auto grid grid-cols-3 items-center">
+        <div class="flex items-center">
+          <button
+            id="menu-btn"
+            class="text-2xl hover:bg-white/10 transition-all p-2 rounded-lg"
+          >
+            <i class="fas fa-bars"></i>
+          </button>
+        </div>
+        <div
+          class="text-center text-pink-accent font-black tracking-tighter text-3xl"
+        >
+          ANGAU <span class="text-green-light">PLAY</span>
+        </div>
+        <div
+          id="current-date"
+          class="hidden md:block text-right text-xs font-mono text-white/70"
+        ></div>
+      </div>
+
+      <div
+        id="mobile-menu"
+        class="fixed top-0 left-0 w-72 bg-blue-dark h-screen p-6 shadow-2xl transform -translate-x-full transition-transform duration-300 z-[110]"
+      >
+        <div class="flex justify-between items-center mb-10">
+          <span
+            class="text-yellow-neon font-black italic text-xl tracking-widest uppercase"
+            >Menú</span
+          >
+          <button
+            id="close-menu"
+            class="text-white hover:text-yellow-neon transition-colors"
+          >
+            <i class="fas fa-times text-2xl"></i>
+          </button>
+        </div>
+        <nav class="flex flex-col gap-6 text-lg text-white font-bold">
+          <a
+            href="index.html"
+            class="hover:text-blue-200 transition-colors"
+            >PORTADA</a
+          >
+          <a href="politica.html" class="hover:text-blue-200 transition-colors">Política</a>
+          <a href="tecnologia.html" class="hover:text-blue-200 transition-colors"
+            >Tecnología</a
+          >
+          <a href="deportes.html" class="hover:text-blue-200 transition-colors">Deportes</a>
+          <a href="Economia.html" class="text-yellow-neon border-l-4 border-yellow-neon pl-2">Economía</a>
+          <a href="cultura.html" class="hover:text-blue-200 transition-colors">Cultura</a>
+        </nav>
+      </div>
+      <div
+        id="overlay"
+        class="fixed inset-0 bg-black/60 hidden z-[105] backdrop-blur-sm"
+      ></div>
+    </header>
+
+<!-- MARQUEE -->
+<div class="bg-pink-accent text-white py-2 overflow-hidden">
+  <div class="animate-marquee">
+    <span class="mx-4 font-bold">ÚLTIMO MOMENTO:</span>
+    <span class="mx-4">Sube el dólar y reaccionan los mercados...</span>
+    <span class="mx-4">Inflación mensual en análisis...</span>
+  </div>
+</div>
+
+<!-- TITULO -->
+<section class="container mx-auto px-4 mt-8">
+  <h2 class="text-4xl font-black border-l-8 pl-4 border-pink-500">
+    ECONOMÍA
+  </h2>
+</section>
+
+<!-- DESTACADA -->
+<section class="container mx-auto px-4 mt-8">
+  <div id="destacada" class="rounded-2xl overflow-hidden shadow-2xl"></div>
+</section>
+
+<!-- PUBLICIDAD -->
+<div class="container mx-auto px-4 mt-10">
+  <div class="h-24 bg-yellow-300 flex items-center justify-center font-bold rounded-xl">
+    PUBLICIDAD
+  </div>
+</div>
+
+<!-- LISTADO -->
+<section class="container mx-auto px-4 py-10">
+  <h3 class="text-2xl font-black mb-6">Últimas en Economía</h3>
+  <div id="noticias-container" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+</section>
+
+<!-- FOOTER -->
+<footer
+      class="bg-gradient-to-r from-[rgb(198,29,102)] via-[rgb(104,89,165)] to-[rgb(68,99,174)] text-white mt-16"
+    >
+      <div class="container mx-auto px-4 py-10 grid md:grid-cols-2 gap-10">
+        <div>
+          <h3 class="text-xl font-bold mb-4">Contacto</h3>
+          <ul class="space-y-2 text-white/80">
+            <li><i class="fas fa-envelope mr-2"></i> contacto@angauplay.com</li>
+            <li>
+              <i class="fas fa-map-marker-alt mr-2"></i> Formosa, Argentina
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-xl font-bold mb-4">Seguinos</h3>
+          <div class="flex gap-4 text-2xl">
+            <i
+              class="fab fa-instagram hover:text-yellow-neon cursor-pointer"
+            ></i>
+            <i class="fab fa-youtube hover:text-yellow-neon cursor-pointer"></i>
+            <i class="fab fa-twitter hover:text-yellow-neon cursor-pointer"></i>
+          </div>
+        </div>
+      </div>
+      <div
+        class="text-center text-sm py-4 border-t border-white/20 uppercase tracking-widest font-bold"
+      >
+        © 2026 Angau Play
+      </div>
+    </footer>
+
+<script src="js/economia.js"></script>
+</body>
+</html>
