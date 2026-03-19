@@ -1,21 +1,31 @@
 const { Router } = require("express");
-const newsController = require("../controllers/newsController");
 const router = Router();
+const newsController = require("../controllers/newsController");
 const categoryController = require("../controllers/categoryController");
 
-const { getAll, getBySlug, create, update } = newsController;
-const { listAll } = categoryController;
+// Middlewares
 const auth = require("../middlewares/authMiddleware");
 const upload = require("../middlewares/uploadMiddleware");
 
-// 'imagen' es el nombre del campo en el formulario HTML
-router.post("/admin/add", auth, upload.single("imagen"), newsController.create);
-// Rutas para los lectores (Públicas)
-router.get("/", getAll);
-router.get("/detalle/:slug", getBySlug);
+// --- RUTAS PÚBLICAS (Lectores) ---
+router.get("/", newsController.getAll);
+router.get("/detalle/:slug", newsController.getBySlug);
+router.get("/categorias", categoryController.listAll);
 
-// Rutas para el panel (Privadas - Admin)
-router.post("/add", create);
-router.put("/edit/:id", update);
+// --- RUTAS PRIVADAS (Panel Admin) ---
+// Usamos .post("/") o .post("/add") pero siempre con los middlewares
+router.post(
+  "/add",
+  auth, // 1. Verifica que sea Admin
+  upload.single("imagen"), // 2. Procesa la foto (Multer)
+  newsController.create, // 3. Guarda en DB y sube a Cloudinary
+);
 
-exports = module.exports = router;
+router.put(
+  "/edit/:id",
+  auth,
+  upload.single("imagen"), // Por si quiere cambiar la foto
+  newsController.update,
+);
+
+module.exports = router;
