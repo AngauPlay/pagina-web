@@ -8,6 +8,11 @@ const sequelize = new Sequelize(
   {
     host: process.env.DB_HOST,
     dialect: "mysql",
+    timezone: "-03:00",
+    dialectOptions: {
+      dateStrings: true, // <-- ESTO: Evita que Sequelize convierta fechas a objetos Date extraños
+      typeCast: true, // <-- ESTO: Mantiene el formato de cadena desde la DB
+    },
     logging: false, // Para que la consola no se llene de texto SQL
     define: {
       timestamps: false, // Porque tu SQL original no tiene createdAt/updatedAt

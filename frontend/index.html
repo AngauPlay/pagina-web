@@ -114,13 +114,23 @@
             class="text-yellow-neon border-l-4 border-yellow-neon pl-2"
             >PORTADA</a
           >
-          <a href="politica.html" class="hover:text-blue-200 transition-colors">Política</a>
-          <a href="tecnologia.html" class="hover:text-blue-200 transition-colors"
+          <a href="politica.html" class="hover:text-blue-200 transition-colors"
+            >Política</a
+          >
+          <a
+            href="tecnologia.html"
+            class="hover:text-blue-200 transition-colors"
             >Tecnología</a
           >
-          <a href="deportes.html" class="hover:text-blue-200 transition-colors">Deportes</a>
-          <a href="Economia.html" class="hover:text-blue-200 transition-colors">Economía</a>
-          <a href="cultura.html" class="hover:text-blue-200 transition-colors">Cultura</a>
+          <a href="deportes.html" class="hover:text-blue-200 transition-colors"
+            >Deportes</a
+          >
+          <a href="Economia.html" class="hover:text-blue-200 transition-colors"
+            >Economía</a
+          >
+          <a href="cultura.html" class="hover:text-blue-200 transition-colors"
+            >Cultura</a
+          >
         </nav>
       </div>
       <div
@@ -291,102 +301,14 @@
         >
           Últimas Noticias
         </h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <article
-            class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all border border-slate-100 group"
-          >
-            <div class="relative overflow-hidden">
-              <img
-                src="https://picsum.photos/seed/ai/600/400"
-                alt="IA"
-                class="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
-              />
-              <span
-                class="absolute top-4 left-4 bg-institutional text-white text-[10px] font-black px-2 py-1 rounded uppercase"
-                >Tecnología</span
-              >
-            </div>
-            <div class="p-6">
-              <h3
-                class="text-xl font-black leading-tight text-slate-800 group-hover:text-institutional transition-colors"
-              >
-                La IA alcanza la paridad con el cerebro humano
-              </h3>
-              <p class="text-slate-500 mt-3 text-sm line-clamp-2">
-                Nuevos procesadores cuánticos han permitido hitos históricos en
-                lógica aplicada.
-              </p>
-              <a
-                href="#"
-                class="inline-block mt-4 text-accent font-black text-xs tracking-widest hover:translate-x-2 transition-transform"
-                >LEER MÁS →</a
-              >
-            </div>
-          </article>
 
-          <article
-            class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all border border-slate-100 group"
-          >
-            <div class="relative overflow-hidden">
-              <img
-                src="https://picsum.photos/seed/space/600/400"
-                alt="Marte"
-                class="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
-              />
-              <span
-                class="absolute top-4 left-4 bg-accent text-white text-[10px] font-black px-2 py-1 rounded uppercase"
-                >Espacio</span
-              >
-            </div>
-            <div class="p-6">
-              <h3
-                class="text-xl font-black leading-tight text-slate-800 group-hover:text-accent transition-colors"
-              >
-                Primeros civiles listos para la Base Alpha
-              </h3>
-              <p class="text-slate-500 mt-3 text-sm line-clamp-2">
-                La Agencia Espacial confirma que los módulos habitables en Marte
-                están operativos.
-              </p>
-              <a
-                href="#"
-                class="inline-block mt-4 text-accent font-black text-xs tracking-widest hover:translate-x-2 transition-transform"
-                >LEER MÁS →</a
-              >
-            </div>
-          </article>
-
-          <article
-            class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all border border-slate-100 group"
-          >
-            <div class="relative overflow-hidden">
-              <img
-                src="https://picsum.photos/seed/eco/600/400"
-                alt="Eco"
-                class="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
-              />
-              <span
-                class="absolute top-4 left-4 bg-green-600 text-white text-[10px] font-black px-2 py-1 rounded uppercase"
-                >Ecología</span
-              >
-            </div>
-            <div class="p-6">
-              <h3
-                class="text-xl font-black leading-tight text-slate-800 group-hover:text-green-600 transition-colors"
-              >
-                Récord Mundial: 90% de energía limpia
-              </h3>
-              <p class="text-slate-500 mt-3 text-sm line-clamp-2">
-                Las nuevas baterías de sodio permiten un almacenamiento masivo
-                sin precedentes.
-              </p>
-              <a
-                href="#"
-                class="inline-block mt-4 text-accent font-black text-xs tracking-widest hover:translate-x-2 transition-transform"
-                >LEER MÁS →</a
-              >
-            </div>
-          </article>
+        <div
+          id="noticias-container"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+        >
+          <p class="text-slate-400 italic">
+            Cargando noticias desde Formosa...
+          </p>
         </div>
       </section>
     </main>
@@ -454,10 +376,11 @@
     <script>
       async function cargarNoticias() {
         const contenedor = document.getElementById("noticias-container");
+        if (!contenedor) return; // Seguridad
 
         try {
-          // Llamamos a la API que creamos en el backend
-          const respuesta = await fetch("/api/noticias");
+          // Usamos la URL completa para evitar errores de puerto
+          const respuesta = await fetch("http://localhost:3000/api/noticias");
           const noticias = await respuesta.json();
 
           if (noticias.length === 0) {
