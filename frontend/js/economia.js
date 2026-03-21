@@ -1,6 +1,8 @@
 const API_URL = "http://localhost:3000/api/noticias";
 
+// ===============================
 // MENU
+// ===============================
 const menuBtn = document.getElementById("menu-btn");
 const closeMenu = document.getElementById("close-menu");
 const mobileMenu = document.getElementById("mobile-menu");
@@ -16,53 +18,95 @@ closeMenu.onclick = () => {
   overlay.classList.add("hidden");
 };
 
+// ===============================
 // FECHA
+// ===============================
 const fecha = new Date();
 document.getElementById("current-date").innerText =
   fecha.toLocaleDateString("es-AR");
 
+// ===============================
+// CONFIG
+// ===============================
+const ID_ECONOMIA = 4; // 🔥 CAMBIAR SI TU DB USA OTRO ID
+
+// ===============================
 // CARGAR NOTICIAS
+// ===============================
 async function cargarNoticias() {
-  const res = await fetch(API_URL);
-  const data = await res.json();
+  try {
+    const res = await fetch(API_URL);
+    const data = await res.json();
 
-  const economia = data.filter(n => n.categoria === "economia");
+    console.log("TODAS:", data);
 
-  const destacada = economia.find(n => n.destacada);
-  const otras = economia.filter(n => !n.destacada);
+    // 🔥 FILTRAR POR CATEGORIA
+    const economia = data.filter(
+      (n) => n.categoria_id === ID_ECONOMIA
+    );
 
-  renderDestacada(destacada);
-  renderNoticias(otras);
+    console.log("ECONOMIA:", economia);
+
+    if (economia.length === 0) {
+      document.getElementById("noticias-container").innerHTML =
+        "<p class='text-red-500 font-bold'>No hay noticias de economía</p>";
+      return;
+    }
+
+    const destacada = economia[0]; // usamos la primera
+    const otras = economia.slice(1);
+
+    renderDestacada(destacada);
+    renderNoticias(otras);
+
+  } catch (error) {
+    console.error("Error:", error);
+
+    document.getElementById("noticias-container").innerHTML =
+      "<p class='text-red-500 font-bold'>Error al cargar noticias</p>";
+  }
 }
 
+// ===============================
 // DESTACADA
+// ===============================
 function renderDestacada(noticia) {
   const cont = document.getElementById("destacada");
-
   if (!noticia) return;
 
   cont.innerHTML = `
-    <img src="${noticia.imagen}" class="w-full h-[400px] object-cover hover:scale-105 transition duration-500">
+    <img src="${noticia.imagen_url}" 
+         class="w-full h-[400px] object-cover hover:scale-105 transition duration-500">
+
     <div class="p-6 bg-white">
       <h2 class="text-3xl font-bold">${noticia.titulo}</h2>
-      <p class="mt-2 text-gray-600">${noticia.descripcion}</p>
+      <p class="mt-2 text-gray-600">${noticia.copete || ""}</p>
     </div>
   `;
 }
 
+// ===============================
 // LISTADO
+// ===============================
 function renderNoticias(noticias) {
   const cont = document.getElementById("noticias-container");
 
   cont.innerHTML = noticias.map(n => `
     <div class="bg-white rounded-xl shadow hover:shadow-xl transition overflow-hidden">
-      <img src="${n.imagen}" class="w-full h-48 object-cover hover:scale-110 transition duration-500">
+
+      <img src="${n.imagen_url}" 
+           class="w-full h-48 object-cover hover:scale-110 transition duration-500">
+
       <div class="p-4">
         <h3 class="font-bold text-lg">${n.titulo}</h3>
-        <p class="text-sm text-gray-600">${n.descripcion}</p>
+        <p class="text-sm text-gray-600">${n.copete || ""}</p>
       </div>
+
     </div>
   `).join("");
 }
 
+// ===============================
+// INIT
+// ===============================
 cargarNoticias();

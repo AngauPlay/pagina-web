@@ -1,3 +1,5 @@
+const API_URL = "http://localhost:3000/api/noticias";
+
 // ===============================
 // MENU
 // ===============================
@@ -12,26 +14,32 @@ function toggleMenu() {
   document.body.classList.toggle("menu-open");
 }
 
-menuBtn.addEventListener("click", toggleMenu);
-closeMenu.addEventListener("click", toggleMenu);
-overlay.addEventListener("click", toggleMenu);
-
+menuBtn?.addEventListener("click", toggleMenu);
+closeMenu?.addEventListener("click", toggleMenu);
+overlay?.addEventListener("click", toggleMenu);
 
 // ===============================
 // FECHA
 // ===============================
 function updateDate() {
   const el = document.getElementById("current-date");
+  if (!el) return;
+
   const date = new Date().toLocaleDateString("es-ES", {
     weekday: "long",
     year: "numeric",
     month: "long",
     day: "numeric"
   });
+
   el.textContent = date.toUpperCase();
 }
 updateDate();
 
+// ===============================
+// CONFIG
+// ===============================
+const ID_DEPORTES = 3; // 🔥 CAMBIAR SI TU DB USA OTRO ID
 
 // ===============================
 // CARGAR NOTICIAS DEPORTES
@@ -43,16 +51,27 @@ async function cargarDeportes() {
 
   try {
 
-    const res = await fetch("/api/noticias?categoria=deportes");
+    const res = await fetch(API_URL);
     const data = await res.json();
 
-    if (!data || data.length === 0) {
+    console.log("TODAS:", data);
+
+    // 🔥 FILTRAR POR CATEGORIA
+    const noticias = data.filter(
+      (n) => n.categoria_id === ID_DEPORTES
+    );
+
+    console.log("DEPORTES:", noticias);
+
+    if (!noticias || noticias.length === 0) {
       contenedor.innerHTML = "<p>No hay noticias deportivas</p>";
       return;
     }
 
+    // ===============================
     // DESTACADA
-    const principal = data[0];
+    // ===============================
+    const principal = noticias[0];
 
     destacada.innerHTML = `
       <img src="${principal.imagen_url}" 
@@ -68,20 +87,17 @@ async function cargarDeportes() {
         </h2>
 
         <p class="mt-2 text-gray-200">
-          ${principal.copete}
+          ${principal.copete || ""}
         </p>
-
-        <a href="/noticia/${principal.slug}" 
-           class="inline-block mt-4 bg-green-500 px-5 py-2 rounded font-bold">
-          LEER NOTICIA
-        </a>
       </div>
     `;
 
+    // ===============================
     // LISTADO
+    // ===============================
     contenedor.innerHTML = "";
 
-    data.slice(1).forEach(n => {
+    noticias.slice(1).forEach(n => {
 
       contenedor.innerHTML += `
         <article class="bg-white rounded-xl overflow-hidden shadow group">
@@ -95,13 +111,8 @@ async function cargarDeportes() {
             <h3 class="font-bold text-lg">${n.titulo}</h3>
 
             <p class="text-sm text-gray-500 mt-2">
-              ${n.copete}
+              ${n.copete || ""}
             </p>
-
-            <a href="/noticia/${n.slug}" 
-               class="text-green-600 text-sm font-bold mt-3 inline-block">
-               LEER MÁS →
-            </a>
           </div>
 
         </article>
@@ -109,7 +120,7 @@ async function cargarDeportes() {
     });
 
   } catch (err) {
-    console.error(err);
+    console.error("Error:", err);
     contenedor.innerHTML = "<p>Error al cargar noticias</p>";
   }
 }

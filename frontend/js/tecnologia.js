@@ -1,5 +1,7 @@
+const API_URL = "http://localhost:3000/api/noticias";
+
 // ===============================
-// MENU HAMBURGUESA
+// MENU
 // ===============================
 
 const menuBtn = document.getElementById("menu-btn");
@@ -13,56 +15,66 @@ function toggleMenu() {
   document.body.classList.toggle("menu-open");
 }
 
-if (menuBtn) menuBtn.addEventListener("click", toggleMenu);
-if (closeMenu) closeMenu.addEventListener("click", toggleMenu);
-if (overlay) overlay.addEventListener("click", toggleMenu);
-
+menuBtn?.addEventListener("click", toggleMenu);
+closeMenu?.addEventListener("click", toggleMenu);
+overlay?.addEventListener("click", toggleMenu);
 
 // ===============================
-// FECHA ACTUAL
+// FECHA
 // ===============================
 
 function updateDate() {
-  const dateElement = document.getElementById("current-date");
+  const el = document.getElementById("current-date");
+  if (!el) return;
 
-  if (!dateElement) return;
-
-  const options = {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  };
-
-  let dateString = new Date().toLocaleDateString("es-ES", options);
-  dateElement.textContent = dateString.toUpperCase();
+  el.textContent = new Date()
+    .toLocaleDateString("es-ES", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    })
+    .toUpperCase();
 }
 
 updateDate();
 
+// ===============================
+// CONFIG
+// ===============================
+
+// 🔥 CAMBIÁ ESTE ID SEGÚN TU BD
+const ID_TECNOLOGIA = 2;
 
 // ===============================
-// CARGAR NOTICIAS TECNOLOGIA
+// CARGAR NOTICIAS
 // ===============================
 
 async function cargarTecnologia() {
-
   const contenedor = document.getElementById("noticias-container");
   const destacada = document.getElementById("destacada");
 
   try {
+    const res = await fetch(API_URL);
+    const data = await res.json();
 
-    const respuesta = await fetch("/api/noticias?categoria=tecnologia");
-    const noticias = await respuesta.json();
+    console.log("TODAS:", data);
 
-    if (!noticias || noticias.length === 0) {
+    // 🔥 FILTRAR POR categoria_id
+    const noticias = data.filter(
+      (n) => n.categoria_id === ID_TECNOLOGIA
+    );
+
+    console.log("TECNOLOGIA:", noticias);
+
+    if (noticias.length === 0) {
       contenedor.innerHTML =
-        "<p class='text-center col-span-3'>No hay noticias de tecnología todavía.</p>";
+        "<p class='text-center col-span-3'>No hay noticias de tecnología.</p>";
       return;
     }
 
     // ===============================
-    // NOTICIA PRINCIPAL
+    // DESTACADA
     // ===============================
 
     const principal = noticias[0];
@@ -70,11 +82,11 @@ async function cargarTecnologia() {
     destacada.innerHTML = `
       <img 
         src="${principal.imagen_url}" 
-        class="w-full h-[450px] object-cover opacity-70 hover:scale-105 transition duration-700"
+        class="w-full h-[450px] object-cover"
       />
 
       <div class="absolute bottom-0 left-0 p-8 w-full bg-gradient-to-t from-black via-black/70 to-transparent text-white">
-        <span class="bg-pink-accent text-white text-xs font-black px-4 py-1 rounded-full uppercase">
+        <span class="bg-pink-accent px-4 py-1 text-xs font-bold rounded-full uppercase">
           Tecnología
         </span>
 
@@ -82,48 +94,27 @@ async function cargarTecnologia() {
           ${principal.titulo}
         </h2>
 
-        <p class="mt-3 text-gray-200 max-w-2xl">
+        <p class="mt-3 text-gray-200">
           ${principal.copete || ""}
         </p>
-
-        <a href="/noticia/${principal.slug}" 
-           class="inline-block mt-4 text-yellow-300 font-bold">
-           Leer noticia →
-        </a>
       </div>
     `;
 
     // ===============================
-    // LISTADO DE NOTICIAS
+    // LISTADO
     // ===============================
 
     contenedor.innerHTML = "";
 
-    noticias.slice(1).forEach((noticia) => {
+    noticias.slice(1).forEach((n) => {
       contenedor.innerHTML += `
-        <article class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all border border-slate-100 group">
+        <article class="bg-white rounded-xl shadow hover:shadow-xl transition overflow-hidden">
 
-          <div class="relative overflow-hidden">
-            <img 
-              src="${noticia.imagen_url}" 
-              alt="${noticia.titulo}"
-              class="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
-            />
-          </div>
+          <img src="${n.imagen_url}" class="w-full h-48 object-cover">
 
-          <div class="p-6">
-            <h3 class="text-xl font-black leading-tight text-slate-800 group-hover:text-pink-accent transition-colors">
-              ${noticia.titulo}
-            </h3>
-
-            <p class="text-slate-500 mt-3 text-sm">
-              ${noticia.copete || ""}
-            </p>
-
-            <a href="/noticia/${noticia.slug}" 
-               class="inline-block mt-4 text-pink-accent font-black text-xs tracking-widest hover:translate-x-2 transition-transform">
-               LEER MÁS →
-            </a>
+          <div class="p-4">
+            <h3 class="font-bold text-lg">${n.titulo}</h3>
+            <p class="text-sm text-gray-600">${n.copete || ""}</p>
           </div>
 
         </article>
@@ -131,19 +122,15 @@ async function cargarTecnologia() {
     });
 
   } catch (error) {
-
-    console.error("Error cargando noticias:", error);
+    console.error("Error:", error);
 
     contenedor.innerHTML =
-      "<p class='text-red-500 text-center col-span-3'>Error al conectar con el servidor.</p>";
+      "<p class='text-red-500 text-center col-span-3'>Error al cargar noticias</p>";
   }
 }
 
-
 // ===============================
-// INICIAR
+// INIT
 // ===============================
 
-document.addEventListener("DOMContentLoaded", () => {
-  cargarTecnologia();
-});
+document.addEventListener("DOMContentLoaded", cargarTecnologia);
