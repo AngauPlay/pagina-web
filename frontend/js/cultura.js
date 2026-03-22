@@ -26,10 +26,10 @@ async function cargarNoticias() {
   const res = await fetch(API_URL);
   const data = await res.json();
 
-  const cultura = data.filter(n => n.categoria === "cultura");
+  const cultura = data.filter((n) => n.categoria === "cultura");
 
-  const destacada = cultura.find(n => n.destacada);
-  const otras = cultura.filter(n => !n.destacada);
+  const destacada = cultura.find((n) => n.destacada);
+  const otras = cultura.filter((n) => !n.destacada);
 
   renderDestacada(destacada);
   renderNoticias(otras);
@@ -54,7 +54,9 @@ function renderDestacada(noticia) {
 function renderNoticias(noticias) {
   const cont = document.getElementById("noticias-container");
 
-  cont.innerHTML = noticias.map(n => `
+  cont.innerHTML = noticias
+    .map(
+      (n) => `
     <div class="bg-white rounded-xl shadow hover:shadow-xl transition overflow-hidden">
       <img src="${n.imagen}" class="w-full h-48 object-cover hover:scale-110 transition duration-500">
       <div class="p-4">
@@ -62,7 +64,9 @@ function renderNoticias(noticias) {
         <p class="text-sm text-gray-600">${n.descripcion}</p>
       </div>
     </div>
-  `).join("");
+  `,
+    )
+    .join("");
 }
 
 cargarNoticias();

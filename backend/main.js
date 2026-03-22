@@ -6,6 +6,7 @@ const Parser = require("rss-parser");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const dotenv = require("dotenv");
+const morgan = require("morgan");
 dotenv.config({ path: join(__dirname, "../.env") });
 // IMPORTANTE: Importar el objeto sequelize directamente
 const sequelize = require("./config/db");
@@ -13,6 +14,7 @@ const sequelize = require("./config/db");
 // Importar Rutas
 const newsRoutes = require("./routes/newsRoutes");
 // const authRoutes = require('./routes/authRoutes');
+const authRoutes = require("./routes/authRoutes");
 const Noticia = require("./models/Noticia");
 const app = express();
 const parser = new Parser();
@@ -22,7 +24,7 @@ app.use(cors());
 app.use(json());
 app.use(urlencoded({ extended: true }));
 app.use(cookieParser());
-
+app.use(morgan("dev"));
 // 2. Servir Archivos Estáticos
 app.use(express.static(join(__dirname, "../frontend")));
 app.use(
@@ -31,11 +33,11 @@ app.use(
 );
 
 // 3. Definición de Rutas de la API
-app.get("/api/noticias", async (req, res) => {
+app.get("/noticias", async (req, res) => {
   try {
-    console.log("Intentando buscar noticias en la DB...");
-    const noticias = await Noticia.findAll();
-    console.log("Noticias encontradas:", noticias.length);
+    const noticias = await Noticia.findAll({
+      where: { estado: "publicado" },
+    });
     res.json(noticias);
   } catch (error) {
     console.error(error);
@@ -58,7 +60,8 @@ app.get("/api/noticias-externas", async (req, res) => {
     res.status(500).json({ error: "No se pudo obtener el feed" });
   }
 });
-
+app.use("/api", newsRoutes);
+app.use("/auth", authRoutes);
 // Ruta para generar el RSS de Angau
 app.get("/rss", async (req, res) => {
   const feed = new RSS({

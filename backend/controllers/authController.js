@@ -1,5 +1,5 @@
 const { Usuario, create } = require("../models/Usuario");
-const bcrypt = require("bcryptjs");
+const bcrypt = require("bcrypt");
 const { genSalt, hash } = bcrypt;
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
@@ -65,4 +65,4 @@ const authController = {
   },
 };
 
-exports = module.exports = authController;
+module.exports = authController;
