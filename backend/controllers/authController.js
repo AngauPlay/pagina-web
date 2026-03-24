@@ -17,15 +17,15 @@ const authController = {
       const token = jwt.sign(
         { id: usuario.id, rol: usuario.rol },
         process.env.JWT_SECRET,
-        { expiresIn: "1d" }, // 1 día de sesión
+        { expiresIn: "8h" }, // 8 horas de sesión
       );
 
       // Enviamos el token en una Cookie
       res.cookie("token_angau", token, {
         httpOnly: true, // No accesible por JS (Seguridad total)
-        secure: process.env.NODE_ENV === "production", // Solo HTTPS en DonWeb
+        secure: process.env.NODE_ENV === "production", // Solo HTTPS
         sameSite: "strict", // Previene ataques CSRF
-        maxAge: 24 * 60 * 60 * 1000, // 1 día en milisegundos
+        maxAge: 8 * 60 * 60 * 1000, // 8 horas en milisegundos
       });
 
       res.json({

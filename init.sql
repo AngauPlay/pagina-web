@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 21-03-2026 a las 17:49:58
+-- Tiempo de generación: 24-03-2026 a las 20:10:48
 -- Versión del servidor: 11.4.10-MariaDB-ubu2404
 -- Versión de PHP: 8.3.30
 
@@ -65,6 +65,15 @@ CREATE TABLE `noticias` (
   `estado` enum('borrador','publicado') NOT NULL DEFAULT 'borrador'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Volcado de datos para la tabla `noticias`
+--
+
+INSERT INTO `noticias` (`id`, `titulo`, `slug`, `copete`, `cuerpo`, `imagen_url`, `fecha_publicacion`, `categoria_id`, `autor`, `estado`) VALUES
+(1, 'Docker revoluciona el desarrollo local', 'docker-revoluciona-desarrollo', 'El uso de contenedores facilita la configuración de entornos PHP y MariaDB.', 'Configurar una base de datos ahora es tan simple como escribir un archivo YAML y ejecutar un comando. Esto elimina el clásico problema de \"en mi máquina funciona\".', 'https://picsum.photos/800/400?random=1', '2026-03-21 19:06:51', 3, 'Juan Pérez', 'publicado'),
+(2, 'Final apasionante en el torneo local', 'final-apasionante-torneo', 'El equipo visitante logró la victoria en el último minuto del encuentro.', 'Con un gol de media distancia, se cerró una jornada histórica para el deporte regional. La hinchada celebró hasta altas horas de la madrugada.', 'https://picsum.photos/800/400?random=2', '2026-03-21 19:06:51', 2, 'Ana Gomez', 'publicado'),
+(3, 'Nuevas tendencias en el mercado digital', 'tendencias-mercado-digital', 'La economía se transforma hacia modelos de suscripción y servicios en la nube.', 'Analistas aseguran que las empresas que no se adapten a la transformación digital perderán competitividad en los próximos dos años.', 'https://picsum.photos/800/400?random=3', '2026-03-21 19:06:51', 5, 'Carlos Slim', 'borrador');
+
 -- --------------------------------------------------------
 
 --
@@ -76,7 +85,7 @@ CREATE TABLE `usuarios` (
   `nombre` varchar(100) NOT NULL,
   `email` varchar(100) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `rol` varchar(100) NOT NULL
+  `rol` enum('administrador','editor') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -119,7 +128,7 @@ ALTER TABLE `categorias`
 -- AUTO_INCREMENT de la tabla `noticias`
 --
 ALTER TABLE `noticias`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`
