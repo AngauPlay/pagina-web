@@ -17,8 +17,21 @@ closeMenu.onclick = () => {
 };
 
 // FECHA
-document.getElementById("current-date").innerText =
-  new Date().toLocaleDateString("es-AR");
+function updateDate() {
+  const el = document.getElementById("current-date");
+  if (!el) return;
+
+  el.textContent = new Date()
+    .toLocaleDateString("es-ES", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    })
+    .toUpperCase();
+}
+
+updateDate();
 
 // CARGAR NOTICIAS
 async function cargarNoticias() {
