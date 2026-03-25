@@ -5,10 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ANGAU PLAY</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-    />
+
+    <!-- Font Awesome ACTUALIZADO -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+  />
+    
     <style>
       @keyframes marquee {
         0% {
@@ -92,21 +95,6 @@
         ></div>
       </div>
 
-<!-- LOGIN / LOGOUT -->
-        <div class="flex justify-end gap-2">
-
-          <a href="login.html" id="btn-login"
-            class="bg-pink-accent px-4 py-2 rounded-lg text-sm font-bold">
-            Iniciar sesión
-          </a>
-
-          <button id="btn-logout"
-            class="hidden bg-red-500 px-4 py-2 rounded-lg text-sm font-bold">
-            Cerrar sesión
-          </button>
-
-        </div>
-
       </div>
 
       <div
@@ -147,6 +135,9 @@
           >
           <a href="cultura.html" class="hover:text-blue-200 transition-colors"
             >Cultura</a
+          >
+          <a href="actualidad.html" class="hover:text-blue-200 transition-colors"
+            >Actualidad</a
           >
         </nav>
       </div>
@@ -330,36 +321,78 @@
       </section>
     </main>
 
-    <footer
-      class="bg-gradient-to-r from-[rgb(198,29,102)] via-[rgb(104,89,165)] to-[rgb(68,99,174)] text-white mt-16"
-    >
-      <div class="container mx-auto px-4 py-10 grid md:grid-cols-2 gap-10">
-        <div>
-          <h3 class="text-xl font-bold mb-4">Contacto</h3>
-          <ul class="space-y-2 text-white/80">
-            <li><i class="fas fa-envelope mr-2"></i> contacto@angauplay.com</li>
-            <li>
-              <i class="fas fa-map-marker-alt mr-2"></i> Formosa, Argentina
-            </li>
-          </ul>
-        </div>
-        <div>
-          <h3 class="text-xl font-bold mb-4">Seguinos</h3>
-          <div class="flex gap-4 text-2xl">
-            <i
-              class="fab fa-instagram hover:text-yellow-neon cursor-pointer"
-            ></i>
-            <i class="fab fa-youtube hover:text-yellow-neon cursor-pointer"></i>
-            <i class="fab fa-twitter hover:text-yellow-neon cursor-pointer"></i>
-          </div>
-        </div>
+  <footer class="bg-gradient-to-r from-[rgb(198,29,102)] via-[rgb(104,89,165)] to-[rgb(68,99,174)] text-white mt-16">
+
+  <div class="container mx-auto px-4 py-10 grid md:grid-cols-3 gap-10">
+    
+    <!-- CONTACTO -->
+    <div>
+      <h3 class="text-xl font-bold mb-4">Contacto</h3>
+      <ul class="space-y-2 text-white/80">
+        <li><i class="fas fa-envelope mr-2"></i> contacto@angauplay.com</li>
+        <li><i class="fas fa-map-marker-alt mr-2"></i> Formosa, Argentina</li>
+      </ul>
+    </div>
+
+    <!-- REDES -->
+    <div>
+      <h3 class="text-xl font-bold mb-4">Seguinos</h3>
+
+      <div class="flex gap-5 text-2xl">
+        <a href="https://instagram.com" target="_blank">
+          <i class="fab fa-instagram hover:text-yellow-neon hover:scale-125 transition"></i>
+        </a>
+
+        <a href="https://youtube.com" target="_blank">
+          <i class="fab fa-youtube hover:text-yellow-neon hover:scale-125 transition"></i>
+        </a>
+
+        <a href="https://x.com" target="_blank">
+          <i class="fa-brands fa-x-twitter hover:text-yellow-neon hover:scale-125 transition"></i>
+        </a>
+
+        <a href="https://facebook.com" target="_blank">
+          <i class="fab fa-facebook hover:text-yellow-neon hover:scale-125 transition"></i>
+        </a>
+
+        <a href="https://tiktok.com" target="_blank">
+          <i class="fab fa-tiktok hover:text-yellow-neon hover:scale-125 transition"></i>
+        </a>
+
+        <a href="https://twitch.tv" target="_blank">
+          <i class="fab fa-twitch hover:text-yellow-neon hover:scale-125 transition"></i>
+        </a>
+
+      
       </div>
-      <div
-        class="text-center text-sm py-4 border-t border-white/20 uppercase tracking-widest font-bold"
-      >
-        © 2026 Angau Play
+    </div>
+
+    <!-- CRÉDITOS + LOGO -->
+    <div class="text-center md:text-left">
+      <h3 class="text-xl font-bold mb-4">Desarrollado por</h3>
+
+      <p class="text-white/80 text-sm leading-relaxed">
+        Franco Mirna & Ocampo Emiliano <br>
+        <span class="text-yellow-neon font-semibold">
+          Egresados del Instituto Politécnico Formosa
+        </span>
+      </p>
+
+      <!-- LOGO -->
+      <div class="mt-4 flex justify-center md:justify-start">
+        <img src="/assets/logo-ipf.png" alt="Instituto Politécnico Formosa"
+          class="w-24 h-auto bg-white/10 p-2 rounded-xl shadow-lg hover:scale-105 transition">
       </div>
-    </footer>
+    </div>
+
+  </div>
+
+  <!-- COPYRIGHT -->
+  <div class="text-center text-sm py-4 border-t border-white/20 uppercase tracking-widest font-bold">
+    © 2026 Angau Play
+  </div>
+
+</footer>
 
     <script>
       const menuBtn = document.getElementById("menu-btn");
