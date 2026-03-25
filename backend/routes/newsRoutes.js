@@ -8,7 +8,7 @@ const auth = require("../middlewares/authMiddleware");
 const upload = require("../middlewares/uploadMiddleware");
 
 // --- RUTAS PÚBLICAS (Lectores) ---
-router.get("/api/", newsController.getAll);
+router.get("/", newsController.getAll);
 router.get("/detalle/:slug", newsController.getBySlug);
 router.get("/categorias", categoryController.listAll);
 
