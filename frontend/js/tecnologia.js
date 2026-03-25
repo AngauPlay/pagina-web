@@ -15,9 +15,9 @@ function toggleMenu() {
   document.body.classList.toggle("menu-open");
 }
 
-menuBtn?.addEventListener("click", toggleMenu);
-closeMenu?.addEventListener("click", toggleMenu);
-overlay?.addEventListener("click", toggleMenu);
+if (menuBtn) menuBtn.addEventListener("click", toggleMenu);
+if (closeMenu) closeMenu.addEventListener("click", toggleMenu);
+if (overlay) overlay.addEventListener("click", toggleMenu);
 
 // ===============================
 // FECHA
@@ -40,13 +40,6 @@ function updateDate() {
 updateDate();
 
 // ===============================
-// CONFIG
-// ===============================
-
-// 🔥 CAMBIÁ ESTE ID SEGÚN TU BD
-const ID_TECNOLOGIA = 2;
-
-// ===============================
 // CARGAR NOTICIAS
 // ===============================
 
@@ -55,17 +48,8 @@ async function cargarTecnologia() {
   const destacada = document.getElementById("destacada");
 
   try {
-    const res = await fetch(API_URL);
-    const data = await res.json();
-
-    console.log("TODAS:", data);
-
-    // 🔥 FILTRAR POR categoria_id
-    const noticias = data.filter(
-      (n) => n.categoria_id === ID_TECNOLOGIA
-    );
-
-    console.log("TECNOLOGIA:", noticias);
+    const respuesta = await fetch("/noticias/por-categoria/tecnologia");
+    const noticias = await respuesta.json();
 
     if (noticias.length === 0) {
       contenedor.innerHTML =
@@ -120,9 +104,8 @@ async function cargarTecnologia() {
         </article>
       `;
     });
-
   } catch (error) {
-    console.error("Error:", error);
+    console.error("Error cargando noticias:", error);
 
     contenedor.innerHTML =
       "<p class='text-red-500 text-center col-span-3'>Error al cargar noticias</p>";
@@ -133,4 +116,6 @@ async function cargarTecnologia() {
 // INIT
 // ===============================
 
-document.addEventListener("DOMContentLoaded", cargarTecnologia);
+document.addEventListener("DOMContentLoaded", () => {
+  cargarTecnologia();
+});
