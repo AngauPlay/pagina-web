@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:3000/api/noticias";
+const API_URL = "http://localhost:3000/noticias/por-categoria/deportes";
 
 // ===============================
 // MENU
