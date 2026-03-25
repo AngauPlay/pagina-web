@@ -43,8 +43,10 @@ async function cargarDeportes() {
   const contenedor = document.getElementById("noticias-container");
   const destacada = document.getElementById("destacada");
 
+  if (!contenedor || !destacada) return;
+
   try {
-    const res = await fetch("/noticias/por-categoria/deportes");
+    const res = await fetch(`${API_URL}/por-categoria/deportes`);
     const data = await res.json();
 
     if (!data || data.length === 0) {
@@ -55,7 +57,7 @@ async function cargarDeportes() {
     // ===============================
     // DESTACADA
     // ===============================
-    const principal = noticias[0];
+    const principal = data[0];
 
     destacada.innerHTML = `
       <img src="${principal.imagen_url}" 
@@ -73,6 +75,11 @@ async function cargarDeportes() {
         <p class="mt-2 text-gray-200">
           ${principal.copete || ""}
         </p>
+
+        <a href="/noticia/${principal.slug}" 
+           class="inline-block mt-4 text-yellow-400 font-bold text-sm">
+          LEER NOTICIA →
+        </a>
       </div>
     `;
 
@@ -96,11 +103,17 @@ async function cargarDeportes() {
             <p class="text-sm text-gray-500 mt-2">
               ${n.copete || ""}
             </p>
+
+            <a href="/noticia/${n.slug}" 
+               class="inline-block mt-3 text-pink-accent font-bold text-xs hover:underline">
+              LEER MÁS →
+            </a>
           </div>
 
         </article>
       `;
     });
+
   } catch (err) {
     console.error("Error:", err);
     contenedor.innerHTML = "<p>Error al cargar noticias</p>";
