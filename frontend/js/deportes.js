@@ -14,9 +14,9 @@ function toggleMenu() {
   document.body.classList.toggle("menu-open");
 }
 
-menuBtn?.addEventListener("click", toggleMenu);
-closeMenu?.addEventListener("click", toggleMenu);
-overlay?.addEventListener("click", toggleMenu);
+menuBtn.addEventListener("click", toggleMenu);
+closeMenu.addEventListener("click", toggleMenu);
+overlay.addEventListener("click", toggleMenu);
 
 // ===============================
 // FECHA
@@ -29,7 +29,7 @@ function updateDate() {
     weekday: "long",
     year: "numeric",
     month: "long",
-    day: "numeric"
+    day: "numeric",
   });
 
   el.textContent = date.toUpperCase();
@@ -37,33 +37,17 @@ function updateDate() {
 updateDate();
 
 // ===============================
-// CONFIG
-// ===============================
-const ID_DEPORTES = 3; // 🔥 CAMBIAR SI TU DB USA OTRO ID
-
-// ===============================
 // CARGAR NOTICIAS DEPORTES
 // ===============================
 async function cargarDeportes() {
-
   const contenedor = document.getElementById("noticias-container");
   const destacada = document.getElementById("destacada");
 
   try {
-
-    const res = await fetch(API_URL);
+    const res = await fetch("/noticias/por-categoria/deportes");
     const data = await res.json();
 
-    console.log("TODAS:", data);
-
-    // 🔥 FILTRAR POR CATEGORIA
-    const noticias = data.filter(
-      (n) => n.categoria_id === ID_DEPORTES
-    );
-
-    console.log("DEPORTES:", noticias);
-
-    if (!noticias || noticias.length === 0) {
+    if (!data || data.length === 0) {
       contenedor.innerHTML = "<p>No hay noticias deportivas</p>";
       return;
     }
@@ -97,8 +81,7 @@ async function cargarDeportes() {
     // ===============================
     contenedor.innerHTML = "";
 
-    noticias.slice(1).forEach(n => {
-
+    data.slice(1).forEach((n) => {
       contenedor.innerHTML += `
         <article class="bg-white rounded-xl overflow-hidden shadow group">
 
@@ -118,7 +101,6 @@ async function cargarDeportes() {
         </article>
       `;
     });
-
   } catch (err) {
     console.error("Error:", err);
     contenedor.innerHTML = "<p>Error al cargar noticias</p>";

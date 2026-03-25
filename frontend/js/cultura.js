@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:3000/api"; // 🔥 IMPORTANTE
+const API_URL = "http://localhost:3000/noticias/por-categoria/cultura";
 
 // ===============================
 // MENU MOBILE
@@ -60,40 +60,13 @@ async function cargarNoticias() {
 
     const data = await res.json();
 
-    console.log("TODAS LAS NOTICIAS:", data);
+  const cultura = data.filter((n) => n.categoria === "cultura");
 
-    // 🔥 FILTRAR CULTURA
-    const cultura = data.filter(
-      (n) =>
-        n.categoria_id == ID_CULTURA &&
-        n.estado === "publicado"
-    );
+  const destacada = cultura.find((n) => n.destacada);
+  const otras = cultura.filter((n) => !n.destacada);
 
-    console.log("CULTURA:", cultura);
-
-    const contenedor = document.getElementById("noticias-container");
-
-    if (!cultura.length) {
-      contenedor.innerHTML =
-        "<p class='text-red-500 font-bold'>No hay noticias de cultura</p>";
-      return;
-    }
-
-    // DESTACADA = PRIMERA
-    const destacada = cultura[0];
-
-    // RESTO
-    const otras = cultura.slice(1);
-
-    renderDestacada(destacada);
-    renderNoticias(otras);
-
-  } catch (error) {
-    console.error("Error cargando noticias:", error);
-
-    document.getElementById("noticias-container").innerHTML =
-      "<p class='text-red-500 font-bold'>Error al cargar noticias</p>";
-  }
+  renderDestacada(destacada);
+  renderNoticias(otras);
 }
 
 // ===============================
@@ -151,12 +124,9 @@ function renderNoticias(noticias) {
       </div>
 
     </div>
-  `
+  `,
     )
     .join("");
 }
 
-// ===============================
-// INIT
-// ===============================
-document.addEventListener("DOMContentLoaded", cargarNoticias);
+cargarNoticias();

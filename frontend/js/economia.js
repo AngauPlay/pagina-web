@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:3000/api/noticias";
+const API_URL = "http://localhost:3000/noticias/por-categoria/economia";
 
 // ===============================
 // MENU
@@ -50,27 +50,13 @@ async function cargarNoticias() {
     const res = await fetch(API_URL);
     const data = await res.json();
 
-    console.log("TODAS:", data);
+    const economia = data.filter((n) => n.categoria === "economia");
 
-    // 🔥 FILTRAR POR CATEGORIA
-    const economia = data.filter(
-      (n) => n.categoria_id === ID_ECONOMIA
-    );
-
-    console.log("ECONOMIA:", economia);
-
-    if (economia.length === 0) {
-      document.getElementById("noticias-container").innerHTML =
-        "<p class='text-red-500 font-bold'>No hay noticias de economía</p>";
-      return;
-    }
-
-    const destacada = economia[0]; // usamos la primera
-    const otras = economia.slice(1);
+    const destacada = economia.find((n) => n.destacada);
+    const otras = economia.filter((n) => !n.destacada);
 
     renderDestacada(destacada);
     renderNoticias(otras);
-
   } catch (error) {
     console.error("Error:", error);
 
@@ -103,7 +89,9 @@ function renderDestacada(noticia) {
 function renderNoticias(noticias) {
   const cont = document.getElementById("noticias-container");
 
-  cont.innerHTML = noticias.map(n => `
+  cont.innerHTML = noticias
+    .map(
+      (n) => `
     <div class="bg-white rounded-xl shadow hover:shadow-xl transition overflow-hidden">
 
       <img src="${n.imagen_url}" 
@@ -115,7 +103,9 @@ function renderNoticias(noticias) {
       </div>
 
     </div>
-  `).join("");
+  `,
+    )
+    .join("");
 }
 
 // ===============================
