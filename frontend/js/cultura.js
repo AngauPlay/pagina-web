@@ -1,64 +1,30 @@
 const API_URL = "http://localhost:3000/noticias/por-categoria/cultura";
 
-// ===============================
-// MENU MOBILE
-// ===============================
+// MENU
 const menuBtn = document.getElementById("menu-btn");
 const closeMenu = document.getElementById("close-menu");
 const mobileMenu = document.getElementById("mobile-menu");
 const overlay = document.getElementById("overlay");
 
-if (menuBtn) {
-  menuBtn.onclick = () => {
-    mobileMenu.classList.remove("-translate-x-full");
-    overlay.classList.remove("hidden");
-  };
-}
+menuBtn.onclick = () => {
+  mobileMenu.classList.remove("-translate-x-full");
+  overlay.classList.remove("hidden");
+};
 
-if (closeMenu) {
-  closeMenu.onclick = () => {
-    mobileMenu.classList.add("-translate-x-full");
-    overlay.classList.add("hidden");
-  };
-}
+closeMenu.onclick = () => {
+  mobileMenu.classList.add("-translate-x-full");
+  overlay.classList.add("hidden");
+};
 
-// ===============================
-// FECHA ACTUAL
-// ===============================
-function updateDate() {
-  const el = document.getElementById("current-date");
-  if (!el) return;
+// FECHA
+const fecha = new Date();
+document.getElementById("current-date").innerText =
+  fecha.toLocaleDateString("es-AR");
 
-  el.textContent = new Date()
-    .toLocaleDateString("es-ES", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    })
-    .toUpperCase();
-}
-
-updateDate();
-
-// ===============================
-// CONFIG
-// ===============================
-const ID_CULTURA = 4; // 🔥 Según tu SQL
-
-// ===============================
 // CARGAR NOTICIAS
-// ===============================
 async function cargarNoticias() {
-  try {
-    const res = await fetch(`${API_URL}/`);
-
-    // 🔥 VALIDACIÓN CLAVE (evita error JSON)
-    if (!res.ok) {
-      throw new Error("La API no respondió correctamente");
-    }
-
-    const data = await res.json();
+  const res = await fetch(API_URL);
+  const data = await res.json();
 
   const cultura = data.filter((n) => n.categoria === "cultura");
 
@@ -69,60 +35,34 @@ async function cargarNoticias() {
   renderNoticias(otras);
 }
 
-// ===============================
 // DESTACADA
-// ===============================
 function renderDestacada(noticia) {
   const cont = document.getElementById("destacada");
 
-  if (!noticia || !cont) return;
+  if (!noticia) return;
 
   cont.innerHTML = `
-    <div class="overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition duration-300">
-
-      <img src="${noticia.imagen_url}" 
-        class="w-full h-[400px] object-cover hover:scale-105 transition duration-500">
-
-      <div class="p-6 bg-white">
-        <h2 class="text-3xl font-bold text-gray-800">
-          ${noticia.titulo}
-        </h2>
-
-        <p class="mt-2 text-gray-600">
-          ${noticia.copete || ""}
-        </p>
-      </div>
-
+    <img src="${noticia.imagen}" class="w-full h-[400px] object-cover hover:scale-105 transition duration-500">
+    <div class="p-6 bg-white">
+      <h2 class="text-3xl font-bold">${noticia.titulo}</h2>
+      <p class="mt-2 text-gray-600">${noticia.descripcion}</p>
     </div>
   `;
 }
 
-// ===============================
 // LISTADO
-// ===============================
 function renderNoticias(noticias) {
   const cont = document.getElementById("noticias-container");
-
-  if (!cont) return;
 
   cont.innerHTML = noticias
     .map(
       (n) => `
     <div class="bg-white rounded-xl shadow hover:shadow-xl transition overflow-hidden">
-
-      <img src="${n.imagen_url}" 
-        class="w-full h-48 object-cover hover:scale-110 transition duration-500">
-
+      <img src="${n.imagen}" class="w-full h-48 object-cover hover:scale-110 transition duration-500">
       <div class="p-4">
-        <h3 class="font-bold text-lg text-gray-800">
-          ${n.titulo}
-        </h3>
-
-        <p class="text-sm text-gray-600">
-          ${n.copete || ""}
-        </p>
+        <h3 class="font-bold text-lg">${n.titulo}</h3>
+        <p class="text-sm text-gray-600">${n.descripcion}</p>
       </div>
-
     </div>
   `,
     )
