@@ -32,19 +32,6 @@ app.use(
   express.static(join(__dirname, "../frontend/assets/uploads")),
 );
 
-// 3. Definición de Rutas de la API
-app.get("/noticias", async (req, res) => {
-  try {
-    const noticias = await Noticia.findAll({
-      where: { estado: "publicado" },
-    });
-    res.json(noticias);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ "error en la base de datos": error.message });
-  }
-});
-
 // Ruta para noticias externas (Agenfor)
 app.get("/api/noticias-externas", async (req, res) => {
   try {
@@ -60,7 +47,7 @@ app.get("/api/noticias-externas", async (req, res) => {
     res.status(500).json({ error: "No se pudo obtener el feed" });
   }
 });
-app.use("/api", newsRoutes);
+app.use("/noticias", newsRoutes);
 app.use("/auth", authRoutes);
 // Ruta para generar el RSS de Angau
 app.get("/rss", async (req, res) => {
@@ -100,8 +87,13 @@ app.get("/rss", async (req, res) => {
 });
 
 // 4. EL FALLBACK SIEMPRE AL FINAL DE LAS RUTAS
+app.use("/noticias", (req, res) => {
+  res.status(404).json({ error: "Endpoint de API no encontrado" });
+});
+
 app.get(/.*/, (req, res) => {
-  res.sendFile(join(__dirname, "../frontend/index.html"));
+  // Si el usuario pide algo que no existe, mostramos tu nueva página de error
+  res.status(404).sendFile(join(__dirname, "../frontend/error.html"));
 });
 
 // 5. Sincronizar Base de Datos y Arrancar Servidor

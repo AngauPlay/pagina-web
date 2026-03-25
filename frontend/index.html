@@ -380,7 +380,7 @@
 
         try {
           // Usamos la URL completa para evitar errores de puerto
-          const respuesta = await fetch("http://localhost:3000/api/noticias");
+          const respuesta = await fetch("http://localhost:3000/noticias");
           const noticias = await respuesta.json();
 
           if (noticias.length === 0) {
@@ -408,9 +408,9 @@
                           <p class="text-slate-500 mt-3 text-sm line-clamp-2">
                               ${noticia.copete}
                           </p>
-                          <a href="/noticia/${noticia.slug}" class="inline-block mt-4 text-pink-accent font-black text-xs tracking-widest hover:translate-x-2 transition-transform">
-                              LEER MÁS →
-                          </a>
+                          <a href="articulo.html?slug=${noticia.slug}" class="inline-block mt-4 text-pink-accent font-black text-xs tracking-widest hover:translate-x-2 transition-transform">
+    LEER MÁS →
+</a>
                       </div>
                   </article>
               `;
