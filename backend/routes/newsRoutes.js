@@ -11,7 +11,7 @@ const upload = require("../middlewares/uploadMiddleware");
 router.get("/", newsController.getAll);
 router.get("/detalle/:slug", newsController.getBySlug);
 router.get("/categorias", categoryController.listAll);
-
+router.get("/por-categoria/:nombreCat", newsController.getByCategory);
 // --- RUTAS PRIVADAS (Panel Admin) ---
 // Usamos .post("/") o .post("/add") pero siempre con los middlewares
 router.post(

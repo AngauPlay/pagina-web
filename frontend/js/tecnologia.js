@@ -17,7 +17,6 @@ if (menuBtn) menuBtn.addEventListener("click", toggleMenu);
 if (closeMenu) closeMenu.addEventListener("click", toggleMenu);
 if (overlay) overlay.addEventListener("click", toggleMenu);
 
-
 // ===============================
 // FECHA ACTUAL
 // ===============================
@@ -40,19 +39,16 @@ function updateDate() {
 
 updateDate();
 
-
 // ===============================
 // CARGAR NOTICIAS TECNOLOGIA
 // ===============================
 
 async function cargarTecnologia() {
-
   const contenedor = document.getElementById("noticias-container");
   const destacada = document.getElementById("destacada");
 
   try {
-
-    const respuesta = await fetch("/api/noticias?categoria=tecnologia");
+    const respuesta = await fetch("/noticias/por-categoria/tecnologia");
     const noticias = await respuesta.json();
 
     if (!noticias || noticias.length === 0) {
@@ -129,16 +125,13 @@ async function cargarTecnologia() {
         </article>
       `;
     });
-
   } catch (error) {
-
     console.error("Error cargando noticias:", error);
 
     contenedor.innerHTML =
       "<p class='text-red-500 text-center col-span-3'>Error al conectar con el servidor.</p>";
   }
 }
-
 
 // ===============================
 // INICIAR

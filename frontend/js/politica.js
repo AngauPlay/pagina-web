@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:3000/api/noticias";
+const API_URL = "http://localhost:3000/noticias/por-categoria/politica";
 
 // MENU
 const menuBtn = document.getElementById("menu-btn");
@@ -29,7 +29,7 @@ async function cargarNoticias() {
     console.log("TODAS LAS NOTICIAS:", data);
 
     // 🔥 FILTRO FLEXIBLE (IMPORTANTE)
-    const politica = data.filter(n => {
+    const politica = data.filter((n) => {
       if (!n.categoria) return false;
 
       return n.categoria.toLowerCase().trim() === "politica";
@@ -43,8 +43,7 @@ async function cargarNoticias() {
       return;
     }
 
-    const destacada =
-      politica.find(n => n.destacada === true) || politica[0];
+    const destacada = politica.find((n) => n.destacada === true) || politica[0];
 
     const principales = politica.slice(0, 3);
     const otras = politica.slice(3);
@@ -52,7 +51,6 @@ async function cargarNoticias() {
     renderDestacada(destacada);
     renderPrincipales(principales);
     renderNoticias(otras);
-
   } catch (error) {
     console.error("Error cargando noticias:", error);
 
@@ -89,7 +87,10 @@ function renderPrincipales(noticias) {
     </article>
 
     <div class="flex flex-col gap-4">
-      ${noticias.slice(1).map(n => `
+      ${noticias
+        .slice(1)
+        .map(
+          (n) => `
         <div class="flex gap-3 bg-white p-3 rounded shadow">
           <img src="${n.imagen_url}" class="w-24 h-20 object-cover rounded">
           <div>
@@ -97,7 +98,9 @@ function renderPrincipales(noticias) {
             <p class="text-sm text-gray-500">${n.descripcion || ""}</p>
           </div>
         </div>
-      `).join("")}
+      `,
+        )
+        .join("")}
     </div>
   `;
 }
@@ -106,7 +109,9 @@ function renderPrincipales(noticias) {
 function renderNoticias(noticias) {
   const cont = document.getElementById("noticias-container");
 
-  cont.innerHTML = noticias.map(n => `
+  cont.innerHTML = noticias
+    .map(
+      (n) => `
     <div class="bg-white rounded-xl shadow hover:shadow-xl transition overflow-hidden">
       <img src="${n.imagen_url}" class="w-full h-48 object-cover">
       <div class="p-4">
@@ -114,7 +119,9 @@ function renderNoticias(noticias) {
         <p class="text-sm text-gray-600">${n.descripcion || ""}</p>
       </div>
     </div>
-  `).join("");
+  `,
+    )
+    .join("");
 }
 
 // INICIAR

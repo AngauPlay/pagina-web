@@ -16,7 +16,6 @@ menuBtn.addEventListener("click", toggleMenu);
 closeMenu.addEventListener("click", toggleMenu);
 overlay.addEventListener("click", toggleMenu);
 
-
 // ===============================
 // FECHA
 // ===============================
@@ -26,24 +25,21 @@ function updateDate() {
     weekday: "long",
     year: "numeric",
     month: "long",
-    day: "numeric"
+    day: "numeric",
   });
   el.textContent = date.toUpperCase();
 }
 updateDate();
 
-
 // ===============================
 // CARGAR NOTICIAS DEPORTES
 // ===============================
 async function cargarDeportes() {
-
   const contenedor = document.getElementById("noticias-container");
   const destacada = document.getElementById("destacada");
 
   try {
-
-    const res = await fetch("/api/noticias?categoria=deportes");
+    const res = await fetch("/noticias/por-categoria/deportes");
     const data = await res.json();
 
     if (!data || data.length === 0) {
@@ -81,8 +77,7 @@ async function cargarDeportes() {
     // LISTADO
     contenedor.innerHTML = "";
 
-    data.slice(1).forEach(n => {
-
+    data.slice(1).forEach((n) => {
       contenedor.innerHTML += `
         <article class="bg-white rounded-xl overflow-hidden shadow group">
 
@@ -107,7 +102,6 @@ async function cargarDeportes() {
         </article>
       `;
     });
-
   } catch (err) {
     console.error(err);
     contenedor.innerHTML = "<p>Error al cargar noticias</p>";

@@ -1,6 +1,11 @@
 const Noticia = require("../models/Noticia");
 const cloudinary = require("../config/cloudinary"); // Importamos tu config de Cloudinary
 const fs = require("fs-extra"); // Para limpiar archivos temporales
+const Categoria = require("../models/Categoria"); // Importamos el modelo de Categoría para los joins
+
+// Establecemos la relación entre Noticia y Categoria
+Noticia.belongsTo(Categoria, { foreignKey: "categoria_id" });
+Categoria.hasMany(Noticia, { foreignKey: "categoria_id" });
 
 const newsController = {
   // Listar todas las noticias publicadas
@@ -10,6 +15,7 @@ const newsController = {
       const noticias = await Noticia.findAll({
         where: { estado: "publicado" },
         order: [["fecha_publicacion", "DESC"]],
+        limit: 6,
       });
       res.json(noticias);
     } catch (error) {
@@ -18,7 +24,29 @@ const newsController = {
         .json({ mensaje: "Error al obtener noticias", error: error.message });
     }
   },
+  getByCategory: async (req, res) => {
+    try {
+      const { nombreCat } = req.params; // Ejemplo: "Cultura"
 
+      const noticias = await Noticia.findAll({
+        where: { estado: "publicado" },
+        include: [
+          {
+            model: Categoria,
+            where: {
+              // Esto hace que filtre por el nombre de la categoría en la otra tabla
+              nombre: nombreCat,
+            },
+          },
+        ],
+        order: [["fecha_publicacion", "DESC"]],
+      });
+
+      res.json(noticias);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
   // Detalle por Slug
   getBySlug: async (req, res) => {
     try {
