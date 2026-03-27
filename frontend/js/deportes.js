@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:3000/noticias/por-categoria/deportes";
+const API_URL = "http://localhost:3000/noticias";
 
 // ===============================
 // MENU
@@ -76,7 +76,8 @@ async function cargarDeportes() {
           ${principal.copete || ""}
         </p>
 
-        <a href="/noticia/${principal.slug}" 
+        <!-- LINK CORREGIDO -->
+        <a href="articulo.html?slug=${principal.slug}" 
            class="inline-block mt-4 text-yellow-400 font-bold text-sm">
           LEER NOTICIA →
         </a>
@@ -104,7 +105,8 @@ async function cargarDeportes() {
               ${n.copete || ""}
             </p>
 
-            <a href="/noticia/${n.slug}" 
+            <!-- LINK CORREGIDO -->
+            <a href="articulo.html?slug=${n.slug}" 
                class="inline-block mt-3 text-pink-accent font-bold text-xs hover:underline">
               LEER MÁS →
             </a>

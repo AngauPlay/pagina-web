@@ -12,11 +12,11 @@ async function verificarSesion() {
     });
 
     if (!res.ok) {
-      window.location.href = "/auth.html";
+      window.location.href = "/admin.html";
     }
 
   } catch (error) {
-    window.location.href = "/auth.html";
+    window.location.href = "/admin.html";
   }
 }
 
@@ -108,7 +108,7 @@ document.getElementById("logoutBtn").addEventListener("click", async () => {
     credentials: "include"
   });
 
-  window.location.href = "/auth.html";
+  window.location.href = "/login.html";
 });
 
 // ===============================

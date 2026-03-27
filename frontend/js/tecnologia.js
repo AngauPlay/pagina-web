@@ -48,7 +48,7 @@ async function cargarTecnologia() {
   const destacada = document.getElementById("destacada");
 
   try {
-    const respuesta = await fetch("/noticias/por-categoria/tecnologia");
+    const respuesta = await fetch(API_URL);
     const noticias = await respuesta.json();
 
     if (noticias.length === 0) {
@@ -81,6 +81,12 @@ async function cargarTecnologia() {
         <p class="mt-3 text-gray-200">
           ${principal.copete || ""}
         </p>
+
+        <!-- BOTÓN -->
+        <a href="articulo.html?slug=${principal.slug}" 
+           class="inline-block mt-4 text-yellow-300 font-bold text-sm">
+          LEER MÁS →
+        </a>
       </div>
     `;
 
@@ -99,11 +105,18 @@ async function cargarTecnologia() {
           <div class="p-4">
             <h3 class="font-bold text-lg">${n.titulo}</h3>
             <p class="text-sm text-gray-600">${n.copete || ""}</p>
+
+            <!-- BOTÓN CLAVE -->
+            <a href="articulo.html?slug=${n.slug}" 
+               class="inline-block mt-4 text-pink-accent font-black text-xs tracking-widest hover:translate-x-2 transition-transform">
+              LEER MÁS →
+            </a>
           </div>
 
         </article>
       `;
     });
+
   } catch (error) {
     console.error("Error cargando noticias:", error);
 

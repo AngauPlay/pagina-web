@@ -1,6 +1,8 @@
 const API_URL = "http://localhost:3000/noticias/por-categoria/politica";
 
+// ===============================
 // MENU
+// ===============================
 const menuBtn = document.getElementById("menu-btn");
 const closeMenu = document.getElementById("close-menu");
 const mobileMenu = document.getElementById("mobile-menu");
@@ -16,7 +18,9 @@ closeMenu.onclick = () => {
   overlay.classList.add("hidden");
 };
 
+// ===============================
 // FECHA
+// ===============================
 function updateDate() {
   const el = document.getElementById("current-date");
   if (!el) return;
@@ -30,10 +34,11 @@ function updateDate() {
     })
     .toUpperCase();
 }
-
 updateDate();
 
+// ===============================
 // CARGAR NOTICIAS
+// ===============================
 async function cargarNoticias() {
   try {
     const res = await fetch(API_URL);
@@ -41,14 +46,10 @@ async function cargarNoticias() {
 
     console.log("TODAS LAS NOTICIAS:", data);
 
-    // 🔥 FILTRO FLEXIBLE (IMPORTANTE)
     const politica = data.filter((n) => {
       if (!n.categoria) return false;
-
       return n.categoria.toLowerCase().trim() === "politica";
     });
-
-    console.log("NOTICIAS POLITICA:", politica);
 
     if (politica.length === 0) {
       document.getElementById("noticias-container").innerHTML =
@@ -57,13 +58,13 @@ async function cargarNoticias() {
     }
 
     const destacada = politica.find((n) => n.destacada === true) || politica[0];
-
     const principales = politica.slice(0, 3);
     const otras = politica.slice(3);
 
     renderDestacada(destacada);
     renderPrincipales(principales);
     renderNoticias(otras);
+
   } catch (error) {
     console.error("Error cargando noticias:", error);
 
@@ -72,7 +73,9 @@ async function cargarNoticias() {
   }
 }
 
+// ===============================
 // DESTACADA
+// ===============================
 function renderDestacada(noticia) {
   if (!noticia) return;
 
@@ -81,11 +84,19 @@ function renderDestacada(noticia) {
     <div class="p-6 bg-white">
       <h2 class="text-3xl font-bold">${noticia.titulo}</h2>
       <p>${noticia.descripcion || ""}</p>
+
+      <!-- BOTÓN LEER MÁS -->
+      <a href="articulo.html?slug=${noticia.slug}" 
+         class="inline-block mt-4 text-pink-accent font-black text-xs tracking-widest hover:translate-x-2 transition-transform">
+        LEER MÁS →
+      </a>
     </div>
   `;
 }
 
+// ===============================
 // PRINCIPALES
+// ===============================
 function renderPrincipales(noticias) {
   const cont = document.getElementById("noticias-principales");
 
@@ -96,6 +107,12 @@ function renderPrincipales(noticias) {
       <img src="${noticias[0].imagen_url}" class="w-full h-[300px] object-cover">
       <div class="absolute bottom-0 bg-black/60 p-4 text-white w-full">
         <h3 class="font-bold text-xl">${noticias[0].titulo}</h3>
+
+        <!-- BOTÓN -->
+        <a href="articulo.html?slug=${noticias[0].slug}" 
+           class="text-yellow-300 text-xs font-bold mt-2 inline-block">
+          LEER MÁS →
+        </a>
       </div>
     </article>
 
@@ -109,16 +126,24 @@ function renderPrincipales(noticias) {
           <div>
             <h4 class="font-bold">${n.titulo}</h4>
             <p class="text-sm text-gray-500">${n.descripcion || ""}</p>
+
+            <!-- BOTÓN -->
+            <a href="articulo.html?slug=${n.slug}" 
+               class="text-pink-accent text-xs font-bold mt-1 inline-block">
+              LEER MÁS →
+            </a>
           </div>
         </div>
-      `,
+      `
         )
         .join("")}
     </div>
   `;
 }
 
+// ===============================
 // LISTADO
+// ===============================
 function renderNoticias(noticias) {
   const cont = document.getElementById("noticias-container");
 
@@ -130,12 +155,20 @@ function renderNoticias(noticias) {
       <div class="p-4">
         <h3 class="font-bold text-lg">${n.titulo}</h3>
         <p class="text-sm text-gray-600">${n.descripcion || ""}</p>
+
+        <!-- BOTÓN CLAVE -->
+        <a href="articulo.html?slug=${n.slug}" 
+           class="inline-block mt-4 text-pink-accent font-black text-xs tracking-widest hover:translate-x-2 transition-transform">
+          LEER MÁS →
+        </a>
       </div>
     </div>
-  `,
+  `
     )
     .join("");
 }
 
+// ===============================
 // INICIAR
+// ===============================
 cargarNoticias();

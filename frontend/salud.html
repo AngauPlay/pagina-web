@@ -3,14 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Política | ANGAU PLAY</title>
+  <title>Salud | ANGAU PLAY</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
   />
-
   <style>
     body.menu-open { overflow: hidden; }
 
@@ -36,20 +35,22 @@
 <!-- HEADER -->
 <header class="bg-purple-main text-white p-4 sticky top-0 z-[100] shadow-xl">
   <div class="container mx-auto grid grid-cols-3 items-center">
-    <button id="menu-btn" class="text-2xl"><i class="fas fa-bars"></i></button>
+
+    <button id="menu-btn" class="text-2xl">
+      <i class="fas fa-bars"></i>
+    </button>
 
     <div class="text-center text-pink-accent font-black text-3xl">
       ANGAU <span class="text-green-light">PLAY</span>
     </div>
 
-    <div
-          id="current-date"
-          class="hidden md:block text-right text-xs font-mono text-white/70"
-        ></div>
-      </div>
+    <div id="current-date" class="hidden md:block text-right text-xs"></div>
 
+  </div>
 
+  <!-- MENU -->
   <div id="mobile-menu" class="fixed top-0 left-0 w-72 bg-blue-dark h-screen p-6 transform -translate-x-full transition z-[110]">
+
     <div class="flex justify-between mb-10">
       <span class="text-yellow-neon font-bold">MENÚ</span>
       <button id="close-menu"><i class="fas fa-times"></i></button>
@@ -57,38 +58,31 @@
 
     <nav class="flex flex-col gap-6 text-white font-bold">
       <a href="index.html">PORTADA</a>
-      <a href="politica.html" class="text-yellow-neon">Política</a>
+      <a href="politica.html">Política</a>
       <a href="tecnologia.html">Tecnología</a>
       <a href="deportes.html">Deportes</a>
-      <a href="economia.html">Economía</a>
+      <a href="Economia.html">Economía</a>
       <a href="cultura.html">Cultura</a>
       <a href="actualidad.html">Actualidad</a>
-      <a href="salud.html">Salud</a>
+      <a href="salud.html" class="text-yellow-neon">Salud</a>
     </nav>
+
   </div>
 
   <div id="overlay" class="fixed inset-0 bg-black/60 hidden"></div>
+
 </header>
 
 <!-- TITULO -->
 <section class="container mx-auto px-4 mt-8">
-  <h2 class="text-4xl font-black border-l-8 pl-4 border-red-500">
-    POLÍTICA
+  <h2 class="text-4xl font-black border-l-8 pl-4 border-green-500">
+    SALUD
   </h2>
 </section>
 
 <!-- DESTACADA -->
 <section class="container mx-auto px-4 mt-8">
-  <div id="destacada"></div>
-</section>
-
-<!-- NOTICIAS PRINCIPALES -->
-<section class="container mx-auto px-4 mt-10">
-  <h3 class="text-2xl font-black mb-6 border-b-4 border-red-500 inline-block">
-    Noticias de Política
-  </h3>
-
-  <div id="noticias-principales" class="grid lg:grid-cols-2 gap-8"></div>
+  <div id="destacada" class="relative rounded-2xl overflow-hidden shadow-2xl"></div>
 </section>
 
 <!-- PUBLICIDAD -->
@@ -100,10 +94,14 @@
 
 <!-- LISTADO -->
 <section class="container mx-auto px-4 py-10">
-  <h3 class="text-2xl font-black mb-6">Últimas en Política</h3>
+
+  <h3 class="text-2xl font-black mb-6">Últimas en Deportes</h3>
+
   <div id="noticias-container" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
 </section>
 
+<!-- FOOTER -->
 <footer class="bg-gradient-to-r from-[rgb(198,29,102)] via-[rgb(104,89,165)] to-[rgb(68,99,174)] text-white mt-16">
 
   <div class="container mx-auto px-4 py-10 grid md:grid-cols-3 gap-10">
@@ -176,7 +174,8 @@
   </div>
 
 </footer>
-    
-<script src="js/politica.js"></script>
+
+<script src="js/salud.js"></script>
+
 </body>
 </html>
