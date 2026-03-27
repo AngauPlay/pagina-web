@@ -90,24 +90,27 @@
 
 
         <!-- LOGO -->
-        <div
-          class="text-center text-pink-accent font-black tracking-tighter text-3xl"
-        >
-          ANGAU <span class="text-green-light">PLAY</span>
-        </div>
+        <div class="flex justify-center">
+  <img 
+    src="/assets/cmpleto logo@4x.png" 
+    alt="Angau Play" 
+    class="h-10 md:h-12 object-contain"
+  >
+</div>
         
 
         <div class="flex items-center justify-end gap-4">
 
   <!-- REDES -->
   <div class="flex gap-3 text-lg">
+    <a href="https://www.youtube.com/@AngauPlay" target="_blank">
+      <i class="fab fa-youtube hover:text-yellow-neon hover:scale-125 transition"></i>
+    </a>
     <a href="https://instagram.com" target="_blank">
       <i class="fab fa-instagram hover:text-yellow-neon hover:scale-125 transition"></i>
     </a>
 
-    <a href="https://youtube.com" target="_blank">
-      <i class="fab fa-youtube hover:text-yellow-neon hover:scale-125 transition"></i>
-    </a>
+    
 
     <a href="https://x.com" target="_blank">
       <i class="fa-brands fa-x-twitter hover:text-yellow-neon hover:scale-125 transition"></i>
@@ -126,8 +129,12 @@
     </a>
   </div>
 
-  <!-- FECHA -->
-  <div id="current-date" class="text-xs font-mono text-white/70"></div>
+<img 
+  src="/assets/matesito@4x.png" 
+  alt="Matesito" 
+  class="h-10 md:h-12 object-contain hover:scale-110 transition-transform"
+/>
+
 
 </div>
       </div>
@@ -255,38 +262,58 @@
             PROGRAMACIÓN EN VIVO
           </h2>
           <div class="space-y-4">
-            <div
-              class="p-4 bg-white/10 rounded-xl border-l-4 border-yellow-neon shadow-inner"
-            >
+            
               <span
                 class="text-[10px] font-black text-yellow-neon uppercase tracking-widest block mb-1"
                 >Al Aire</span
               >
-              <a href="">
-                <h3 class="font-bold text-white">ERE EREA // Live Show</h3>
-                <p class="text-xs text-white/70">Giane, Greis, Alex y José</p>
-              </a>
-            </div>
-            <div
-              class="p-4 border-b border-white/10 opacity-70 hover:opacity-100 transition-opacity"
-            >
-              <span class="text-[10px] font-bold text-yellow-neon uppercase"
-                >21:00 HS</span
-              >
-              <a href="">
-                <h3 class="font-bold text-white">EXPERTOS EN NADA</h3>
-              </a>
-            </div>
-            <div
-              class="p-4 border-b border-white/10 opacity-70 hover:opacity-100 transition-opacity"
-            >
-              <span class="text-[10px] font-bold text-yellow-neon uppercase"
-                >22:30 HS</span
-              >
-              <a href="">
-                <h3 class="font-bold text-white">MAL PERO BIEN</h3>
-              </a>
-            </div>
+              <!-- PROGRAMA 1 -->
+  <div class="flex items-center gap-4 p-4 bg-white/10 rounded-xl border-l-4 border-yellow-neon shadow-inner">
+    <img src="/assets/programa1.jpg" class="w-16 h-16 rounded-lg object-cover border-2 border-yellow-neon" alt="Programa 1">
+    
+    <div>
+      <span class="text-[10px] font-black text-yellow-neon uppercase block">EN VIVO</span>
+      <h3 class="font-bold text-white">ERE EREA // Live Show</h3>
+      <p class="text-xs text-white/70">Giane, Greis, Alex y José</p>
+    </div>
+  </div>
+
+  <!-- PROGRAMA 2 -->
+  <div class="flex items-center gap-4 p-4 bg-white/10 rounded-xl hover:bg-white/20 transition">
+    <img src="/assets/programa2.jpg" class="w-16 h-16 rounded-lg object-cover border-2 border-yellow-neon" alt="Programa 2">
+    
+    <div>
+      <span class="text-[10px] font-bold text-yellow-neon uppercase">21:00 HS</span>
+      <h3 class="font-bold text-white">EXPERTOS EN NADA</h3>
+    </div>
+  </div>
+
+  <!-- PROGRAMA 3 -->
+  <div class="flex items-center gap-4 p-4 bg-white/10 rounded-xl hover:bg-white/20 transition">
+    <img src="/assets/programa3.jpg" class="w-16 h-16 rounded-lg object-cover border-2 border-yellow-neon" alt="Programa 3">
+    
+    <div>
+      <span class="text-[10px] font-bold text-yellow-neon uppercase">22:30 HS</span>
+      <h3 class="font-bold text-white">MAL PERO BIEN</h3>
+    </div>
+  </div>
+
+  <!-- PROGRAMA 4 -->
+  <div class="flex items-center gap-4 p-4 bg-white/10 rounded-xl hover:bg-white/20 transition">
+    <img src="/assets/programa4.jpg" class="w-16 h-16 rounded-lg object-cover border-2 border-yellow-neon" alt="Programa 4">
+    
+    <div>
+      <span class="text-[10px] font-bold text-yellow-neon uppercase">23:00 HS</span>
+      <h3 class="font-bold text-white">NOCHE STREAM</h3>
+      <p class="text-xs text-white/70">María</p>
+    </div>
+  </div>
+
+</div>
+
+
+              
+            
           </div>
         </aside>
       </div>
@@ -363,79 +390,56 @@
     </main>
 
     <footer
-      class="bg-gradient-to-r from-[rgb(198,29,102)] via-[rgb(104,89,165)] to-[rgb(68,99,174)] text-white mt-16"
-    >
-      <div class="container mx-auto px-4 py-10 grid md:grid-cols-3 gap-10">
-        <div>
-          <h3 class="text-xl font-bold mb-4">Contacto</h3>
-          <ul class="space-y-2 text-white/80">
-            <li><i class="fas fa-envelope mr-2"></i> angauplay@gmail.com</li>
-            <li>
-              <i class="fas fa-map-marker-alt mr-2"></i> Formosa, Argentina
-            </li>
-          </ul>
-        </div>
+  class="bg-gradient-to-r from-[rgb(198,29,102)] via-[rgb(104,89,165)] to-[rgb(68,99,174)] text-white mt-16"
+>
+  <!-- LOGO -->
+  <div class="flex justify-center pt-8">
+    <img
+      src="/assets/logo blanco@4x.png"
+      alt="Angau Play"
+      class="h-14 object-contain hover:scale-110 transition-transform duration-300"
+    />
+  </div>
 
-        <div>
-          <h3 class="text-xl font-bold mb-4">Seguinos</h3>
-          <div class="flex flex-wrap gap-5 text-2xl">
-            <a href="https://instagram.com/angauplay" target="_blank">
-              <i
-                class="fab fa-instagram hover:text-yellow-neon hover:scale-125 transition"
-              ></i>
-            </a>
-            <a href="https://youtube.com/@angauplay" target="_blank">
-              <i
-                class="fab fa-youtube hover:text-yellow-neon hover:scale-125 transition"
-              ></i>
-            </a>
-            <a href="https://kick.com/angauplay" target="_blank" title="Kick">
-              <i
-                class="fa-solid fa-bolt-lightning hover:text-green-400 hover:scale-125 transition"
-              ></i>
-            </a>
-            <a href="https://facebook.com/angauplay" target="_blank">
-              <i
-                class="fab fa-facebook hover:text-yellow-neon hover:scale-125 transition"
-              ></i>
-            </a>
-            <a href="https://www.twitch.tv/angauplay" target="_blank">
-              <i
-                class="fab fa-twitch hover:text-yellow-neon hover:scale-125 transition"
-              ></i>
-            </a>
-          </div>
-        </div>
-
-<<<<<<< HEAD
+  <div class="container mx-auto px-4 py-10 grid md:grid-cols-2 gap-10">
     
+    <!-- CONTACTO -->
+    <div>
+      <h3 class="text-xl font-bold mb-4">Contacto</h3>
+      <ul class="space-y-2 text-white/80">
+        <li><i class="fas fa-envelope mr-2"></i> angauplay@gmail.com</li>
+        <li>
+          <i class="fas fa-map-marker-alt mr-2"></i> Formosa, Argentina
+        </li>
+      </ul>
     </div>
-=======
-        <div class="text-center md:text-left">
-          <h3 class="text-xl font-bold mb-4">Desarrollado por</h3>
-          <p class="text-white/80 text-sm leading-relaxed">
-            Franco Mirna & Ocampo Emiliano <br />
-            <span class="text-yellow-neon font-semibold">
-              Egresados del Instituto Politécnico Formosa
-            </span>
-          </p>
-          <div class="mt-4 flex justify-center md:justify-start">
-            <img
-              src="assets/logo-ipf.png"
-              alt="IPF"
-              class="w-24 h-auto bg-white/10 p-2 rounded-xl"
-            />
-          </div>
-        </div>
-      </div>
->>>>>>> d559680cb269d7167d53f0fa972dd7ecd2b7ae47
 
-      <div
-        class="text-center text-sm py-4 border-t border-white/20 uppercase tracking-widest font-bold"
-      >
-        © 2026 Angau Play
+    <!-- DESARROLLO -->
+    <div class="text-center md:text-left">
+      <h3 class="text-xl font-bold mb-4">Desarrollado por</h3>
+      <p class="text-white/80 text-sm leading-relaxed">
+        Franco Mirna & Ocampo Emiliano <br />
+        <span class="text-yellow-neon font-semibold">
+          Egresados del Instituto Politécnico Formosa
+        </span>
+      </p>
+      <div class="mt-4 flex justify-center md:justify-start">
+        <img
+          src="assets/logo-ipf.png"
+          alt="IPF"
+          class="w-24 h-auto bg-white/10 p-2 rounded-xl"
+        />
       </div>
-    </footer>
+    </div>
+
+  </div>
+
+  <div
+    class="text-center text-sm py-4 border-t border-white/20 uppercase tracking-widest font-bold"
+  >
+    © 2026 Angau Play
+  </div>
+</footer>
 
     <script>
       // LÓGICA DEL MENÚ
@@ -454,19 +458,7 @@
       closeMenu.addEventListener("click", toggleMenu);
       overlay.addEventListener("click", toggleMenu);
 
-      // FECHA ACTUALIZADA
-      function updateDate() {
-        const dateElement = document.getElementById("current-date");
-        const options = {
-          weekday: "long",
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        };
-        let dateString = new Date().toLocaleDateString("es-ES", options);
-        if (dateElement) dateElement.textContent = dateString.toUpperCase();
-      }
-      updateDate();
+      
 
       // CARGA DE NOTICIAS
       async function cargarNoticias() {
