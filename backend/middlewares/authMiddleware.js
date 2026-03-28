@@ -1,6 +1,6 @@
 const { verify } = require("jsonwebtoken");
 
-module.exports = (req, res, next) => {
+const verificarSessionJWT = (req, res, next) => {
   // Leemos la cookie llamada 'token_angau'
   const token = req.cookies.token_angau;
 
@@ -19,3 +19,4 @@ module.exports = (req, res, next) => {
     res.status(401).json({ mensaje: "Sesión expirada o inválida" });
   }
 };
+module.exports = verificarSessionJWT;

@@ -60,7 +60,17 @@ const authController = {
 
       res.status(201).json({ mensaje: "Usuario creado", id: nuevoUsuario.id });
     } catch (error) {
-      res.status(400).json({ error: "El email ya existe o datos inválidos", detalle: error.message });
+      res.status(400).json({
+        error: "El email ya existe o datos inválidos",
+        detalle: error.message,
+      });
+    }
+  },
+  session: (req, res) => {
+    if (req.usuario) {
+      res.json({ usuario: req.usuario });
+    } else {
+      res.status(401).json({ mensaje: "No autenticado" });
     }
   },
 };
