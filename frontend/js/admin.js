@@ -1,5 +1,5 @@
 const API_URL = "http://localhost:3000/api";
-const API_CATEGORIAS = "http://localhost:3000/api/categorias";
+const API_CATEGORIAS = "http://localhost:3000/noticias/categorias";
 const API_LOGOUT = "http://localhost:3000/auth/logout";
 
 // ===============================
@@ -8,15 +8,14 @@ const API_LOGOUT = "http://localhost:3000/auth/logout";
 async function verificarSesion() {
   try {
     const res = await fetch("http://localhost:3000/auth/me", {
-      credentials: "include"
+      credentials: "include",
     });
 
     if (!res.ok) {
-      window.location.href = "/admin.html";
+      window.location.href = "/login.html";
     }
-
   } catch (error) {
-    window.location.href = "/admin.html";
+    window.location.href = "/login.html";
   }
 }
 
@@ -35,13 +34,12 @@ async function cargarCategorias() {
 
     select.innerHTML = "<option value=''>Seleccionar categoría</option>";
 
-    categorias.forEach(cat => {
+    categorias.forEach((cat) => {
       const option = document.createElement("option");
       option.value = cat.id;
       option.textContent = cat.nombre;
       select.appendChild(option);
     });
-
   } catch (error) {
     console.error(error);
     select.innerHTML = "<option>Error al cargar categorías</option>";
@@ -64,40 +62,39 @@ document.getElementById("imagen").addEventListener("change", (e) => {
 // ===============================
 // 🚀 ENVIAR FORMULARIO
 // ===============================
-document.getElementById("form-noticia")
-.addEventListener("submit", async (e) => {
+document
+  .getElementById("form-noticia")
+  .addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-  e.preventDefault();
+    const form = e.target;
+    const mensaje = document.getElementById("mensaje");
 
-  const form = e.target;
-  const mensaje = document.getElementById("mensaje");
+    const formData = new FormData(form);
 
-  const formData = new FormData(form);
+    try {
+      const res = await fetch(`${API_URL}/add`, {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+      });
 
-  try {
-    const res = await fetch(`${API_URL}/add`, {
-      method: "POST",
-      body: formData,
-      credentials: "include"
-    });
+      const data = await res.json();
 
-    const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Error");
 
-    if (!res.ok) throw new Error(data.error || "Error");
+      mensaje.textContent = "✅ Noticia creada correctamente";
+      mensaje.className = "text-green-600";
 
-    mensaje.textContent = "✅ Noticia creada correctamente";
-    mensaje.className = "text-green-600";
+      form.reset();
+      document.getElementById("preview").classList.add("hidden");
+    } catch (error) {
+      console.error(error);
 
-    form.reset();
-    document.getElementById("preview").classList.add("hidden");
-
-  } catch (error) {
-    console.error(error);
-
-    mensaje.textContent = "❌ " + error.message;
-    mensaje.className = "text-red-600";
-  }
-});
+      mensaje.textContent = "❌ " + error.message;
+      mensaje.className = "text-red-600";
+    }
+  });
 
 // ===============================
 // 🚪 LOGOUT
@@ -105,7 +102,7 @@ document.getElementById("form-noticia")
 document.getElementById("logoutBtn").addEventListener("click", async () => {
   await fetch(API_LOGOUT, {
     method: "POST",
-    credentials: "include"
+    credentials: "include",
   });
 
   window.location.href = "/login.html";

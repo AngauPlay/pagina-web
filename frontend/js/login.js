@@ -30,31 +30,30 @@ form.addEventListener("submit", async (e) => {
     const res = await fetch(API_LOGIN, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
-      credentials: "include" // 🔥 para cookies JWT
+      credentials: "include", // 🔥 para cookies JWT
     });
 
     const result = await res.json();
 
     if (!res.ok) throw new Error(result.mensaje || "Error al iniciar sesión");
 
-    mensaje.textContent = "✅ Bienvenido!";
+    mensaje.textContent = " Bienvenido!";
     mensaje.className = "text-green-600";
 
     // Redirección según rol
     setTimeout(() => {
-      if (result.usuario.rol === "admin") {
-        window.location.href = "/admin.html";
+      if (result.usuario.rol === "admin" || result.usuario.rol === "editor") {
+        console.log(result.usuario.rol, "rol del usuario");
+        window.location.href = "admin.html";
       } else {
-        window.location.href = "/";
+        window.location.href = "index.html";
       }
     }, 1000);
-
   } catch (err) {
     mensaje.textContent = "❌ " + err.message;
     mensaje.className = "text-red-600";
   }
 });
-
