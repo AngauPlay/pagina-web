@@ -1,7 +1,7 @@
 const { DataTypes } = require("sequelize");
-const sequelize = require("../config/db"); // Importamos la conexión
+const sequelize = require("../config/db");
+const slugify = require("slugify"); // No olvides instalarlo: npm install slugify
 
-// ACÁ ESTÁ EL CAMBIO: Usamos sequelize.define
 const Noticia = sequelize.define(
   "Noticia",
   {
@@ -10,8 +10,14 @@ const Noticia = sequelize.define(
       primaryKey: true,
       autoIncrement: true,
     },
-    titulo: { type: DataTypes.STRING, allowNull: false },
-    slug: { type: DataTypes.STRING, unique: true },
+    titulo: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    slug: {
+      type: DataTypes.STRING,
+      unique: true,
+    },
     copete: { type: DataTypes.TEXT },
     cuerpo: { type: DataTypes.TEXT },
     imagen_url: { type: DataTypes.STRING },
@@ -26,6 +32,22 @@ const Noticia = sequelize.define(
   {
     tableName: "noticias",
     timestamps: false,
+    hooks: {
+      // Se ejecuta antes de validar los datos para INSERT o UPDATE
+      beforeValidate: (noticia) => {
+        if (noticia.titulo) {
+          // Creamos el slug base
+          const baseSlug = slugify(noticia.titulo, {
+            lower: true,
+            strict: true,
+            trim: true,
+          });
+
+          // Agregar un sufijo aleatorio para evitar colisiones de duplicados
+          noticia.slug = `${baseSlug}-${Math.floor(Math.random() * 1000)}`;
+        }
+      },
+    },
   },
 );
 

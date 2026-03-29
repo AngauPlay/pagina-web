@@ -1,98 +1,121 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <title>Panel Admin - ANGAU PLAY</title>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Panel Admin - ANGAU PLAY</title>
 
-  <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
 
-  <style>
-    :root {
-      --pink-accent: rgb(224, 35, 117);
-      --purple-main: rgb(104, 89, 165);
-      --blue-dark: rgb(68, 99, 174);
-      --yellow-neon: rgb(229, 235, 53);
-      --green-light: rgb(140, 199, 73);
-    }
+    <style>
+      :root {
+        --pink-accent: rgb(224, 35, 117);
+        --purple-main: rgb(104, 89, 165);
+        --blue-dark: rgb(68, 99, 174);
+        --yellow-neon: rgb(229, 235, 53);
+        --green-light: rgb(140, 199, 73);
+      }
 
-    .bg-main { background-color: var(--purple-main); }
-    .bg-accent { background-color: var(--pink-accent); }
-    .text-accent { color: var(--pink-accent); }
+      .bg-main {
+        background-color: var(--purple-main);
+      }
+      .bg-accent {
+        background-color: var(--pink-accent);
+      }
+      .text-accent {
+        color: var(--pink-accent);
+      }
 
-    .card {
-      border: 3px solid var(--purple-main);
-      box-shadow: 0 10px 30px rgba(104, 89, 165, 0.2);
-      transition: 0.3s;
-    }
+      .card {
+        border: 3px solid var(--purple-main);
+        box-shadow: 0 10px 30px rgba(104, 89, 165, 0.2);
+        transition: 0.3s;
+      }
 
-    .card:hover {
-      box-shadow: 0 20px 50px rgba(104, 89, 165, 0.3);
-    }
-  </style>
-</head>
+      .card:hover {
+        box-shadow: 0 20px 50px rgba(104, 89, 165, 0.3);
+      }
+    </style>
+  </head>
 
-<body class="bg-gray-100">
+  <body class="bg-gray-100">
+    <header
+      class="bg-main text-white text-center p-4 text-2xl font-black flex justify-between items-center px-6"
+    >
+      PANEL ADMIN - ANGAU PLAY
 
-<header class="bg-main text-white text-center p-4 text-2xl font-black flex justify-between items-center px-6">
-  PANEL ADMIN - ANGAU PLAY
+      <button
+        id="logoutBtn"
+        class="bg-red-500 px-4 py-2 rounded-lg text-sm font-bold"
+      >
+        Cerrar sesión
+      </button>
+    </header>
 
-  <button id="logoutBtn" class="bg-red-500 px-4 py-2 rounded-lg text-sm font-bold">
-    Cerrar sesión
-  </button>
-</header>
+    <div class="max-w-3xl mx-auto mt-10 bg-white p-8 rounded-2xl card">
+      <h2 class="text-2xl font-black mb-6 text-accent">Crear Nueva Noticia</h2>
 
-<div class="max-w-3xl mx-auto mt-10 bg-white p-8 rounded-2xl card">
+      <form id="form-noticia" class="space-y-4">
+        <input
+          name="titulo"
+          placeholder="Título"
+          class="w-full border p-3 rounded-lg"
+          required
+        />
 
-  <h2 class="text-2xl font-black mb-6 text-accent">
-    Crear Nueva Noticia
-  </h2>
+        <textarea
+          name="copete"
+          placeholder="Copete"
+          class="w-full border p-3 rounded-lg"
+        ></textarea>
 
-  <form id="form-noticia" class="space-y-4">
+        <textarea
+          name="cuerpo"
+          placeholder="Contenido completo"
+          class="w-full border p-3 rounded-lg h-32"
+        ></textarea>
 
-    <input name="titulo" placeholder="Título"
-      class="w-full border p-3 rounded-lg" required />
+        <input
+          name="autor"
+          placeholder="Autor"
+          class="w-full border p-3 rounded-lg"
+          required
+        />
 
-    <input name="slug" placeholder="slug (ej: mi-noticia)"
-      class="w-full border p-3 rounded-lg" required />
+        <!-- 🔥 CATEGORIAS -->
+        <select
+          name="categoria_id"
+          id="categorias"
+          class="w-full border p-3 rounded-lg"
+          required
+        >
+          <option value="">Cargando categorías...</option>
+        </select>
 
-    <textarea name="copete" placeholder="Copete"
-      class="w-full border p-3 rounded-lg"></textarea>
+        <select name="estado" class="w-full border p-3 rounded-lg">
+          <option value="borrador">Borrador</option>
+          <option value="publicado">Publicado</option>
+        </select>
 
-    <textarea name="cuerpo" placeholder="Contenido completo"
-      class="w-full border p-3 rounded-lg h-32"></textarea>
+        <!-- IMAGEN -->
+        <input
+          type="file"
+          id="imagen"
+          name="imagen"
+          accept="image/*"
+          class="w-full border p-3 rounded-lg"
+        />
 
-    <input name="autor" placeholder="Autor"
-      class="w-full border p-3 rounded-lg" required />
+        <!-- PREVIEW -->
+        <img id="preview" class="hidden w-full h-48 object-cover rounded-lg" />
 
-    <!-- 🔥 CATEGORIAS -->
-    <select name="categoria_id" id="categorias"
-      class="w-full border p-3 rounded-lg" required>
-      <option value="">Cargando categorías...</option>
-    </select>
+        <button class="w-full bg-accent text-white py-3 rounded-xl font-bold">
+          PUBLICAR 🚀
+        </button>
+      </form>
 
-    <select name="estado" class="w-full border p-3 rounded-lg">
-      <option value="borrador">Borrador</option>
-      <option value="publicado">Publicado</option>
-    </select>
+      <p id="mensaje" class="text-center mt-4 font-bold"></p>
+    </div>
 
-    <!-- IMAGEN -->
-    <input type="file" id="imagen" name="imagen" accept="image/*"
-      class="w-full border p-3 rounded-lg" />
-
-    <!-- PREVIEW -->
-    <img id="preview" class="hidden w-full h-48 object-cover rounded-lg"/>
-
-    <button class="w-full bg-accent text-white py-3 rounded-xl font-bold">
-      PUBLICAR 🚀
-    </button>
-
-  </form>
-
-  <p id="mensaje" class="text-center mt-4 font-bold"></p>
-
-</div>
-
-<script src="js/admin.js"></script>
-
-</body>
+    <script src="js/admin.js"></script>
+  </body>
 </html>

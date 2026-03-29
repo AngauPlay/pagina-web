@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:3000/api";
+const API_URL = "http://localhost:3000/noticias";
 const API_CATEGORIAS = "http://localhost:3000/noticias/categorias";
 const API_LOGOUT = "http://localhost:3000/auth/logout";
 
