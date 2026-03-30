@@ -3,10 +3,6 @@ const cloudinary = require("../config/cloudinary"); // Importamos tu config de C
 const fs = require("fs-extra"); // Para limpiar archivos temporales
 const Categoria = require("../models/Categoria"); // Importamos el modelo de Categoría para los joins
 
-// Establecemos la relación entre Noticia y Categoria
-Noticia.belongsTo(Categoria, { foreignKey: "categoria_id" });
-Categoria.hasMany(Noticia, { foreignKey: "categoria_id" });
-
 const newsController = {
   // Listar todas las noticias publicadas
   getAll: async (req, res) => {

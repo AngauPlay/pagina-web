@@ -1,7 +1,7 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/db");
 const slugify = require("slugify"); // No olvides instalarlo: npm install slugify
-
+const Categoria = require("./Categoria"); // Importamos el modelo de Categoría para las relaciones
 const Noticia = sequelize.define(
   "Noticia",
   {
@@ -51,4 +51,7 @@ const Noticia = sequelize.define(
   },
 );
 
+// Establecemos la relación entre Noticia y Categoria
+Noticia.belongsTo(Categoria, { foreignKey: "categoria_id" });
+Categoria.hasMany(Noticia, { foreignKey: "categoria_id" });
 module.exports = Noticia;
