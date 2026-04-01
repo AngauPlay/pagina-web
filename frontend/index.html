@@ -102,37 +102,51 @@
         <div class="flex items-center justify-end gap-4">
 
   <!-- REDES -->
-  <div class="flex gap-3 text-lg">
-    <a href="https://www.youtube.com/@AngauPlay" target="_blank">
-      <i class="fab fa-youtube hover:text-yellow-neon hover:scale-125 transition"></i>
-    </a>
-    <a href="https://instagram.com" target="_blank">
-      <i class="fab fa-instagram hover:text-yellow-neon hover:scale-125 transition"></i>
-    </a>
+  <div class="flex gap-3 items-center">
+  
+  <a href="https://www.youtube.com/@AngauPlay" target="_blank">
+    <img src="/assets/logo-youtube.png" 
+         class="w-6 h-6 hover:scale-125 transition duration-300" 
+         alt="YouTube">
+  </a>
 
-    
+  <a href="https://www.facebook.com/angauplay" target="_blank">
+    <img src="/assets/logo-facebook.png" 
+         class="w-6 h-6 hover:scale-125 transition duration-300" 
+         alt="Facebook">
+  </a>
 
-    <a href="https://x.com" target="_blank">
-      <i class="fa-brands fa-x-twitter hover:text-yellow-neon hover:scale-125 transition"></i>
-    </a>
+  <a href="https://kick.com/angauplay" target="_blank">
+    <img src="/assets/logo-kick.png" 
+         class="w-6 h-6 hover:scale-125 transition duration-300" 
+         alt="Kick">
+  </a>
 
-    <a href="https://facebook.com" target="_blank">
-      <i class="fab fa-facebook hover:text-yellow-neon hover:scale-125 transition"></i>
-    </a>
+  <a href="https://www.twitch.tv/angauplay" target="_blank">
+    <img src="/assets/logo-twitch.png" 
+         class="w-6 h-6 hover:scale-125 transition duration-300" 
+         alt="Twitch">
+  </a>
 
-    <a href="https://tiktok.com" target="_blank">
-      <i class="fab fa-tiktok hover:text-yellow-neon hover:scale-125 transition"></i>
-    </a>
+<a href="https://www.tiktok.com/@angauplay" target="_blank">
+    <img src="/assets/logo-tik-tok.png" 
+         class="w-6 h-6 hover:scale-125 transition duration-300" 
+         alt="TikTok">
+  </a>
 
-    <a href="https://twitch.tv" target="_blank">
-      <i class="fab fa-twitch hover:text-yellow-neon hover:scale-125 transition"></i>
-    </a>
-  </div>
+  <a href="https://www.instagram.com/angauplay.ok/" target="_blank">
+    <img src="/assets/logo-instagram.png" 
+         class="w-6 h-6 hover:scale-125 transition duration-300" 
+         alt="Instagram">
+  </a>
+
+
+</div>
+
 
 <img 
   src="/assets/matesito@4x.png" 
-  alt="Matesito" 
-  class="h-10 md:h-12 object-contain hover:scale-110 transition-transform"
+  class="h-10 md:h-12 object-contain hover:scale-110 transition-transform ml-6"
 />
 
 
@@ -261,55 +275,10 @@
             ></span>
             PROGRAMACIÓN EN VIVO
           </h2>
-          <div class="space-y-4">
+          <div id="programacion-container" class="space-y-4"></div>
             
-              <span
-                class="text-[10px] font-black text-yellow-neon uppercase tracking-widest block mb-1"
-                >Al Aire</span
-              >
-              <!-- PROGRAMA 1 -->
-  <div class="flex items-center gap-4 p-4 bg-white/10 rounded-xl border-l-4 border-yellow-neon shadow-inner">
-    <img src="/assets/programa1.jpg" class="w-16 h-16 rounded-lg object-cover border-2 border-yellow-neon" alt="Programa 1">
-    
-    <div>
-      <span class="text-[10px] font-black text-yellow-neon uppercase block">EN VIVO</span>
-      <h3 class="font-bold text-white">ERE EREA // Live Show</h3>
-      <p class="text-xs text-white/70">Giane, Greis, Alex y José</p>
-    </div>
-  </div>
-
-  <!-- PROGRAMA 2 -->
-  <div class="flex items-center gap-4 p-4 bg-white/10 rounded-xl hover:bg-white/20 transition">
-    <img src="/assets/programa2.jpg" class="w-16 h-16 rounded-lg object-cover border-2 border-yellow-neon" alt="Programa 2">
-    
-    <div>
-      <span class="text-[10px] font-bold text-yellow-neon uppercase">21:00 HS</span>
-      <h3 class="font-bold text-white">EXPERTOS EN NADA</h3>
-    </div>
-  </div>
-
-  <!-- PROGRAMA 3 -->
-  <div class="flex items-center gap-4 p-4 bg-white/10 rounded-xl hover:bg-white/20 transition">
-    <img src="/assets/programa3.jpg" class="w-16 h-16 rounded-lg object-cover border-2 border-yellow-neon" alt="Programa 3">
-    
-    <div>
-      <span class="text-[10px] font-bold text-yellow-neon uppercase">22:30 HS</span>
-      <h3 class="font-bold text-white">MAL PERO BIEN</h3>
-    </div>
-  </div>
-
-  <!-- PROGRAMA 4 -->
-  <div class="flex items-center gap-4 p-4 bg-white/10 rounded-xl hover:bg-white/20 transition">
-    <img src="/assets/programa4.jpg" class="w-16 h-16 rounded-lg object-cover border-2 border-yellow-neon" alt="Programa 4">
-    
-    <div>
-      <span class="text-[10px] font-bold text-yellow-neon uppercase">23:00 HS</span>
-      <h3 class="font-bold text-white">NOCHE STREAM</h3>
-      <p class="text-xs text-white/70">María</p>
-    </div>
-  </div>
-
-</div>
+              
+              
 
 
               
@@ -389,6 +358,132 @@
       </section>
     </main>
 
+<script>
+      
+
+      // ===== PROGRAMACIÓN =====
+      function obtenerProgramacion() {
+        return {
+          1: [
+            { inicio: "11:00", fin: "12:30", nombre: "ERE EREA" },
+            { inicio: "17:00", fin: "18:30", nombre: "PERROS AL AIRE" },
+            { inicio: "20:00", fin: "21:30", nombre: "PURA GAMBETEADA" },
+          ],
+          2: [
+            { inicio: "11:00", fin: "12:30", nombre: "ERE EREA" },
+          ],
+          3: [
+            { inicio: "11:00", fin: "12:30", nombre: "ERE EREA" },
+            { inicio: "18:00", fin: "19:30", nombre: "REY DEL STREAMING" },
+            { inicio: "20:00", fin: "21:30", nombre: "LA FARRA" },
+            { inicio: "22:00", fin: "23:30", nombre: "ENREDADOS" },
+          ],
+          4: [
+            { inicio: "09:00", fin: "10:30", nombre: "VOCES PRODUCTIVAS" },
+            { inicio: "11:00", fin: "12:30", nombre: "ERE EREA" },
+            { inicio: "14:00", fin: "15:30", nombre: "4 FANTASTICOACH" },
+            { inicio: "16:30", fin: "18:00", nombre: "ESTO SOMOS" },
+            { inicio: "20:00", fin: "21:30", nombre: "ÑANDE FOLCK" },
+            { inicio: "22:00", fin: "23:30", nombre: "MAGESTUOSO" },
+          ],
+          5: [
+            { inicio: "11:00", fin: "12:30", nombre: "ERE EREA" },
+            { inicio: "18:00", fin: "19:30", nombre: "INTELIGENCIA ANIMAL" },
+            { inicio: "20:00", fin: "21:30", nombre: "NOTI ANGAU" },
+            { inicio: "22:00", fin: "23:30", nombre: "PURA GAMBETA" },
+          ],
+          6: [
+            { inicio: "09:00", fin: "10:30", nombre: "DE LO NUESTRO" },
+            { inicio: "11:00", fin: "12:30", nombre: "DESCONTRUIDOS: LA HORA DE LOS PROFES" },
+            { inicio: "13:00", fin: "14:30", nombre: "EXPERTOS EN NADA" },
+            { inicio: "15:00", fin: "16:30", nombre: "DEPORTES SIN FILTROS" },
+            { inicio: "20:00", fin: "21:30", nombre: "UN SÁBADO EPICO" },
+            { inicio: "22:00", fin: "23:30", nombre: "DICASTERIO" },
+          ],
+        };
+      }
+
+      function estaEnVivo(inicio, fin) {
+        const ahora = new Date();
+        const actual = ahora.getHours() * 60 + ahora.getMinutes();
+
+        const [hi, mi] = inicio.split(":").map(Number);
+        const [hf, mf] = fin.split(":").map(Number);
+
+        const ini = hi * 60 + mi;
+        const finM = hf * 60 + mf;
+
+        return actual >= ini && actual <= finM;
+      }
+
+      function renderProgramacion() {
+        const contenedor = document.getElementById("programacion-container");
+        const hoy = new Date().getDay();
+
+        const data = obtenerProgramacion()[hoy];
+
+        if (!data) {
+          contenedor.innerHTML = "<p>No hay programación hoy</p>";
+          return;
+        }
+
+        contenedor.innerHTML = data.map(p => {
+          const vivo = estaEnVivo(p.inicio, p.fin);
+
+          return `
+            <div class="relative rounded-xl overflow-hidden group cursor-pointer">
+
+    <div class="w-full aspect-[2/1] overflow-hidden">
+      <img 
+        src="/assets/programa2-banner.jpg" 
+        class="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+      />
+    </div>
+
+    <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
+
+    <div class="absolute bottom-3 left-3 text-white">
+      <span class="text-[10px] font-bold ${
+        vivo ? "text-yellow-neon" : "text-white/80"
+      } uppercase">
+        ${vivo ? "EN VIVO" : `${p.inicio} - ${p.fin}`}
+      </span>
+      <h3 class="font-bold text-sm">${p.nombre}</h3>
+    </div>
+
+  </div>
+          `;
+        }).join("");
+      }
+
+      // ===== NOTICIAS =====
+      async function cargarNoticias() {
+        const contenedor = document.getElementById("noticias-container");
+
+        try {
+          const res = await fetch("http://localhost:3000/noticias");
+          const noticias = await res.json();
+
+          contenedor.innerHTML = noticias.map(n => `
+            <div class="bg-white p-4 rounded shadow mb-4">
+              <h3 class="font-bold">${n.titulo}</h3>
+              <p>${n.copete}</p>
+            </div>
+          `).join("");
+
+        } catch {
+          contenedor.innerHTML = "<p>Error cargando noticias</p>";
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        renderProgramacion();
+        cargarNoticias();
+      });
+    </script>
+
+
+
     <footer
   class="bg-gradient-to-r from-[rgb(198,29,102)] via-[rgb(104,89,165)] to-[rgb(68,99,174)] text-white mt-16"
 >
@@ -407,10 +502,31 @@
     <div>
       <h3 class="text-xl font-bold mb-4">Contacto</h3>
       <ul class="space-y-2 text-white/80">
-        <li><i class="fas fa-envelope mr-2"></i> angauplay@gmail.com</li>
+        <li>
+  <a 
+    href="mailto:angauplay@gmail.com"
+    class="flex items-center gap-2 hover:text-yellow-neon transition"
+  >
+    <i class="fas fa-envelope"></i>
+    angauplay@gmail.com
+  </a>
+</li>
+
         <li>
           <i class="fas fa-map-marker-alt mr-2"></i> Formosa, Argentina
         </li>
+
+         <!-- WHATSAPP -->
+    <li>
+      <a 
+        href="https://wa.me/5493704808722" 
+        target="_blank"
+        class="flex items-center gap-2 hover:text-green-300 transition"
+      >
+        <i class="fab fa-whatsapp text-green-400"></i>
+        +54 9 370 480-8722
+      </a>
+    </li>
       </ul>
     </div>
 

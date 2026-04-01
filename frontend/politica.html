@@ -48,45 +48,141 @@
   <body class="bg-gray-50 font-sans text-slate-900">
     <!-- HEADER -->
     <header
-      class="bg-purple-main text-white p-4 sticky top-0 z-[100] shadow-xl"
+      class="bg-purple-main text-white p-4 sticky top-0 z-[100] shadow-xl border-b border-white/10"
     >
       <div class="container mx-auto grid grid-cols-3 items-center">
-        <button id="menu-btn" class="text-2xl">
-          <i class="fas fa-bars"></i>
-        </button>
+        <div class="flex items-center">
+          <button
+            id="menu-btn"
+            class="text-2xl hover:bg-white/10 transition-all p-2 rounded-lg"
+          >
+            <i class="fas fa-bars"></i>
+          </button>
 
-        <div class="text-center text-pink-accent font-black text-3xl">
-          ANGAU <span class="text-green-light">PLAY</span>
+          <!-- 🔥 TEXTO AGREGADO --> <span class="text-[10px] font-bold text-white/80 uppercase tracking-wider"> El primer canal de streaming formoseño </span>
         </div>
 
-        <div
-          id="current-date"
-          class="hidden md:block text-right text-xs font-mono text-white/70"
-        ></div>
+
+
+        <!-- LOGO -->
+        <div class="flex justify-center">
+  <img 
+    src="/assets/cmpleto logo@4x.png" 
+    alt="Angau Play" 
+    class="h-10 md:h-12 object-contain"
+  >
+</div>
+        
+
+        <div class="flex items-center justify-end gap-4">
+
+  <!-- REDES -->
+  <div class="flex gap-3 items-center">
+  
+  <a href="https://www.youtube.com/@AngauPlay" target="_blank">
+    <img src="/assets/logo-youtube.png" 
+         class="w-6 h-6 hover:scale-125 transition duration-300" 
+         alt="YouTube">
+  </a>
+
+  <a href="https://www.facebook.com/angauplay" target="_blank">
+    <img src="/assets/logo-facebook.png" 
+         class="w-6 h-6 hover:scale-125 transition duration-300" 
+         alt="Facebook">
+  </a>
+
+  <a href="https://kick.com/angauplay" target="_blank">
+    <img src="/assets/logo-kick.png" 
+         class="w-6 h-6 hover:scale-125 transition duration-300" 
+         alt="Kick">
+  </a>
+
+  <a href="https://www.twitch.tv/angauplay" target="_blank">
+    <img src="/assets/logo-twitch.png" 
+         class="w-6 h-6 hover:scale-125 transition duration-300" 
+         alt="Twitch">
+  </a>
+
+<a href="https://www.tiktok.com/@angauplay" target="_blank">
+    <img src="/assets/logo-tik-tok.png" 
+         class="w-6 h-6 hover:scale-125 transition duration-300" 
+         alt="TikTok">
+  </a>
+
+  <a href="https://www.instagram.com/angauplay.ok/" target="_blank">
+    <img src="/assets/logo-instagram.png" 
+         class="w-6 h-6 hover:scale-125 transition duration-300" 
+         alt="Instagram">
+  </a>
+
+
+</div>
+
+
+<img 
+  src="/assets/matesito@4x.png" 
+  class="h-10 md:h-12 object-contain hover:scale-110 transition-transform ml-6"
+/>
+
+
+</div>
       </div>
 
       <div
         id="mobile-menu"
-        class="fixed top-0 left-0 w-72 bg-blue-dark h-screen p-6 transform -translate-x-full transition z-[110]"
+        class="fixed top-0 left-0 w-72 bg-blue-dark h-screen p-6 shadow-2xl transform -translate-x-full transition-transform duration-300 z-[110]"
       >
-        <div class="flex justify-between mb-10">
-          <span class="text-yellow-neon font-bold">MENÚ</span>
-          <button id="close-menu"><i class="fas fa-times"></i></button>
+        <div class="flex justify-between items-center mb-10">
+          <span
+            class="text-yellow-neon font-black italic text-xl tracking-widest uppercase"
+            >Menú</span
+          >
+          <button
+            id="close-menu"
+            class="text-white hover:text-yellow-neon transition-colors"
+          >
+            <i class="fas fa-times text-2xl"></i>
+          </button>
         </div>
-
-        <nav class="flex flex-col gap-6 text-white font-bold">
-          <a href="index.html">PORTADA</a>
-          <a href="politica.html" class="text-yellow-neon">Política</a>
-          <a href="tecnologia.html">Tecnología</a>
-          <a href="deportes.html">Deportes</a>
-          <a href="economia.html">Economía</a>
-          <a href="cultura.html">Cultura</a>
-          <a href="actualidad.html">Actualidad</a>
+        <nav class="flex flex-col gap-6 text-lg text-white font-bold">
+          <a
+            href="#"
+            class="text-yellow-neon border-l-4 border-yellow-neon pl-2"
+            >PORTADA</a
+          >
+          <a href="politica.html" class="hover:text-blue-200 transition-colors"
+            >Política</a
+          >
+          <a
+            href="tecnologia.html"
+            class="hover:text-blue-200 transition-colors"
+            >Tecnología</a
+          >
+          <a href="deportes.html" class="hover:text-blue-200 transition-colors"
+            >Deportes</a
+          >
+          <a href="Economia.html" class="hover:text-blue-200 transition-colors"
+            >Economía</a
+          >
+          <a href="cultura.html" class="hover:text-blue-200 transition-colors"
+            >Cultura</a
+          >
+          <a
+            href="actualidad.html"
+            class="hover:text-blue-200 transition-colors"
+            >Actualidad</a
+          >
+          <a href="salud.html" class="hover:text-blue-200 transition-colors"
+            >Salud</a
+          >
         </nav>
       </div>
-
-      <div id="overlay" class="fixed inset-0 bg-black/60 hidden"></div>
+      <div
+        id="overlay"
+        class="fixed inset-0 bg-black/60 hidden z-[105] backdrop-blur-sm"
+      ></div>
     </header>
+
 
     <!-- TITULO -->
     <section class="container mx-auto px-4 mt-8">
@@ -130,92 +226,77 @@
     </section>
 
     <footer
-      class="bg-gradient-to-r from-[rgb(198,29,102)] via-[rgb(104,89,165)] to-[rgb(68,99,174)] text-white mt-16"
-    >
-      <div class="container mx-auto px-4 py-10 grid md:grid-cols-3 gap-10">
-        <!-- CONTACTO -->
-        <div>
-          <h3 class="text-xl font-bold mb-4">Contacto</h3>
-          <ul class="space-y-2 text-white/80">
-            <li><i class="fas fa-envelope mr-2"></i> contacto@angauplay.com</li>
-            <li>
-              <i class="fas fa-map-marker-alt mr-2"></i> Formosa, Argentina
-            </li>
-          </ul>
-        </div>
+  class="bg-gradient-to-r from-[rgb(198,29,102)] via-[rgb(104,89,165)] to-[rgb(68,99,174)] text-white mt-16"
+>
+  <!-- LOGO -->
+  <div class="flex justify-center pt-8">
+    <img
+      src="/assets/logo blanco@4x.png"
+      alt="Angau Play"
+      class="h-14 object-contain hover:scale-110 transition-transform duration-300"
+    />
+  </div>
 
-        <!-- REDES -->
-        <div>
-          <h3 class="text-xl font-bold mb-4">Seguinos</h3>
+  <div class="container mx-auto px-4 py-10 grid md:grid-cols-2 gap-10">
+    
+    <!-- CONTACTO -->
+    <div>
+      <h3 class="text-xl font-bold mb-4">Contacto</h3>
+      <ul class="space-y-2 text-white/80">
+        <li>
+  <a 
+    href="mailto:angauplay@gmail.com"
+    class="flex items-center gap-2 hover:text-yellow-neon transition"
+  >
+    <i class="fas fa-envelope"></i>
+    angauplay@gmail.com
+  </a>
+</li>
 
-          <div class="flex gap-5 text-2xl">
-            <a href="https://instagram.com" target="_blank">
-              <i
-                class="fab fa-instagram hover:text-yellow-neon hover:scale-125 transition"
-              ></i>
-            </a>
+        <li>
+          <i class="fas fa-map-marker-alt mr-2"></i> Formosa, Argentina
+        </li>
 
-            <a href="https://youtube.com" target="_blank">
-              <i
-                class="fab fa-youtube hover:text-yellow-neon hover:scale-125 transition"
-              ></i>
-            </a>
-
-            <a href="https://x.com" target="_blank">
-              <i
-                class="fa-brands fa-x-twitter hover:text-yellow-neon hover:scale-125 transition"
-              ></i>
-            </a>
-
-            <a href="https://facebook.com" target="_blank">
-              <i
-                class="fab fa-facebook hover:text-yellow-neon hover:scale-125 transition"
-              ></i>
-            </a>
-
-            <a href="https://tiktok.com" target="_blank">
-              <i
-                class="fab fa-tiktok hover:text-yellow-neon hover:scale-125 transition"
-              ></i>
-            </a>
-
-            <a href="https://twitch.tv" target="_blank">
-              <i
-                class="fab fa-twitch hover:text-yellow-neon hover:scale-125 transition"
-              ></i>
-            </a>
-          </div>
-        </div>
-
-        <!-- CRÉDITOS + LOGO -->
-        <div class="text-center md:text-left">
-          <h3 class="text-xl font-bold mb-4">Desarrollado por</h3>
-
-          <p class="text-white/80 text-sm leading-relaxed">
-            Franco Mirna & Ocampo Emiliano <br />
-            <span class="text-yellow-neon font-semibold">
-              Egresados del Instituto Politécnico Formosa
-            </span>
-          </p>
-
-          <!-- LOGO -->
-          <div class="mt-4 flex justify-center md:justify-start">
-            <img
-              src="assets/logo-ipf.png"
-              alt="Instituto Politécnico Formosa"
-              class="w-24 h-auto bg-white/10 p-2 rounded-xl shadow-lg hover:scale-105 transition"
-            />
-          </div>
-        </div>
-      </div>
-
-      <!-- COPYRIGHT -->
-      <div
-        class="text-center text-sm py-4 border-t border-white/20 uppercase tracking-widest font-bold"
+         <!-- WHATSAPP -->
+    <li>
+      <a 
+        href="https://wa.me/5493704808722" 
+        target="_blank"
+        class="flex items-center gap-2 hover:text-green-300 transition"
       >
-        © 2026 Angau Play
+        <i class="fab fa-whatsapp text-green-400"></i>
+        +54 9 370 480-8722
+      </a>
+    </li>
+      </ul>
+    </div>
+
+    <!-- DESARROLLO -->
+    <div class="text-center md:text-left">
+      <h3 class="text-xl font-bold mb-4">Desarrollado por</h3>
+      <p class="text-white/80 text-sm leading-relaxed">
+        Franco Mirna & Ocampo Emiliano <br />
+        <span class="text-yellow-neon font-semibold">
+          Egresados del Instituto Politécnico Formosa
+        </span>
+      </p>
+      <div class="mt-4 flex justify-center md:justify-start">
+        <img
+          src="assets/logo-ipf.png"
+          alt="IPF"
+          class="w-24 h-auto bg-white/10 p-2 rounded-xl"
+        />
       </div>
-    </footer>
+    </div>
+
+  </div>
+
+  <div
+    class="text-center text-sm py-4 border-t border-white/20 uppercase tracking-widest font-bold"
+  >
+    © 2026 Angau Play
+  </div>
+</footer>
 
     <script src="js/politica.js"></script>
   </body>
