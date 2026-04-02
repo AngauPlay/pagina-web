@@ -3,10 +3,6 @@ const cloudinary = require("../config/cloudinary"); // Importamos tu config de C
 const fs = require("fs-extra"); // Para limpiar archivos temporales
 const Categoria = require("../models/Categoria"); // Importamos el modelo de Categoría para los joins
 
-// Establecemos la relación entre Noticia y Categoria
-Noticia.belongsTo(Categoria, { foreignKey: "categoria_id" });
-Categoria.hasMany(Noticia, { foreignKey: "categoria_id" });
-
 const newsController = {
   // Listar todas las noticias publicadas
   getAll: async (req, res) => {
@@ -63,19 +59,19 @@ const newsController = {
 
   // Crear una noticia con Cloudinary
   create: async (req, res) => {
+    let tempPath = req.file ? req.file.path : null;
     try {
       let imageUrl = "/assets/uploads/default.jpg";
 
-      // Si Multer recibió un archivo, lo subimos a Cloudinary
-      if (req.file) {
-        const result = await cloudinary.uploader.upload(req.file.path, {
+      if (tempPath) {
+        const result = await cloudinary.uploader.upload(tempPath, {
           folder: "angau_play/noticias",
         });
-        imageUrl = result.secure_url; // Guardamos la URL de la nube
-
-        // OPCIONAL: Borrar el archivo temporal de tu servidor para no llenar el disco
-        await fs.unlink(req.file.path);
+        imageUrl = result.secure_url;
       }
+
+      // OPCIONAL: Borrar el archivo temporal de tu servidor para no llenar el disco
+      await fs.unlink(tempPath);
 
       const nuevaNoticia = await Noticia.create({
         ...req.body,
@@ -90,19 +86,49 @@ const newsController = {
 
   // Editar una noticia
   update: async (req, res) => {
+    let tempPath = req.file ? req.file.path : null;
     try {
-      // USAMOS EL MODELO: Noticia.update
-      const [actualizado] = await Noticia.update(req.body, {
+      const dataToUpdate = { ...req.body };
+
+      // Si el usuario envía una nueva imagen en el update
+      if (tempPath) {
+        const result = await cloudinary.uploader.upload(tempPath, {
+          folder: "angau_play/noticias",
+        });
+        dataToUpdate.imagen_url = result.secure_url;
+      }
+
+      const [actualizado] = await Noticia.update(dataToUpdate, {
         where: { id: req.params.id },
       });
 
-      if (!actualizado)
-        return res.status(404).json({ mensaje: "No se encontró" });
-      res.json({ mensaje: "Noticia actualizada" });
+      if (actualizado === 0) {
+        return res
+          .status(404)
+          .json({ mensaje: "No se encontró la noticia para actualizar" });
+      }
+
+      res.json({ mensaje: "Noticia actualizada con éxito" });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    } finally {
+      if (tempPath) await fs.unlink(tempPath);
+    }
+  },
+
+  delete: async (req, res) => {
+    try {
+      const noticia = await Noticia.findByPk(req.params.id);
+      if (!noticia) return res.status(404).json({ mensaje: "No existe" });
+      // Extraemos el public_id de Cloudinary de la URL de la imagen
+      const public_id = noticia.imagen_url;
+      await cloudinary.uploader.destroy(public_id);
+
+      await noticia.destroy();
+      res.json({ mensaje: "Noticia eliminada" });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
   },
 };
-
 module.exports = newsController;
