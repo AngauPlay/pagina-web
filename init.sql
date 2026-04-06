@@ -89,6 +89,21 @@ CREATE TABLE `usuarios` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
+-- estructura de tabla para la tabla `programas`
+--
+
+CREATE TABLE IF NOT EXISTS `programas` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `nombre` VARCHAR(255) NOT NULL,
+  `hora` TIME NOT NULL,
+  `staff` VARCHAR(255),
+  `dia_semana` INT NOT NULL,
+  `activo` TINYINT(1) DEFAULT 1,
+  `createdAt` DATETIME NOT NULL,
+  `updatedAt` DATETIME NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB;
+--
 -- Índices para tablas volcadas
 --
 
