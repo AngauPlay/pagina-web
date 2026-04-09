@@ -1,7 +1,7 @@
 const API_URL = "http://localhost:3000/noticias";
 const API_CATEGORIAS = "http://localhost:3000/noticias/categorias";
 const API_LOGOUT = "http://localhost:3000/auth/logout";
-
+const API_BASE = "http://localhost:3000";
 // ===============================
 // 🔐 PROTEGER ADMIN
 // ===============================
@@ -19,82 +19,142 @@ async function verificarSesion() {
   }
 }
 
-// ===============================
-// 🔥 CARGAR CATEGORIAS
-// ===============================
-async function cargarCategorias() {
-  const select = document.getElementById("categorias");
+// --- NAVEGACIÓN ---
+function showSection(section) {
+  document
+    .querySelectorAll(".content-section")
+    .forEach((s) => s.classList.add("hidden"));
+  document.getElementById(`sec-${section}`).classList.remove("hidden");
+  if (section === "noticias") cargarNoticias();
+  if (section === "programacion") cargarProgramacion();
+}
 
-  try {
-    const res = await fetch(API_CATEGORIAS);
+// --- GESTIÓN DE NOTICIAS ---
+async function cargarNoticias() {
+  const res = await fetch(`${API_URL}`);
+  const noticias = await res.json();
+  const lista = document.getElementById("tabla-noticias");
+  lista.innerHTML = noticias
+    .map(
+      (n) => `
+        <tr class="border-b hover:bg-gray-50">
+            <td class="p-4 font-medium">${n.titulo}</td>
+            <td class="p-4">${n.autor}</td>
+            <td class="p-4 text-center">
+                <button onclick="eliminarNoticia(${n.id})" class="text-red-500 font-bold">Eliminar</button>
+            </td>
+        </tr>
+    `,
+    )
+    .join("");
+}
 
-    if (!res.ok) throw new Error("Error al obtener categorías");
+// --- GESTIÓN DE PROGRAMACIÓN ---
+const dias = [
+  "Domingo",
+  "Lunes",
+  "Martes",
+  "Miércoles",
+  "Jueves",
+  "Viernes",
+  "Sábado",
+];
 
-    const categorias = await res.json();
+async function cargarProgramacion() {
+  const res = await fetch(`${API_BASE}/programas`); // Ajusta a tu ruta
+  const programas = await res.json();
+  const lista = document.getElementById("tabla-programacion");
+  lista.innerHTML = programas
+    .map(
+      (programa) => `
+        <tr class="border-b hover:bg-gray-50">
+            <td class="p-4 font-bold">${dias[programa.dia_semana]}</td>
+            <td class="p-4">${programa.hora}</td>
+            <td class="p-4">${programa.nombre}</td>
+            <td class="p-4 text-center">
+                <button onclick="eliminarPrograma(${programa.id})" class="text-red-500 font-bold">Eliminar</button>
+            </td>
+        </tr>
+    `,
+    )
+    .join("");
+}
 
-    select.innerHTML = "<option value=''>Seleccionar categoría</option>";
+// --- MODALES ---
+function openModal(tipo) {
+  const modal = document.getElementById("modal");
+  const content = document.getElementById("modal-content");
+  modal.classList.remove("hidden");
 
-    categorias.forEach((cat) => {
-      const option = document.createElement("option");
-      option.value = cat.id;
-      option.textContent = cat.nombre;
-      select.appendChild(option);
-    });
-  } catch (error) {
-    console.error(error);
-    select.innerHTML = "<option>Error al cargar categorías</option>";
+  if (tipo === "noticia") {
+    content.innerHTML = `
+            <h3 class="text-2xl font-black mb-4">Nueva Noticia</h3>
+            <form id="form-noticia" class="space-y-4">
+                <input name="titulo" placeholder="Título" class="w-full border p-2 rounded" required>
+                <textarea name="cuerpo" placeholder="Contenido" class="w-full border p-2 rounded h-32" required></textarea>
+                <input name="autor" placeholder="Autor" class="w-full border p-2 rounded" required>
+                <input type="file" name="imagen" class="w-full border p-2 rounded">
+                <button class="w-full bg-pink-600 text-white py-2 rounded font-bold">PUBLICAR</button>
+            </form>`;
+    setupFormNoticia();
+  } else {
+    content.innerHTML = `
+            <h3 class="text-2xl font-black mb-4">Nuevo Programa</h3>
+            <form id="form-programa" class="space-y-4">
+                <input name="nombre" placeholder="Nombre del Programa" class="w-full border p-2 rounded" required>
+                <input name="staff" placeholder="Ej: Juan Pérez, María García" class="w-full border p-2 rounded-lg">
+                <input type="time" name="hora" class="w-full border p-2 rounded" required>
+                <select name="dia_semana" class="w-full border p-2 rounded">
+                    ${dias.map((d, i) => `<option value="${i}">${d}</option>`).join("")}
+                </select>
+                <button class="w-full bg-purple-600 text-white py-2 rounded font-bold">GUARDAR</button>
+            </form>`;
+    setupFormPrograma();
   }
 }
 
-// ===============================
-// 🖼 PREVIEW IMAGEN
-// ===============================
-document.getElementById("imagen").addEventListener("change", (e) => {
-  const file = e.target.files[0];
-  const preview = document.getElementById("preview");
+function closeModal() {
+  document.getElementById("modal").classList.add("hidden");
+}
 
-  if (file) {
-    preview.src = URL.createObjectURL(file);
-    preview.classList.remove("hidden");
-  }
-});
-
-// ===============================
-// 🚀 ENVIAR FORMULARIO
-// ===============================
-document
-  .getElementById("form-noticia")
-  .addEventListener("submit", async (e) => {
+// --- ENVÍO DE DATOS ---
+function setupFormNoticia() {
+  document.getElementById("form-noticia").onsubmit = async (e) => {
     e.preventDefault();
-
-    const form = e.target;
-    const mensaje = document.getElementById("mensaje");
-
-    const formData = new FormData(form);
-
-    try {
-      const res = await fetch(`${API_URL}/add`, {
-        method: "POST",
-        body: formData,
-        credentials: "include",
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) throw new Error(data.error || "Error");
-
-      mensaje.textContent = "✅ Noticia creada correctamente";
-      mensaje.className = "text-green-600";
-
-      form.reset();
-      document.getElementById("preview").classList.add("hidden");
-    } catch (error) {
-      console.error(error);
-
-      mensaje.textContent = "❌ " + error.message;
-      mensaje.className = "text-red-600";
+    const formData = new FormData(e.target);
+    const res = await fetch(`${API_BASE}/noticias/add`, {
+      method: "POST",
+      body: formData,
+      credentials: "include",
+    });
+    if (res.ok) {
+      closeModal();
+      cargarNoticias();
     }
-  });
+  };
+}
+
+function setupFormPrograma() {
+  document.getElementById("form-programa").onsubmit = async (e) => {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(e.target));
+    const res = await fetch(`${API_BASE}/programas`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+      credentials: "include",
+    });
+    if (res.ok) {
+      closeModal();
+      cargarProgramacion();
+    }
+  };
+}
+
+// --- INIT ---
+document.addEventListener("DOMContentLoaded", () => {
+  showSection("noticias"); // Vista inicial
+});
 
 // ===============================
 // 🚪 LOGOUT

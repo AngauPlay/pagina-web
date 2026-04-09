@@ -2,118 +2,120 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <title>Panel Admin - ANGAU PLAY</title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin - ANGAU PLAY</title>
     <script src="https://cdn.tailwindcss.com"></script>
-
     <style>
       :root {
-        --pink-accent: rgb(224, 35, 117);
-        --purple-main: rgb(104, 89, 165);
-        --blue-dark: rgb(68, 99, 174);
-        --yellow-neon: rgb(229, 235, 53);
-        --green-light: rgb(140, 199, 73);
+        --pink: #e02375;
+        --purple: #6859a5;
       }
-
       .bg-main {
-        background-color: var(--purple-main);
-      }
-      .bg-accent {
-        background-color: var(--pink-accent);
+        background-color: var(--purple);
       }
       .text-accent {
-        color: var(--pink-accent);
+        color: var(--pink);
       }
-
-      .card {
-        border: 3px solid var(--purple-main);
-        box-shadow: 0 10px 30px rgba(104, 89, 165, 0.2);
+      .btn-pink {
+        background-color: var(--pink);
+        color: white;
         transition: 0.3s;
       }
-
-      .card:hover {
-        box-shadow: 0 20px 50px rgba(104, 89, 165, 0.3);
+      .btn-pink:hover {
+        opacity: 0.9;
+        transform: scale(1.02);
       }
     </style>
   </head>
-
-  <body class="bg-gray-100">
-    <header
-      class="bg-main text-white text-center p-4 text-2xl font-black flex justify-between items-center px-6"
-    >
-      PANEL ADMIN - ANGAU PLAY
-
-      <button
-        id="logoutBtn"
-        class="bg-red-500 px-4 py-2 rounded-lg text-sm font-bold"
-      >
-        Cerrar sesión
-      </button>
-    </header>
-
-    <div class="max-w-3xl mx-auto mt-10 bg-white p-8 rounded-2xl card">
-      <h2 class="text-2xl font-black mb-6 text-accent">Crear Nueva Noticia</h2>
-
-      <form id="form-noticia" class="space-y-4">
-        <input
-          name="titulo"
-          placeholder="Título"
-          class="w-full border p-3 rounded-lg"
-          required
-        />
-
-        <textarea
-          name="copete"
-          placeholder="Copete"
-          class="w-full border p-3 rounded-lg"
-        ></textarea>
-
-        <textarea
-          name="cuerpo"
-          placeholder="Contenido completo"
-          class="w-full border p-3 rounded-lg h-32"
-        ></textarea>
-
-        <input
-          name="autor"
-          placeholder="Autor"
-          class="w-full border p-3 rounded-lg"
-          required
-        />
-
-        <!-- 🔥 CATEGORIAS -->
-        <select
-          name="categoria_id"
-          id="categorias"
-          class="w-full border p-3 rounded-lg"
-          required
+  <body class="bg-gray-100 flex min-h-screen">
+    <aside class="w-64 bg-main text-white flex flex-col shadow-xl">
+      <div class="p-6 text-2xl font-black border-b border-purple-400">
+        ANGAU PLAY
+      </div>
+      <nav class="flex-1 p-4 space-y-2">
+        <button
+          onclick="showSection('noticias')"
+          class="w-full text-left p-3 rounded hover:bg-purple-500 font-bold"
         >
-          <option value="">Cargando categorías...</option>
-        </select>
-
-        <select name="estado" class="w-full border p-3 rounded-lg">
-          <option value="borrador">Borrador</option>
-          <option value="publicado">Publicado</option>
-        </select>
-
-        <!-- IMAGEN -->
-        <input
-          type="file"
-          id="imagen"
-          name="imagen"
-          accept="image/*"
-          class="w-full border p-3 rounded-lg"
-        />
-
-        <!-- PREVIEW -->
-        <img id="preview" class="hidden w-full h-48 object-cover rounded-lg" />
-
-        <button class="w-full bg-accent text-white py-3 rounded-xl font-bold">
-          PUBLICAR 🚀
+          📰 Noticias
         </button>
-      </form>
+        <button
+          onclick="showSection('programacion')"
+          class="w-full text-left p-3 rounded hover:bg-purple-500 font-bold"
+        >
+          📺 Programación
+        </button>
+      </nav>
+      <button id="logoutBtn" class="p-4 bg-red-600 hover:bg-red-700 font-bold">
+        Cerrar Sesión
+      </button>
+    </aside>
 
-      <p id="mensaje" class="text-center mt-4 font-bold"></p>
+    <main class="flex-1 p-8">
+      <section id="sec-noticias" class="content-section">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-3xl font-black text-accent">Gestión de Noticias</h2>
+          <button
+            onclick="openModal('noticia')"
+            class="btn-pink px-6 py-2 rounded-lg font-bold"
+          >
+            + Nueva Noticia
+          </button>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+          <table class="w-full">
+            <thead class="bg-gray-200 text-gray-700">
+              <tr>
+                <th class="p-4 text-left">Título</th>
+                <th class="p-4 text-left">Autor</th>
+                <th class="p-4 text-center">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-noticias"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="sec-programacion" class="content-section hidden">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-3xl font-black text-accent">
+            Grilla de Programación
+          </h2>
+          <button
+            onclick="openModal('programa')"
+            class="btn-pink px-6 py-2 rounded-lg font-bold"
+          >
+            + Nuevo Programa
+          </button>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+          <table class="w-full">
+            <thead class="bg-gray-200">
+              <tr>
+                <th class="p-4 text-left">Día</th>
+                <th class="p-4 text-left">Hora</th>
+                <th class="p-4 text-left">Programa</th>
+                <th class="p-4 text-center">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-programacion"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <div
+      id="modal"
+      class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4"
+    >
+      <div
+        class="bg-white rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto relative"
+      >
+        <button onclick="closeModal()" class="absolute top-4 right-4 text-2xl">
+          &times;
+        </button>
+        <div id="modal-content"></div>
+      </div>
     </div>
 
     <script src="js/admin.js"></script>

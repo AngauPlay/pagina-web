@@ -49,6 +49,7 @@ app.get("/api/noticias-externas", async (req, res) => {
 });
 app.use("/noticias", newsRoutes);
 app.use("/auth", authRoutes);
+app.use("/programas", require("./routes/programasRoutes"));
 // Ruta para generar el RSS de Angau
 app.get("/rss", async (req, res) => {
   const feed = new RSS({

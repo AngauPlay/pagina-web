@@ -1,9 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const Programa = require("../models/Programa");
-const { Op } = require("sequelize");
-const { getProgramasHoy } = require("../controllers/programasController");
+const programasController = require("../controllers/programasController");
 
-router.get("/hoy", getProgramasHoy);
+router.get("/hoy", programasController.getProgramasHoy);
+router.get("/", programasController.getAllProgramas);
+router.post("/", programasController.savePrograma);
+router.delete("/:id", programasController.deletePrograma);
 
 module.exports = router;
