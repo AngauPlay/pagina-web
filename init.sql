@@ -55,7 +55,7 @@ INSERT INTO `categorias` (`id`, `nombre`, `slug`) VALUES
 CREATE TABLE `noticias` (
   `id` int(11) NOT NULL,
   `titulo` varchar(255) NOT NULL,
-  `slug` varchar(100) NOT NULL,
+  `slug` varchar(255) NOT NULL,
   `copete` text NOT NULL,
   `cuerpo` longtext NOT NULL,
   `imagen_url` varchar(255) NOT NULL,

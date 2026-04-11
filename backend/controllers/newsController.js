@@ -61,6 +61,8 @@ const newsController = {
   create: async (req, res) => {
     let tempPath = req.file ? req.file.path : null;
     try {
+      const { titulo, copete, cuerpo, autor, categoria_id, estado, slug } =
+        req.body;
       let imageUrl = "/assets/uploads/default.jpg";
 
       if (tempPath) {
@@ -74,12 +76,21 @@ const newsController = {
       await fs.unlink(tempPath);
 
       const nuevaNoticia = await Noticia.create({
-        ...req.body,
+        titulo,
+        copete,
+        cuerpo,
+        autor,
+        categoria_id: parseInt(categoria_id), // Forzamos que sea número
+        estado: estado,
         imagen_url: imageUrl,
+        fecha_publicacion: new Date(), // Fecha actual
       });
 
       res.status(201).json(nuevaNoticia);
     } catch (error) {
+      console.error("Error al crear noticia:", error);
+      // Si falló pero había un archivo, hay que borrarlo
+      if (tempPath && fs.existsSync(tempPath)) await fs.unlink(tempPath);
       res.status(400).json({ error: error.message });
     }
   },
