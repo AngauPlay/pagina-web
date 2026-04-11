@@ -1,4 +1,4 @@
-const { Programa } = require("../models");
+const  Programa  = require("../models/Programa");
 const { Op } = require("sequelize");
 
 const getProgramasHoy = async (req, res) => {
