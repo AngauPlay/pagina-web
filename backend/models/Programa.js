@@ -1,17 +1,38 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/db");
 
-const Programa = sequelize.define("Programa", {
-  nombre: { type: DataTypes.STRING, allowNull: false },
-  hora: { type: DataTypes.STRING, allowNull: false }, // Ej: "20:00"
-  staff: { type: DataTypes.STRING },
-  dia_semana: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    validate: { min: 0, max: 6 }, // 0=Domingo, 1=Lunes, 2=Martes, 3=Miércoles, 4=Jueves, 5=Viernes, 6=Sábado
+const Programa = sequelize.define(
+  "Programa",
+  {
+    nombre: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    hora: {
+      // Cambiado a TIME para coincidir con tu tabla MySQL
+      // Sequelize manejará el formato "HH:mm:ss" automáticamente
+      type: DataTypes.TIME,
+      allowNull: false,
+    },
+    staff: {
+      type: DataTypes.STRING,
+    },
+    dia_semana: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      validate: { min: 0, max: 6 },
+    },
+    activo: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
+    },
   },
-  link: { type: DataTypes.STRING, defaultValue: "#" },
-  activo: { type: DataTypes.BOOLEAN, defaultValue: true },
-});
+  {
+    // MUY IMPORTANTE: Sequelize por defecto busca la tabla "Programas" (plural).
+    // Tu SQL usa "programas" (minúscula), forzamos el nombre aquí:
+    tableName: "programas",
+    timestamps: true, // Tu SQL tiene createdAt y updatedAt, así que esto debe ser true.
+  },
+);
 
 module.exports = Programa;
