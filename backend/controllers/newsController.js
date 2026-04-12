@@ -7,11 +7,10 @@ const newsController = {
   // Listar todas las noticias publicadas
   getAll: async (req, res) => {
     try {
-      // USAMOS EL MODELO: Noticia.findAll
       const noticias = await Noticia.findAll({
-        where: { estado: "publicado" },
+        // Quitamos el filtro de "publicado" para que el admin vea sus borradores
+        include: [{ model: Categoria, attributes: ["nombre"] }],
         order: [["fecha_publicacion", "DESC"]],
-        limit: 6,
       });
       res.json(noticias);
     } catch (error) {
@@ -48,7 +47,14 @@ const newsController = {
     try {
       const noticia = await Noticia.findOne({
         where: { slug: req.params.slug, estado: "publicado" },
+        include: [
+          {
+            model: Categoria,
+            attributes: ["nombre"],
+          },
+        ],
       });
+
       if (!noticia)
         return res.status(404).json({ mensaje: "Noticia no encontrada" });
       res.json(noticia);
@@ -56,7 +62,25 @@ const newsController = {
       res.status(500).json({ error: error.message });
     }
   },
+  getById: async (req, res) => {
+    try {
+      const noticia = await Noticia.findOne({
+        where: { id: req.params.id, estado: "publicado" },
+        include: [
+          {
+            model: Categoria,
+            attributes: ["nombre"],
+          },
+        ],
+      });
 
+      if (!noticia)
+        return res.status(404).json({ mensaje: "Noticia no encontrada" });
+      res.json(noticia);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
   // Crear una noticia con Cloudinary
   create: async (req, res) => {
     let tempPath = req.file ? req.file.path : null;

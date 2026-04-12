@@ -81,11 +81,12 @@ INSERT INTO `noticias` (`id`, `titulo`, `slug`, `copete`, `cuerpo`, `imagen_url`
 --
 
 CREATE TABLE `usuarios` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `nombre` varchar(100) NOT NULL,
-  `email` varchar(100) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `rol` enum('admin','editor') NOT NULL
+  `rol` enum('admin', 'editor', 'redactor') NOT NULL DEFAULT 'redactor',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `nombre_unico` (`nombre`) -- Usamos el nombre como identificador único
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -122,12 +123,6 @@ ALTER TABLE `noticias`
   ADD UNIQUE KEY `slug_unico` (`slug`),
   ADD KEY `fk_categoria` (`categoria_id`);
 
---
--- Indices de la tabla `usuarios`
---
-ALTER TABLE `usuarios`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `email` (`email`);
 
 --
 -- AUTO_INCREMENT de las tablas volcadas

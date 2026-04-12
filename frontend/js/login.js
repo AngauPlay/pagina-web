@@ -3,25 +3,20 @@ const API_LOGIN = "http://localhost:3000/auth/login";
 const form = document.getElementById("loginForm");
 const mensaje = document.getElementById("mensaje");
 
-// Validación email
-function emailValido(email) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
-
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
+form.addEventListener("submit", async (event) => {
+  event.preventDefault();
 
   const data = Object.fromEntries(new FormData(form));
 
   // Validaciones
-  if (!emailValido(data.email)) {
-    mensaje.textContent = "❌ Email inválido";
+  if (!data.nombre) {
+    mensaje.textContent = " Nombre de usuario inválido";
     mensaje.className = "text-red-600";
     return;
   }
 
   if (data.password.length < 6) {
-    mensaje.textContent = "❌ La contraseña debe tener al menos 6 caracteres";
+    mensaje.textContent = " La contraseña debe tener al menos 6 caracteres";
     mensaje.className = "text-red-600";
     return;
   }
@@ -33,7 +28,7 @@ form.addEventListener("submit", async (e) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
-      credentials: "include", // 🔥 para cookies JWT
+      credentials: "include",
     });
 
     const result = await res.json();
@@ -53,7 +48,7 @@ form.addEventListener("submit", async (e) => {
       }
     }, 1000);
   } catch (err) {
-    mensaje.textContent = "❌ " + err.message;
+    mensaje.textContent = " " + err.message;
     mensaje.className = "text-red-600";
   }
 });

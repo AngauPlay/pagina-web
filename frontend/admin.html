@@ -95,17 +95,25 @@
             + Nuevo Programa
           </button>
         </div>
-        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-          <table class="w-full">
-            <thead class="bg-gray-200">
-              <tr>
-                <th class="p-4 text-left">Día</th>
-                <th class="p-4 text-left">Hora</th>
-                <th class="p-4 text-left">Programa</th>
-                <th class="p-4 text-center">Acciones</th>
+        <div
+          class="overflow-x-auto rounded-3xl border border-gray-200 shadow-sm bg-white"
+        >
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr
+                class="bg-slate-900 text-white text-[10px] uppercase tracking-widest"
+              >
+                <th class="p-4 text-center bg-purple-600">HORARIO</th>
+                <th class="p-4 border-r border-white/10">Domingo</th>
+                <th class="p-4 border-r border-white/10">Lunes</th>
+                <th class="p-4 border-r border-white/10">Martes</th>
+                <th class="p-4 border-r border-white/10">Miércoles</th>
+                <th class="p-4 border-r border-white/10">Jueves</th>
+                <th class="p-4 border-r border-white/10">Viernes</th>
+                <th class="p-4">Sábado</th>
               </tr>
             </thead>
-            <tbody id="tabla-programacion"></tbody>
+            <tbody id="tabla-programacion" class="text-sm"></tbody>
           </table>
         </div>
       </section>
