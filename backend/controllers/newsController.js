@@ -48,7 +48,14 @@ const newsController = {
     try {
       const noticia = await Noticia.findOne({
         where: { slug: req.params.slug, estado: "publicado" },
+        include: [
+          {
+            model: Categoria,
+            attributes: ["nombre"],
+          },
+        ],
       });
+
       if (!noticia)
         return res.status(404).json({ mensaje: "Noticia no encontrada" });
       res.json(noticia);

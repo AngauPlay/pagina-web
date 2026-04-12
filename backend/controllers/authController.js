@@ -7,8 +7,8 @@ require("dotenv").config();
 const authController = {
   login: async (req, res) => {
     try {
-      const { email, password } = req.body;
-      const usuario = await Usuario.findOne({ where: { email } });
+      const { nombre, password } = req.body;
+      const usuario = await Usuario.findOne({ where: { nombre } });
 
       if (!usuario || !(await bcrypt.compare(password, usuario.password))) {
         return res.status(401).json({ mensaje: "Credenciales inválidas" });
@@ -45,7 +45,7 @@ const authController = {
   // Registro (Solo para crear el primer usuario o si sos Admin)
   register: async (req, res) => {
     try {
-      const { nombre, email, password, rol } = req.body;
+      const { nombre, password, rol } = req.body;
 
       // Hashear la contraseña antes de guardarla
       const salt = await genSalt(10);
@@ -53,7 +53,6 @@ const authController = {
 
       const nuevoUsuario = await create({
         nombre,
-        email,
         password: hashedPassword,
         rol: rol || "redactor",
       });
@@ -61,7 +60,7 @@ const authController = {
       res.status(201).json({ mensaje: "Usuario creado", id: nuevoUsuario.id });
     } catch (error) {
       res.status(400).json({
-        error: "El email ya existe o datos inválidos",
+        error: "El nombre de usuario ya existe o datos inválidos",
         detalle: error.message,
       });
     }
