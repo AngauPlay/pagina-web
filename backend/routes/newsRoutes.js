@@ -9,6 +9,7 @@ const upload = require("../middlewares/uploadMiddleware");
 
 // --- RUTAS PÚBLICAS (Lectores) ---
 router.get("/", newsController.getAll);
+router.get("/:id", newsController.getById);
 router.get("/detalle/:slug", newsController.getBySlug);
 router.get("/categorias", categoryController.listAll);
 router.get("/por-categoria/:nombreCat", newsController.getByCategory);

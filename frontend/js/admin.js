@@ -85,35 +85,63 @@ async function cargarProgramacion() {
     const res = await fetch(`${API_BASE}/programas`);
     const programas = await res.json();
     const lista = document.getElementById("tabla-programacion");
-    lista.innerHTML = programas
-      .map(
-        (p) => `
-            <tr class="border-b hover:bg-gray-50">
-                <td class="p-4 font-bold">${dias[p.dia_semana]}</td>
-                <td class="p-4">${p.hora}</td>
-                <td class="p-4">
-                    <div class="font-bold text-purple-700">${p.nombre}</div>
-                    <div class="text-xs text-gray-500 italic">${p.staff || "Sin staff"}</div>
-                </td>
-                <td class="p-4 text-center">
-                    <button onclick="eliminarPrograma(${p.id})" class="text-red-500 font-bold hover:underline">Eliminar</button>
-                </td>
-            </tr>
-        `,
-      )
+
+    // 1. Obtener todas las horas únicas y ordenarlas
+    const horasUnicas = [
+      ...new Set(programas.map((p) => p.hora.substring(0, 5))),
+    ].sort();
+
+    if (horasUnicas.length === 0) {
+      lista.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-gray-400 italic">No hay programas cargados en la grilla</td></tr>`;
+      return;
+    }
+
+    // 2. Generar el HTML de la tabla semanal
+    lista.innerHTML = horasUnicas
+      .map((hora) => {
+        return `
+        <tr class="border-b hover:bg-gray-50">
+          <td class="p-3 font-black text-purple-600 bg-purple-50 border-r w-24 text-center">${hora} hs</td>
+          ${[0, 1, 2, 3, 4, 5, 6]
+            .map((diaIndex) => {
+              // Buscamos si hay un programa este día a esta hora
+              const programa = programas.find(
+                (p) => p.dia_semana === diaIndex && p.hora.startsWith(hora),
+              );
+
+              return `
+              <td class="p-2 border-r min-w-[120px] vertical-align-top">
+                ${
+                  programa
+                    ? `
+                  <div class="relative group bg-white p-2 rounded-lg shadow-sm border-l-4 border-pink-500">
+                    <div class="text-[10px] font-black text-pink-500 uppercase leading-none mb-1">En Vivo</div>
+                    <div class="font-bold text-slate-800 text-sm leading-tight">${programa.nombre}</div>
+                    <div class="text-[10px] text-gray-500 italic line-clamp-1">${programa.staff || ""}</div>
+                    
+                    <button onclick="eliminarPrograma(${programa.id})" 
+                            class="absolute -top-1 -right-1 bg-red-500 text-white w-5 h-5 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
+                      <i class="fas fa-times text-[10px]"></i>
+                    </button>
+                  </div>
+                `
+                    : `
+                  <div class="h-full w-full py-4 opacity-10 flex items-center justify-center">
+                    <i class="fas fa-minus text-gray-400"></i>
+                  </div>
+                `
+                }
+              </td>
+            `;
+            })
+            .join("")}
+        </tr>
+      `;
+      })
       .join("");
   } catch (error) {
     console.error("Error al cargar programas", error);
   }
-}
-
-async function eliminarPrograma(id) {
-  if (!confirm("¿Eliminar este programa de la grilla?")) return;
-  const res = await fetch(`${API_BASE}/programas/${id}`, {
-    method: "DELETE",
-    credentials: "include",
-  });
-  if (res.ok) cargarProgramacion();
 }
 
 // ===============================
