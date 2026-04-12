@@ -219,31 +219,6 @@ async function cargarProgramacion() {
     const programas = await res.json();
     const lista = document.getElementById("tabla-programacion");
 
-<<<<<<< HEAD
-    if (!lista) return;
-
-    lista.innerHTML = programas
-      .map(
-        (p) => `
-        <tr class="border-b hover:bg-gray-50">
-          <td class="p-4 font-bold">${dias[p.dia_semana]}</td>
-          <td class="p-4">${p.hora}</td>
-          <td class="p-4">
-            <div class="font-bold text-purple-700">${p.nombre}</div>
-            <div class="text-xs text-gray-500 italic">
-              ${p.staff || "Sin staff"}
-            </div>
-          </td>
-          <td class="p-4 text-center">
-            <button onclick="eliminarPrograma(${p.id})"
-              class="text-red-500 font-bold hover:underline">
-              Eliminar
-            </button>
-          </td>
-        </tr>
-      `
-      )
-=======
     // 1. Obtener todas las horas únicas y ordenarlas
     const horasUnicas = [
       ...new Set(programas.map((p) => p.hora.substring(0, 5))),
@@ -253,6 +228,7 @@ async function cargarProgramacion() {
       lista.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-gray-400 italic">No hay programas cargados en la grilla</td></tr>`;
       return;
     }
+  
 
     // 2. Generar el HTML de la tabla semanal
     lista.innerHTML = horasUnicas
@@ -266,7 +242,7 @@ async function cargarProgramacion() {
               const programa = programas.find(
                 (p) => p.dia_semana === diaIndex && p.hora.startsWith(hora),
               );
-
+            
               return `
               <td class="p-2 border-r min-w-[120px] vertical-align-top">
                 ${
@@ -296,27 +272,12 @@ async function cargarProgramacion() {
         </tr>
       `;
       })
->>>>>>> dbbe7d70fa53063dfd28785f5f7dd7ebd9e683d0
       .join("");
   } catch (error) {
     console.error("Error al cargar programas", error);
   }
 }
 
-<<<<<<< HEAD
-async function eliminarPrograma(id) {
-  if (!confirm("¿Eliminar este programa de la grilla?")) return;
-
-  const res = await fetch(`${API_BASE}/programas/${id}`, {
-    method: "DELETE",
-    credentials: "include",
-  });
-
-  if (res.ok) cargarProgramacion();
-}
-
-=======
->>>>>>> dbbe7d70fa53063dfd28785f5f7dd7ebd9e683d0
 // ===============================
 // 📦 MODALES
 // ===============================
