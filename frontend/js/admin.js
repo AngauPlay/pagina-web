@@ -117,25 +117,51 @@ async function eliminarNoticia(id) {
 // ===============================
 async function editarNoticia(id) {
   try {
-    const res = await fetch(`${API_URL}/${id}`);
-    const noticia = await res.json();
-
     const modal = document.getElementById("modal");
     const content = document.getElementById("modal-content");
+
+    // Traer noticia
+    const res = await fetch(`${API_URL}/detalle/${id}`);
+    const noticia = await res.json();
+
+    // Traer categorías
+    const catRes = await fetch(API_CATEGORIAS);
+    const categorias = await catRes.json();
 
     modal.classList.remove("hidden");
 
     content.innerHTML = `
       <h3 class="text-2xl font-black mb-4 text-blue-600">Editar Noticia</h3>
 
-      <form id="form-editar-noticia" class="space-y-4">
-        <input name="titulo" value="${noticia.titulo}" class="w-full border p-2 rounded" required>
+      <form id="form-editar-noticia" class="space-y-4" enctype="multipart/form-data">
 
-        <textarea name="copete" class="w-full border p-2 rounded h-20" required>${noticia.copete}</textarea>
+        <input name="titulo" id="tit-noticia"
+          value="${noticia.titulo}"
+          class="w-full border p-2 rounded" required>
 
-        <textarea name="cuerpo" class="w-full border p-2 rounded h-40" required>${noticia.cuerpo}</textarea>
+        <textarea name="copete"
+          class="w-full border p-2 rounded h-20" required>${noticia.copete}</textarea>
 
-        <input name="autor" value="${noticia.autor}" class="w-full border p-2 rounded" required>
+        <select name="categoria_id" class="w-full border p-2 rounded" required>
+          <option value="">Seleccionar Categoría</option>
+          ${categorias.map(c => `
+            <option value="${c.id}" ${c.id === noticia.categoria_id ? "selected" : ""}>
+              ${c.nombre}
+            </option>
+          `).join("")}
+        </select>
+
+        <textarea name="cuerpo"
+          class="w-full border p-2 rounded h-40" required>${noticia.cuerpo}</textarea>
+
+        <input name="autor"
+          value="${noticia.autor}"
+          class="w-full border p-2 rounded" required>
+
+        <input type="file" name="imagen"
+          class="w-full border p-2 rounded">
+
+        <input type="hidden" name="slug" id="slug-noticia" value="${noticia.slug}">
 
         <button class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold">
           GUARDAR CAMBIOS
@@ -143,17 +169,28 @@ async function editarNoticia(id) {
       </form>
     `;
 
+    // AUTO SLUG (igual que crear)
+    const inputTitulo = document.getElementById("tit-noticia");
+    const inputSlug = document.getElementById("slug-noticia");
+
+    inputTitulo.addEventListener("input", () => {
+      inputSlug.value = inputTitulo.value
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s-]/g, "")
+        .replace(/[\s_-]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+    });
+
+    // SUBMIT
     document.getElementById("form-editar-noticia").onsubmit = async (e) => {
       e.preventDefault();
 
-      const data = Object.fromEntries(new FormData(e.target));
+      const formData = new FormData(e.target);
 
       const updateRes = await fetch(`${API_URL}/${id}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
+        body: formData,
         credentials: "include",
       });
 
@@ -161,7 +198,7 @@ async function editarNoticia(id) {
         closeModal();
         cargarNoticias();
       } else {
-        alert("Error al actualizar noticia");
+        alert("❌ Error al actualizar noticia");
       }
     };
 
@@ -169,6 +206,9 @@ async function editarNoticia(id) {
     console.error("Error al editar noticia", error);
   }
 }
+
+
+
 
 // ===============================
 // 📺 GESTIÓN DE PROGRAMACIÓN
