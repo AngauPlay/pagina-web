@@ -2,6 +2,8 @@ const { Usuario, create } = require("../models/Usuario");
 const bcrypt = require("bcrypt");
 const { genSalt, hash } = bcrypt;
 const jwt = require("jsonwebtoken");
+const { get } = require("../routes/newsRoutes");
+const { getAll } = require("./newsController");
 require("dotenv").config();
 
 const authController = {
@@ -70,6 +72,24 @@ const authController = {
       res.json({ usuario: req.usuario });
     } else {
       res.status(401).json({ mensaje: "No autenticado" });
+    }
+  },
+  getUserById: async (id) => {
+    try {
+      const usuario = await Usuario.findByPk(id);
+      return usuario;
+    } catch (error) {
+      throw new Error("Error al obtener usuario por ID");
+    }
+  },
+  getAllUsers: async () => {
+    try {
+      const usuarios = await Usuario.findAll({
+        attributes: ["id", "nombre", "rol"], // Solo campos públicos
+      });
+      return usuarios;
+    } catch (error) {
+      throw new Error("Error al obtener lista de usuarios");
     }
   },
 };
