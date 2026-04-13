@@ -47,7 +47,7 @@
         </button>
 
         <button
-  onclick="irARegistro()"
+  onclick="showSection('usuarios')"
   class="w-full text-left p-3 rounded hover:bg-purple-500 font-bold"
 >
   👤 Usuarios
@@ -117,6 +117,35 @@
           </table>
         </div>
       </section>
+
+      <section id="sec-usuarios" class="content-section hidden">
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-3xl font-black text-accent">Gestión de Usuarios</h2>
+    <button
+      onclick="openModal('usuario')"
+      class="btn-pink px-6 py-2 rounded-lg font-bold"
+    >
+      + Nuevo Usuario
+    </button>
+  </div>
+
+  <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+    <table class="w-full">
+      <thead class="bg-gray-200 text-gray-700">
+        <tr>
+          <th class="p-4 text-left">Usuario</th>
+          <th class="p-4 text-left">Contraseña</th>
+          <th class="p-4 text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tabla-usuarios"></tbody>
+    </table>
+  </div>
+</section>
+
+
+
+
     </main>
 
     <div

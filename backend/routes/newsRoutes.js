@@ -9,10 +9,11 @@ const upload = require("../middlewares/uploadMiddleware");
 
 // --- RUTAS PÚBLICAS (Lectores) ---
 router.get("/", newsController.getAll);
-router.get("/:id", newsController.getById);
+
 router.get("/detalle/:slug", newsController.getBySlug);
 router.get("/categorias", categoryController.listAll);
 router.get("/por-categoria/:nombreCat", newsController.getByCategory);
+router.get("/:id", newsController.getById);
 // --- RUTAS PRIVADAS (Panel Admin) ---
 // Usamos .post("/") o .post("/add") pero siempre con los middlewares
 router.post(

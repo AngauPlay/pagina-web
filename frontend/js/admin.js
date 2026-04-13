@@ -1,5 +1,6 @@
 const API_BASE = "http://localhost:3000";
 const API_URL = `${API_BASE}/noticias`;
+const API_USUARIOS = `${API_BASE}/usuarios`;
 const API_LOGOUT = `${API_BASE}/auth/logout`;
 const API_CATEGORIAS = `${API_BASE}/noticias/categorias`;
 
@@ -121,7 +122,7 @@ async function editarNoticia(id) {
     const content = document.getElementById("modal-content");
 
     // Traer noticia
-    const res = await fetch(`${API_URL}/detalle/${id}`);
+    const res = await fetch(`${API_URL}/${id}`);
     const noticia = await res.json();
 
     // Traer categorías
@@ -188,7 +189,7 @@ async function editarNoticia(id) {
 
       const formData = new FormData(e.target);
 
-      const updateRes = await fetch(`${API_URL}/${id}`, {
+      const updateRes = await fetch(`${API_URL}/edit/${id}`, {
         method: "PUT",
         body: formData,
         credentials: "include",
@@ -322,15 +323,11 @@ async function openModal(tipo) {
       </form>
     `;
 
-    const inputTitulo = document.getElementById("tit-noticia");
-    const inputSlug = document.getElementById("slug-noticia");
-
-    inputTitulo.addEventListener("input", () => {
-      inputSlug.value = inputTitulo.value.toLowerCase().replace(/\s+/g, "-");
-    });
-
     setupFormNoticia();
-  } else {
+  }
+
+  // ================= PROGRAMA =================
+else if (tipo === "programa") {
     content.innerHTML = `
       <h3 class="text-2xl font-black mb-4 text-purple-600">Nuevo Programa</h3>
 
@@ -353,10 +350,74 @@ async function openModal(tipo) {
         </button>
       </form>
     `;
-
     setupFormPrograma();
   }
+
+    // ================= USUARIO (NUEVO) =================
+  else if (tipo === "usuario") {
+    content.innerHTML = `
+      <h3 class="text-2xl font-black mb-4 text-pink-600">Nuevo Usuario</h3>
+
+      <form id="form-usuario" class="space-y-4">
+        <input name="username" placeholder="Nombre de usuario"
+          class="w-full border p-2 rounded" required>
+
+        <input type="password" name="password"
+          placeholder="Contraseña"
+          class="w-full border p-2 rounded" required>
+
+        <select name="rol" class="w-full border p-2 rounded" required>
+          <option value="">Seleccionar rol</option>
+          <option value="admin">Admin</option>
+          <option value="editor">Editor</option>
+        </select>
+
+        <button class="w-full bg-pink-600 text-white py-3 rounded-xl font-bold">
+          CREAR USUARIO
+        </button>
+      </form>
+    `;
+
+    document.getElementById("form-usuario").onsubmit = async (e) => {
+      e.preventDefault();
+
+      const data = Object.fromEntries(new FormData(e.target));
+
+      const res = await fetch(API_USUARIOS, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+        credentials: "include",
+      });
+
+      if (res.ok) {
+        closeModal();
+        cargarUsuarios();
+      } else {
+        alert("Error al crear usuario");
+      }
+    };
+  }
 }
+
+
+    const inputTitulo = document.getElementById("tit-noticia");
+    const inputSlug = document.getElementById("slug-noticia");
+
+    inputTitulo.addEventListener("input", () => {
+      inputSlug.value = inputTitulo.value.toLowerCase().replace(/\s+/g, "-");
+    });
+
+ 
+
+
+
+
+
+  
+
+    setupFormPrograma();
+  
 
 function closeModal() {
   document.getElementById("modal").classList.add("hidden");
@@ -382,3 +443,145 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 });
+
+
+async function cargarUsuarios() {
+  try {
+    const res = await fetch(API_USUARIOS, {
+      credentials: "include",
+    });
+
+    const usuarios = await res.json();
+    const lista = document.getElementById("tabla-usuarios");
+
+    if (!lista) return;
+
+    lista.innerHTML = usuarios
+      .map(
+        (u) => `
+        <tr class="border-b hover:bg-gray-50">
+          <td class="p-4 font-medium">${u.username}</td>
+          <td class="p-4">••••••••</td>
+          <td class="p-4 text-center space-x-2">
+            <button onclick="editarUsuario(${u.id})"
+              class="text-blue-500 font-bold hover:underline">
+              Editar
+            </button>
+
+            <button onclick="eliminarUsuario(${u.id})"
+              class="text-red-500 font-bold hover:underline">
+              Eliminar
+            </button>
+          </td>
+        </tr>
+      `
+      )
+      .join("");
+  } catch (error) {
+    console.error("Error al cargar usuarios", error);
+  }
+}
+
+
+async function eliminarUsuario(id) {
+  if (!confirm("¿Eliminar usuario?")) return;
+
+  const res = await fetch(`${API_USUARIOS}/${id}`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+
+  if (res.ok) cargarUsuarios();
+}
+
+
+async function editarUsuario(id) {
+  const modal = document.getElementById("modal");
+  const content = document.getElementById("modal-content");
+
+  const res = await fetch(`${API_USUARIOS}/${id}`, {
+    credentials: "include",
+  });
+
+  const user = await res.json();
+
+  modal.classList.remove("hidden");
+
+  content.innerHTML = `
+    <h3 class="text-2xl font-black mb-4 text-blue-600">Editar Usuario</h3>
+
+    <form id="form-editar-usuario" class="space-y-4">
+      <input name="username" value="${user.username}"
+        class="w-full border p-2 rounded" required>
+
+      <input type="password" name="password"
+        placeholder="Nueva contraseña (opcional)"
+        class="w-full border p-2 rounded">
+
+      <button class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold">
+        GUARDAR CAMBIOS
+      </button>
+    </form>
+  `;
+
+  document.getElementById("form-editar-usuario").onsubmit = async (e) => {
+    e.preventDefault();
+
+    const data = Object.fromEntries(new FormData(e.target));
+
+    const res = await fetch(`${API_USUARIOS}/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+      credentials: "include",
+    });
+
+    if (res.ok) {
+      closeModal();
+      cargarUsuarios();
+    } else {
+      alert("Error al actualizar usuario");
+    }
+  };
+}
+
+
+
+if (tipo === "usuario") {
+  content.innerHTML = `
+    <h3 class="text-2xl font-black mb-4 text-pink-600">Nuevo Usuario</h3>
+
+    <form id="form-usuario" class="space-y-4">
+      <input name="username" placeholder="Usuario"
+        class="w-full border p-2 rounded" required>
+
+      <input type="password" name="password"
+        placeholder="Contraseña"
+        class="w-full border p-2 rounded" required>
+
+      <button class="w-full bg-pink-600 text-white py-3 rounded-xl font-bold">
+        CREAR USUARIO
+      </button>
+    </form>
+  `;
+
+  document.getElementById("form-usuario").onsubmit = async (e) => {
+    e.preventDefault();
+
+    const data = Object.fromEntries(new FormData(e.target));
+
+    const res = await fetch(API_USUARIOS, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+      credentials: "include",
+    });
+
+    if (res.ok) {
+      closeModal();
+      cargarUsuarios();
+    } else {
+      alert("Error al crear usuario");
+    }
+  };
+}
