@@ -94,7 +94,7 @@ async function cargarNoticias() {
             </button>
           </td>
         </tr>
-      `
+      `,
       )
       .join("");
   } catch (error) {
@@ -145,11 +145,15 @@ async function editarNoticia(id) {
 
         <select name="categoria_id" class="w-full border p-2 rounded" required>
           <option value="">Seleccionar Categoría</option>
-          ${categorias.map(c => `
+          ${categorias
+            .map(
+              (c) => `
             <option value="${c.id}" ${c.id === noticia.categoria_id ? "selected" : ""}>
               ${c.nombre}
             </option>
-          `).join("")}
+          `,
+            )
+            .join("")}
         </select>
 
         <textarea name="cuerpo"
@@ -199,17 +203,13 @@ async function editarNoticia(id) {
         closeModal();
         cargarNoticias();
       } else {
-        alert("❌ Error al actualizar noticia");
+        alert("Error al actualizar noticia");
       }
     };
-
   } catch (error) {
     console.error("Error al editar noticia", error);
   }
 }
-
-
-
 
 // ===============================
 // 📺 GESTIÓN DE PROGRAMACIÓN
@@ -229,7 +229,6 @@ async function cargarProgramacion() {
       lista.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-gray-400 italic">No hay programas cargados en la grilla</td></tr>`;
       return;
     }
-  
 
     // 2. Generar el HTML de la tabla semanal
     lista.innerHTML = horasUnicas
@@ -243,31 +242,40 @@ async function cargarProgramacion() {
               const programa = programas.find(
                 (p) => p.dia_semana === diaIndex && p.hora.startsWith(hora),
               );
-            
+
               return `
-              <td class="p-2 border-r min-w-[120px] vertical-align-top">
-                ${
-                  programa
-                    ? `
-                  <div class="relative group bg-white p-2 rounded-lg shadow-sm border-l-4 border-pink-500">
-                    <div class="text-[10px] font-black text-pink-500 uppercase leading-none mb-1">En Vivo</div>
-                    <div class="font-bold text-slate-800 text-sm leading-tight">${programa.nombre}</div>
-                    <div class="text-[10px] text-gray-500 italic line-clamp-1">${programa.staff || ""}</div>
-                    
-                    <button onclick="eliminarPrograma(${programa.id})" 
-                            class="absolute -top-1 -right-1 bg-red-500 text-white w-5 h-5 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
-                      <i class="fas fa-times text-[10px]"></i>
-                    </button>
-                  </div>
-                `
-                    : `
-                  <div class="h-full w-full py-4 opacity-10 flex items-center justify-center">
-                    <i class="fas fa-minus text-gray-400"></i>
-                  </div>
-                `
-                }
-              </td>
-            `;
+          <td class="p-2 border-r min-w-[120px] vertical-align-top">
+          ${
+            programa
+              ? `
+          <div class="relative group bg-white p-2 rounded-lg shadow-sm border-l-4 border-pink-500">
+           <div class="text-[10px] font-black text-pink-500 uppercase leading-none mb-1">En Vivo</div>
+          <div class="font-bold text-slate-800 text-sm leading-tight">${programa.nombre}</div>
+          <div class="text-[10px] text-gray-500 italic line-clamp-1">${programa.staff || ""}</div>
+      
+          <div class="absolute -top-2 -right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+             <button onclick="editarPrograma(${programa.id})" 
+                  title="Editar"
+                  class="bg-blue-500 text-white w-6 h-6 rounded-full flex items-center justify-center shadow-md hover:bg-blue-600 transition-colors">
+            <i class="fas fa-edit text-[10px]"></i>
+          </button>
+        
+          <button onclick="eliminarPrograma(${programa.id})" 
+                title="Eliminar"
+                class="bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center shadow-md hover:bg-red-600 transition-colors">
+          <i class="fas fa-times text-[10px]"></i>
+        </button>
+        </div>
+        </div>
+      `
+              : `
+      <div class="h-full w-full py-4 opacity-10 flex items-center justify-center">
+       <i class="fas fa-minus text-gray-400"></i>
+     </div>
+    `
+          }
+    </td>
+    `;
             })
             .join("")}
         </tr>
@@ -276,6 +284,109 @@ async function cargarProgramacion() {
       .join("");
   } catch (error) {
     console.error("Error al cargar programas", error);
+  }
+}
+// ===============================
+// ✏️ EDITAR PROGRAMA
+// ===============================
+async function editarPrograma(id) {
+  try {
+    const modal = document.getElementById("modal");
+    const content = document.getElementById("modal-content");
+
+    // Traer datos del programa (Asumiendo que tienes una ruta /programas/:id)
+    const res = await fetch(`${API_BASE}/programas/${id}`);
+    const programa = await res.json();
+
+    modal.classList.remove("hidden");
+
+    content.innerHTML = `
+      <h3 class="text-2xl font-black mb-4 text-purple-600">Editar Programa</h3>
+
+      <form id="form-editar-programa" class="space-y-4">
+        <input name="nombre" value="${programa.nombre}" placeholder="Nombre"
+          class="w-full border p-2 rounded" required>
+
+        <input name="staff" value="${programa.staff || ""}" placeholder="Conductores"
+          class="w-full border p-2 rounded">
+
+        <input type="time" name="hora" value="${programa.hora.substring(0, 5)}"
+          class="w-full border p-2 rounded" required>
+
+        <select name="dia_semana" class="w-full border p-2 rounded">
+          ${dias
+            .map(
+              (d, i) => `
+            <option value="${i}" ${programa.dia_semana === i ? "selected" : ""}>
+              ${d}
+            </option>
+          `,
+            )
+            .join("")}
+        </select>
+
+        <div class="flex items-center space-x-2">
+          <input type="checkbox" name="activo" id="prog-activo" ${programa.activo ? "checked" : ""}>
+          <label for="prog-activo">Programa Activo</label>
+        </div>
+
+        <button class="w-full bg-purple-600 text-white py-3 rounded-xl font-bold">
+          GUARDAR CAMBIOS
+        </button>
+      </form>
+    `;
+
+    // Manejar el envío del formulario
+    document.getElementById("form-editar-programa").onsubmit = async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(e.target);
+      const data = {
+        nombre: formData.get("nombre"),
+        staff: formData.get("staff"),
+        hora: formData.get("hora"),
+        dia_semana: formData.get("dia_semana"),
+        activo: e.target.activo.checked,
+      };
+
+      const updateRes = await fetch(`${API_BASE}/programas/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+        credentials: "include",
+      });
+
+      if (updateRes.ok) {
+        closeModal();
+        cargarProgramacion(); // Recargar la grilla
+      } else {
+        alert("Error al actualizar el programa");
+      }
+    };
+  } catch (error) {
+    console.error("Error al editar programa", error);
+  }
+}
+
+// ===============================
+// 🗑️ ELIMINAR PROGRAMA
+// ===============================
+async function eliminarPrograma(id) {
+  if (!confirm("¿Seguro que deseas eliminar este programa?")) return;
+
+  try {
+    const res = await fetch(`${API_BASE}/programas/${id}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+
+    if (res.ok) {
+      cargarProgramacion(); // Recargar la grilla
+    } else {
+      alert("Error al eliminar el programa");
+    }
+  } catch (error) {
+    console.error("Error al eliminar programa", error);
   }
 }
 
@@ -304,7 +415,7 @@ async function openModal(tipo) {
 
         <select name="categoria_id" class="w-full border p-2 rounded" required>
           <option value="">Seleccionar Categoría</option>
-          ${categorias.map(c => `<option value="${c.id}">${c.nombre}</option>`).join("")}
+          ${categorias.map((c) => `<option value="${c.id}">${c.nombre}</option>`).join("")}
         </select>
 
         <textarea name="cuerpo" placeholder="Contenido"
@@ -342,7 +453,7 @@ else if (tipo === "programa") {
           class="w-full border p-2 rounded" required>
 
         <select name="dia_semana" class="w-full border p-2 rounded">
-          ${dias.map((d,i)=>`<option value="${i}">${d}</option>`).join("")}
+          ${dias.map((d, i) => `<option value="${i}">${d}</option>`).join("")}
         </select>
 
         <button class="w-full bg-purple-600 text-white py-2 rounded font-bold">
@@ -443,145 +554,3 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 });
-
-
-async function cargarUsuarios() {
-  try {
-    const res = await fetch(API_USUARIOS, {
-      credentials: "include",
-    });
-
-    const usuarios = await res.json();
-    const lista = document.getElementById("tabla-usuarios");
-
-    if (!lista) return;
-
-    lista.innerHTML = usuarios
-      .map(
-        (u) => `
-        <tr class="border-b hover:bg-gray-50">
-          <td class="p-4 font-medium">${u.username}</td>
-          <td class="p-4">••••••••</td>
-          <td class="p-4 text-center space-x-2">
-            <button onclick="editarUsuario(${u.id})"
-              class="text-blue-500 font-bold hover:underline">
-              Editar
-            </button>
-
-            <button onclick="eliminarUsuario(${u.id})"
-              class="text-red-500 font-bold hover:underline">
-              Eliminar
-            </button>
-          </td>
-        </tr>
-      `
-      )
-      .join("");
-  } catch (error) {
-    console.error("Error al cargar usuarios", error);
-  }
-}
-
-
-async function eliminarUsuario(id) {
-  if (!confirm("¿Eliminar usuario?")) return;
-
-  const res = await fetch(`${API_USUARIOS}/${id}`, {
-    method: "DELETE",
-    credentials: "include",
-  });
-
-  if (res.ok) cargarUsuarios();
-}
-
-
-async function editarUsuario(id) {
-  const modal = document.getElementById("modal");
-  const content = document.getElementById("modal-content");
-
-  const res = await fetch(`${API_USUARIOS}/${id}`, {
-    credentials: "include",
-  });
-
-  const user = await res.json();
-
-  modal.classList.remove("hidden");
-
-  content.innerHTML = `
-    <h3 class="text-2xl font-black mb-4 text-blue-600">Editar Usuario</h3>
-
-    <form id="form-editar-usuario" class="space-y-4">
-      <input name="username" value="${user.username}"
-        class="w-full border p-2 rounded" required>
-
-      <input type="password" name="password"
-        placeholder="Nueva contraseña (opcional)"
-        class="w-full border p-2 rounded">
-
-      <button class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold">
-        GUARDAR CAMBIOS
-      </button>
-    </form>
-  `;
-
-  document.getElementById("form-editar-usuario").onsubmit = async (e) => {
-    e.preventDefault();
-
-    const data = Object.fromEntries(new FormData(e.target));
-
-    const res = await fetch(`${API_USUARIOS}/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-      credentials: "include",
-    });
-
-    if (res.ok) {
-      closeModal();
-      cargarUsuarios();
-    } else {
-      alert("Error al actualizar usuario");
-    }
-  };
-}
-
-
-
-if (tipo === "usuario") {
-  content.innerHTML = `
-    <h3 class="text-2xl font-black mb-4 text-pink-600">Nuevo Usuario</h3>
-
-    <form id="form-usuario" class="space-y-4">
-      <input name="username" placeholder="Usuario"
-        class="w-full border p-2 rounded" required>
-
-      <input type="password" name="password"
-        placeholder="Contraseña"
-        class="w-full border p-2 rounded" required>
-
-      <button class="w-full bg-pink-600 text-white py-3 rounded-xl font-bold">
-        CREAR USUARIO
-      </button>
-    </form>
-  `;
-
-  document.getElementById("form-usuario").onsubmit = async (e) => {
-    e.preventDefault();
-
-    const data = Object.fromEntries(new FormData(e.target));
-
-    const res = await fetch(API_USUARIOS, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-      credentials: "include",
-    });
-
-    if (res.ok) {
-      closeModal();
-      cargarUsuarios();
-    } else {
-      alert("Error al crear usuario");
-    }
-  };
-}
