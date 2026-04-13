@@ -26,6 +26,22 @@ const getProgramasHoy = async (req, res) => {
     res.status(500).json({ error: "Error al obtener programas del día" });
   }
 };
+// Obtener un programa específico por su ID
+const getProgramasForId = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const programa = await Programa.findByPk(id);
+
+    if (!programa) {
+      return res.status(404).json({ message: "Programa no encontrado" });
+    }
+
+    res.json(programa);
+  } catch (error) {
+    console.error("Error al obtener programa por ID:", error);
+    res.status(500).json({ error: "Error al obtener programa por ID" });
+  }
+};
 
 const savePrograma = async (req, res) => {
   try {
@@ -126,4 +142,5 @@ module.exports = {
   deletePrograma,
   getAllProgramas,
   updatePrograma,
+  getProgramasForId,
 };
