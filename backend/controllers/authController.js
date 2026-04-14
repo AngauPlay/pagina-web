@@ -2,9 +2,6 @@ const { Usuario, create } = require("../models/Usuario");
 const bcrypt = require("bcrypt");
 const { genSalt, hash } = bcrypt;
 const jwt = require("jsonwebtoken");
-const { get } = require("../routes/newsRoutes");
-const { getAll } = require("./newsController");
-require("dotenv").config();
 
 const authController = {
   login: async (req, res) => {
@@ -56,7 +53,7 @@ const authController = {
       const nuevoUsuario = await create({
         nombre,
         password: hashedPassword,
-        rol: rol || "redactor",
+        rol: rol,
       });
 
       res.status(201).json({ mensaje: "Usuario creado", id: nuevoUsuario.id });
