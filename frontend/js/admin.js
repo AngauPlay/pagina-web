@@ -544,16 +544,32 @@ async function cargarUsuarios() {
     if (!lista) return;
 
     lista.innerHTML = usuarios
-      .map(
-        (u) => `
-        <tr class="border-b">
-          <td class="p-3">${u.id}</td>
-          <td class="p-3">${u.nombre}</td>
-          <td class="p-3">${u.rol}</td>
-        </tr>
-      `
-      )
-      .join("");
+  .map(
+    (u) => `
+    <tr class="border-b hover:bg-gray-50">
+      <td class="p-3">${u.id}</td>
+      <td class="p-3">${u.nombre}</td>
+      <td class="p-3">${u.rol}</td>
+
+      <td class="p-3 text-center space-x-2">
+        <button 
+          onclick="editarUsuario(${u.id})"
+          class="text-blue-500 font-bold hover:underline"
+        >
+          Editar
+        </button>
+
+        <button 
+          onclick="eliminarUsuario(${u.id})"
+          class="text-red-500 font-bold hover:underline"
+        >
+          Eliminar
+        </button>
+      </td>
+    </tr>
+  `
+  )
+  .join("");
   } catch (error) {
     console.error("Error al cargar usuarios", error);
   }
@@ -596,3 +612,81 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 });
+
+
+
+
+
+
+
+async function eliminarUsuario(id) {
+  if (!confirm("¿Seguro que querés eliminar este usuario?")) return;
+
+  try {
+    const res = await fetch(`${API_BASE}/auth/usuarios/${id}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+
+    if (res.ok) {
+      cargarUsuarios();
+    } else {
+      alert("Error al eliminar usuario");
+    }
+  } catch (error) {
+    console.error("Error:", error);
+  }
+}
+
+
+
+
+
+async function editarUsuario(id) {
+  const modal = document.getElementById("modal");
+  const content = document.getElementById("modal-content");
+
+  modal.classList.remove("hidden");
+
+  content.innerHTML = `
+    <h3 class="text-2xl font-black mb-4 text-blue-600">Editar Usuario</h3>
+
+    <form id="form-editar-usuario" class="space-y-4">
+      <input name="nombre" placeholder="Nuevo nombre"
+        class="w-full border p-2 rounded" required>
+
+      <input type="password" name="password"
+        placeholder="Nueva contraseña"
+        class="w-full border p-2 rounded">
+
+      <select name="rol" class="w-full border p-2 rounded">
+        <option value="admin">Admin</option>
+        <option value="editor">Editor</option>
+      </select>
+
+      <button class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold">
+        GUARDAR CAMBIOS
+      </button>
+    </form>
+  `;
+
+  document.getElementById("form-editar-usuario").onsubmit = async (e) => {
+    e.preventDefault();
+
+    const data = Object.fromEntries(new FormData(e.target));
+
+    const res = await fetch(`${API_BASE}/auth/usuarios/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+      credentials: "include",
+    });
+
+    if (res.ok) {
+      closeModal();
+      cargarUsuarios();
+    } else {
+      alert("Error al actualizar usuario");
+    }
+  };
+}
