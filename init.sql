@@ -96,7 +96,8 @@ CREATE TABLE `usuarios` (
 CREATE TABLE IF NOT EXISTS `programas` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `nombre` VARCHAR(255) NOT NULL,
-  `hora` TIME NOT NULL,
+  `hora_inicio` TIME NOT NULL,
+  `hora_fin` TIME NOT NULL,
   `staff` VARCHAR(255),
   `dia_semana` INT NOT NULL,
   `activo` TINYINT(1) DEFAULT 1,
