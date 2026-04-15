@@ -1,6 +1,6 @@
 const API_BASE = "http://localhost:3000";
 const API_URL = `${API_BASE}/noticias`;
-const API_USUARIOS = `${API_BASE}/usuarios`;
+const API_USUARIOS = `${API_BASE}/auth/usuarios`;
 const API_LOGOUT = `${API_BASE}/auth/logout`;
 const API_CATEGORIAS = `${API_BASE}/noticias/categorias`;
 
@@ -44,6 +44,7 @@ function showSection(section) {
 
   if (section === "noticias") cargarNoticias();
   if (section === "programacion") cargarProgramacion();
+  if (section === "usuarios") cargarUsuarios();
 }
 
 // ===============================
@@ -399,6 +400,7 @@ async function openModal(tipo) {
 
   modal.classList.remove("hidden");
 
+  // ================= NOTICIA =================
   if (tipo === "noticia") {
     const catRes = await fetch(API_CATEGORIAS);
     const categorias = await catRes.json();
@@ -434,6 +436,15 @@ async function openModal(tipo) {
       </form>
     `;
 
+     const inputTitulo = document.getElementById("tit-noticia");
+    const inputSlug = document.getElementById("slug-noticia");
+
+    inputTitulo.addEventListener("input", () => {
+      inputSlug.value = inputTitulo.value.toLowerCase().replace(/\s+/g, "-");
+    });
+
+
+
     setupFormNoticia();
   }
 
@@ -465,6 +476,8 @@ else if (tipo === "programa") {
   }
 
     // ================= USUARIO (NUEVO) =================
+
+    
   else if (tipo === "usuario") {
     content.innerHTML = `
       <h3 class="text-2xl font-black mb-4 text-pink-600">Nuevo Usuario</h3>
@@ -492,9 +505,17 @@ else if (tipo === "programa") {
     document.getElementById("form-usuario").onsubmit = async (e) => {
       e.preventDefault();
 
-      const data = Object.fromEntries(new FormData(e.target));
+      const formData = new FormData(e.target);
 
-      const res = await fetch(API_USUARIOS, {
+const data = {
+  nombre: formData.get("username"), // 👈 CAMBIO CLAVE
+  password: formData.get("password"),
+  rol: formData.get("rol"),
+};
+
+
+
+      const res = await fetch(`${API_BASE}/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -511,13 +532,35 @@ else if (tipo === "programa") {
   }
 }
 
-
-    const inputTitulo = document.getElementById("tit-noticia");
-    const inputSlug = document.getElementById("slug-noticia");
-
-    inputTitulo.addEventListener("input", () => {
-      inputSlug.value = inputTitulo.value.toLowerCase().replace(/\s+/g, "-");
+async function cargarUsuarios() {
+  try {
+    const res = await fetch(`${API_BASE}/auth/usuarios`, {
+      credentials: "include",
     });
+
+    const usuarios = await res.json();
+    const lista = document.getElementById("tabla-usuarios");
+
+    if (!lista) return;
+
+    lista.innerHTML = usuarios
+      .map(
+        (u) => `
+        <tr class="border-b">
+          <td class="p-3">${u.id}</td>
+          <td class="p-3">${u.nombre}</td>
+          <td class="p-3">${u.rol}</td>
+        </tr>
+      `
+      )
+      .join("");
+  } catch (error) {
+    console.error("Error al cargar usuarios", error);
+  }
+}
+
+
+   
 
  
 
@@ -527,7 +570,6 @@ else if (tipo === "programa") {
 
   
 
-    setupFormPrograma();
   
 
 function closeModal() {
