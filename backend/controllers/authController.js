@@ -1,10 +1,7 @@
-const { Usuario, create } = require("../models/Usuario");
+const { Usuario } = require("../models/Usuario"); // Importación corregida
 const bcrypt = require("bcrypt");
 const { genSalt, hash } = bcrypt;
 const jwt = require("jsonwebtoken");
-const { get } = require("../routes/newsRoutes");
-const { getAll } = require("./newsController");
-require("dotenv").config();
 
 const authController = {
   login: async (req, res) => {
@@ -19,15 +16,14 @@ const authController = {
       const token = jwt.sign(
         { id: usuario.id, rol: usuario.rol },
         process.env.JWT_SECRET,
-        { expiresIn: "8h" }, // 8 horas de sesión
+        { expiresIn: "8h" },
       );
 
-      // Enviamos el token en una Cookie
       res.cookie("token_angau", token, {
-        httpOnly: true, // No accesible por JS (Seguridad total)
-        secure: process.env.NODE_ENV === "production", // Solo HTTPS
-        sameSite: "strict", // Previene ataques CSRF
-        maxAge: 8 * 60 * 60 * 1000, // 8 horas en milisegundos
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 8 * 60 * 60 * 1000,
       });
 
       res.json({
@@ -44,19 +40,18 @@ const authController = {
     res.json({ mensaje: "Sesión cerrada" });
   },
 
-  // Registro (Solo para crear el primer usuario o si sos Admin)
   register: async (req, res) => {
     try {
       const { nombre, password, rol } = req.body;
 
-      // Hashear la contraseña antes de guardarla
       const salt = await genSalt(10);
       const hashedPassword = await hash(password, salt);
 
-      const nuevoUsuario = await create({
+      // Usamos Usuario.create en lugar de create solo
+      const nuevoUsuario = await Usuario.create({
         nombre,
         password: hashedPassword,
-        rol: rol || "redactor",
+        rol: rol || "user", // Rol por defecto si no viene en el body
       });
 
       res.status(201).json({ mensaje: "Usuario creado", id: nuevoUsuario.id });
@@ -67,28 +62,37 @@ const authController = {
       });
     }
   },
+
   session: (req, res) => {
+    // Esto asume que tienes un middleware que decodifica el token y llena req.usuario
     if (req.usuario) {
       res.json({ usuario: req.usuario });
     } else {
       res.status(401).json({ mensaje: "No autenticado" });
     }
   },
+
+  // Estos métodos parecen ser funciones de utilidad, asegúrate de llamarlos correctamente
   getUserById: async (id) => {
     try {
-      const usuario = await Usuario.findByPk(id);
-      return usuario;
+      return await Usuario.findByPk(id, {
+        attributes: ["id", "nombre", "rol"],
+      });
     } catch (error) {
       throw new Error("Error al obtener usuario por ID");
     }
   },
-  getAllUsers: async () => {
+
+  getAllUsers: async (req, res) => {
     try {
       const usuarios = await Usuario.findAll({
-        attributes: ["id", "nombre", "rol"], // Solo campos públicos
+        attributes: ["id", "nombre", "rol"],
       });
+      // Si esto se usa como ruta, necesita enviar respuesta
+      if (res) return res.json(usuarios);
       return usuarios;
     } catch (error) {
+      if (res) return res.status(500).json({ error: error.message });
       throw new Error("Error al obtener lista de usuarios");
     }
   },
