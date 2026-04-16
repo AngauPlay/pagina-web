@@ -4,25 +4,27 @@ const {Op} = require("sequelize");
 const getProgramasHoy = async (req, res) => {
 	try {
 		const ahora = new Date();
-
-		// OJO: Asegúrate que esto coincida con la zona horaria de tu audiencia
 		const hoy = ahora.getDay();
-		const horaActual = ahora.toLocaleTimeString("en-GB", {hour12: false}); // "HH:MM:SS"
+		// Usamos formato HH:mm:ss para comparar correctamente con la DB
+		const horaActual = ahora.toLocaleTimeString("en-GB", {hour12: false});
 
 		const programas = await Programa.findAll({
 			where: {
 				dia_semana: hoy,
 				activo: true,
-				hora_inicio: {
-					[Op.gte]: horaActual,
+				// Cambiamos la lógica:
+				// Queremos programas que aún no hayan terminado
+				hora_fin: {
+					[Op.gt]: horaActual,
 				},
 			},
 			order: [["hora_inicio", "ASC"]],
-			limit: 2,
+			limit: 2, // El que está al aire + el que sigue
 		});
 
 		res.json(programas);
 	} catch (error) {
+		console.error(error);
 		res.status(500).json({error: "Error al obtener programas del día"});
 	}
 };
