@@ -83,10 +83,10 @@ INSERT INTO `noticias` (`id`, `titulo`, `slug`, `copete`, `cuerpo`, `imagen_url`
 CREATE TABLE `programas` (
   `id` int(11) NOT NULL,
   `nombre` varchar(255) NOT NULL,
-  `hora` time NOT NULL,
+  `hora_inicio` time NOT NULL,
+  `hora_fin` time NOT NULL,
   `staff` varchar(255) DEFAULT NULL,
   `dia_semana` int(11) NOT NULL,
-  `activo` tinyint(1) DEFAULT 1,
   `createdAt` datetime NOT NULL,
   `updatedAt` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;

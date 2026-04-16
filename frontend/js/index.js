@@ -37,7 +37,7 @@
 
           contenedor.innerHTML = data
             .map((p) => {
-              const vivo = estaEnVivo(p.hora, p.hora);
+              const vivo = estaEnVivo(p.hora_inicio, p.hora_fin);
 
               return `
         <div class="relative rounded-xl overflow-hidden group cursor-pointer">
@@ -55,7 +55,7 @@
             <span class="text-[10px] font-bold ${
               vivo ? "text-yellow-neon" : "text-white/80"
             } uppercase">
-              ${vivo ? "EN VIVO 🔴" : `${p.inicio} - ${p.fin}`}
+             ${vivo ? "EN VIVO 🔴" : `${p.hora_inicio} - ${p.hora_fin}`}
             </span>
             <h3 class="font-bold text-sm">${p.nombre}</h3>
           </div>

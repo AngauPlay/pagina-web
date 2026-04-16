@@ -220,78 +220,72 @@ async function editarNoticia(id) {
 // ===============================
 
 async function cargarProgramacion() {
-	try {
-		const res = await fetch(`${API_BASE}/programas`);
-		const programas = await res.json();
-		const lista = document.getElementById("tabla-programacion");
+  try {
+    const res = await fetch(`${API_BASE}/programas`);
+    const programas = await res.json();
+    const lista = document.getElementById("tabla-programacion");
 
-		// 1. Obtener todas las horas únicas y ordenarlas
-		const horasUnicas = [
-			...new Set(programas.map((p) => p.hora.substring(0, 5))),
-		].sort();
+    if (!Array.isArray(programas) || programas.length === 0) {
+      lista.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-gray-400 italic">No hay programas cargados</td></tr>`;
+      return;
+    }
 
-		if (horasUnicas.length === 0) {
-			lista.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-gray-400 italic">No hay programas cargados en la grilla</td></tr>`;
-			return;
-		}
+    // 1. Extraer horas únicas de inicio (HH:mm)
+    const horasUnicas = [
+      ...new Set(
+        programas
+          .filter(p => p && p.hora_inicio) // Aseguramos que el objeto y la hora existan
+          .map(p => p.hora_inicio.substring(0, 5))
+      )
+    ].sort();
 
-		// 2. Generar el HTML de la tabla semanal
-		lista.innerHTML = horasUnicas
-			.map((hora) => {
-				return `
+    // 2. Renderizar filas
+    lista.innerHTML = horasUnicas.map(hora => {
+      return `
         <tr class="border-b hover:bg-gray-50">
           <td class="p-3 font-black text-purple-600 bg-purple-50 border-r w-24 text-center">
             ${hora} hs
           </td>
-          ${[0, 1, 2, 3, 4, 5, 6]
-						.map((diaIndex) => {
-							// Buscamos si hay un programa este día a esta hora
-							const programa = programas.find(
-								(p) => p.dia_semana === diaIndex && p.hora.startsWith(hora),
-							);
+          ${[0, 1, 2, 3, 4, 5, 6].map(diaIndex => {
+            
+            // BUSQUEDA SEGURA:
+            const programa = programas.find(p => {
+              if (!p || !p.hora_inicio) return false;
+              const hInicio = p.hora_inicio.substring(0, 5);
+              return p.dia_semana === diaIndex && hInicio === hora;
+            });
 
-							return `
-          <td class="p-2 border-r min-w-[120px] vertical-align-top">
-          ${
-						programa
-							? `
-          <div class="relative group bg-white p-2 rounded-lg shadow-sm border-l-4 border-pink-500">
-           <div class="text-[10px] font-black text-pink-500 uppercase leading-none mb-1">En Vivo</div>
-          <div class="font-bold text-slate-800 text-sm leading-tight">${programa.nombre}</div>
-          <div class="text-[10px] text-gray-500 italic line-clamp-1">${programa.staff || ""}</div>
-      
-          <div class="absolute -top-2 -right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-             <button onclick="editarPrograma(${programa.id})" 
-                  title="Editar"
-                  class="bg-blue-500 text-white w-6 h-6 rounded-full flex items-center justify-center shadow-md hover:bg-blue-600 transition-colors">
-            <i class="fas fa-edit text-[10px]"></i>
-          </button>
-        
-          <button onclick="eliminarPrograma(${programa.id})" 
-                title="Eliminar"
-                class="bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center shadow-md hover:bg-red-600 transition-colors">
-          <i class="fas fa-times text-[10px]"></i>
-        </button>
-        </div>
-        </div>
-      `
-							: `
-      <div class="h-full w-full py-4 opacity-10 flex items-center justify-center">
-       <i class="fas fa-minus text-gray-400"></i>
-     </div>
-    `
-					}
-    </td>
-    `;
-						})
-						.join("")}
-        </tr>
-      `;
-			})
-			.join("");
-	} catch (error) {
-		console.error("Error al cargar programas", error);
-	}
+            if (programa) {
+              return `
+                <td class="p-2 border-r min-w-[140px] align-top">
+                  <div class="relative group bg-white p-2 rounded-lg shadow-sm border-l-4 border-pink-500">
+                    <div class="text-[9px] font-black text-gray-400 uppercase mb-1">
+                      ${programa.hora_inicio.substring(0, 5)} - ${programa.hora_fin ? programa.hora_fin.substring(0, 5) : '??'}
+                    </div>
+                    <div class="font-bold text-slate-800 text-sm leading-tight">${programa.nombre}</div>
+                    <div class="text-[10px] text-gray-500 italic line-clamp-1">${programa.staff || ''}</div>
+                    
+                    <div class="absolute -top-2 -right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button onclick="editarPrograma(${programa.id})" class="bg-blue-500 text-white w-6 h-6 rounded-full flex items-center justify-center shadow-md">
+                        <i class="fas fa-edit text-[10px]"></i>
+                      </button>
+                      <button onclick="eliminarPrograma(${programa.id})" class="bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center shadow-md">
+                        <i class="fas fa-times text-[10px]"></i>
+                      </button>
+                    </div>
+                  </div>
+                </td>`;
+            } else {
+              return `<td class="p-2 border-r opacity-20 text-center"><i class="fas fa-minus text-gray-300"></i></td>`;
+            }
+          }).join("")}
+        </tr>`;
+    }).join("");
+
+  } catch (error) {
+    console.error("Error al cargar programas:", error);
+    lista.innerHTML = `<tr><td colspan="8" class="p-4 text-red-500 text-center">Error crítico al renderizar la grilla.</td></tr>`;
+  }
 }
 // ===============================
 // ✏️ EDITAR PROGRAMA
