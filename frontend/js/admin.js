@@ -5,42 +5,42 @@ const API_LOGOUT = `${API_BASE}/auth/logout`;
 const API_CATEGORIAS = `${API_BASE}/noticias/categorias`;
 
 const dias = [
-  "Domingo",
-  "Lunes",
-  "Martes",
-  "Miércoles",
-  "Jueves",
-  "Viernes",
-  "Sábado",
+	"Domingo",
+	"Lunes",
+	"Martes",
+	"Miércoles",
+	"Jueves",
+	"Viernes",
+	"Sábado",
 ];
 
 // ===============================
 // 🔐 PROTEGER ADMIN
 // ===============================
 async function verificarSesion() {
-  try {
-    const res = await fetch(`${API_BASE}/auth/me`, {
-      credentials: "include",
-    });
+	try {
+		const res = await fetch(`${API_BASE}/auth/me`, {
+			credentials: "include",
+		});
 
-    if (!res.ok) {
-      window.location.href = "/login.html";
-    }
-  } catch (error) {
-    window.location.href = "/login.html";
-  }
+		if (!res.ok) {
+			window.location.href = "/login.html";
+		}
+	} catch (error) {
+		window.location.href = "/login.html";
+	}
 }
 
 // ===============================
 // 📑 NAVEGACIÓN
 // ===============================
 function showSection(section) {
-  document
-    .querySelectorAll(".content-section")
-    .forEach((s) => s.classList.add("hidden"));
+	document
+		.querySelectorAll(".content-section")
+		.forEach((s) => s.classList.add("hidden"));
 
-  const target = document.getElementById(`sec-${section}`);
-  if (target) target.classList.remove("hidden");
+	const target = document.getElementById(`sec-${section}`);
+	if (target) target.classList.remove("hidden");
 
   if (section === "noticias") cargarNoticias();
   if (section === "programacion") cargarProgramacion();
@@ -51,23 +51,23 @@ function showSection(section) {
 // 👤 IR A REGISTRO
 // ===============================
 function irARegistro() {
-  window.location.href = "/register.html";
+	window.location.href = "/register.html";
 }
 
 // ===============================
 // 📰 GESTIÓN DE NOTICIAS
 // ===============================
 async function cargarNoticias() {
-  try {
-    const res = await fetch(API_URL);
-    const noticias = await res.json();
-    const lista = document.getElementById("tabla-noticias");
+	try {
+		const res = await fetch(API_URL);
+		const noticias = await res.json();
+		const lista = document.getElementById("tabla-noticias");
 
-    if (!lista) return;
+		if (!lista) return;
 
-    lista.innerHTML = noticias
-      .map(
-        (n) => `
+		lista.innerHTML = noticias
+			.map(
+				(n) => `
         <tr class="border-b hover:bg-gray-50">
           <td class="p-4 font-medium">${n.titulo}</td>
           <td class="p-4">${n.autor}</td>
@@ -96,43 +96,43 @@ async function cargarNoticias() {
           </td>
         </tr>
       `,
-      )
-      .join("");
-  } catch (error) {
-    console.error("Error al cargar noticias", error);
-  }
+			)
+			.join("");
+	} catch (error) {
+		console.error("Error al cargar noticias", error);
+	}
 }
 
 async function eliminarNoticia(id) {
-  if (!confirm("¿Seguro que deseas eliminar esta noticia?")) return;
+	if (!confirm("¿Seguro que deseas eliminar esta noticia?")) return;
 
-  const res = await fetch(`${API_URL}/${id}`, {
-    method: "DELETE",
-    credentials: "include",
-  });
+	const res = await fetch(`${API_URL}/${id}`, {
+		method: "DELETE",
+		credentials: "include",
+	});
 
-  if (res.ok) cargarNoticias();
+	if (res.ok) cargarNoticias();
 }
 
 // ===============================
 // ✏️ EDITAR NOTICIA (NUEVO)
 // ===============================
 async function editarNoticia(id) {
-  try {
-    const modal = document.getElementById("modal");
-    const content = document.getElementById("modal-content");
+	try {
+		const modal = document.getElementById("modal");
+		const content = document.getElementById("modal-content");
 
     // Traer noticia
     const res = await fetch(`${API_URL}/${id}`);
     const noticia = await res.json();
 
-    // Traer categorías
-    const catRes = await fetch(API_CATEGORIAS);
-    const categorias = await catRes.json();
+		// Traer categorías
+		const catRes = await fetch(API_CATEGORIAS);
+		const categorias = await catRes.json();
 
-    modal.classList.remove("hidden");
+		modal.classList.remove("hidden");
 
-    content.innerHTML = `
+		content.innerHTML = `
       <h3 class="text-2xl font-black mb-4 text-blue-600">Editar Noticia</h3>
 
       <form id="form-editar-noticia" class="space-y-4" enctype="multipart/form-data">
@@ -147,14 +147,14 @@ async function editarNoticia(id) {
         <select name="categoria_id" class="w-full border p-2 rounded" required>
           <option value="">Seleccionar Categoría</option>
           ${categorias
-            .map(
-              (c) => `
+						.map(
+							(c) => `
             <option value="${c.id}" ${c.id === noticia.categoria_id ? "selected" : ""}>
               ${c.nombre}
             </option>
           `,
-            )
-            .join("")}
+						)
+						.join("")}
         </select>
 
         <textarea name="cuerpo"
@@ -175,24 +175,24 @@ async function editarNoticia(id) {
       </form>
     `;
 
-    // AUTO SLUG (igual que crear)
-    const inputTitulo = document.getElementById("tit-noticia");
-    const inputSlug = document.getElementById("slug-noticia");
+		// AUTO SLUG (igual que crear)
+		const inputTitulo = document.getElementById("tit-noticia");
+		const inputSlug = document.getElementById("slug-noticia");
 
-    inputTitulo.addEventListener("input", () => {
-      inputSlug.value = inputTitulo.value
-        .toLowerCase()
-        .trim()
-        .replace(/[^\w\s-]/g, "")
-        .replace(/[\s_-]+/g, "-")
-        .replace(/^-+|-+$/g, "");
-    });
+		inputTitulo.addEventListener("input", () => {
+			inputSlug.value = inputTitulo.value
+				.toLowerCase()
+				.trim()
+				.replace(/[^\w\s-]/g, "")
+				.replace(/[\s_-]+/g, "-")
+				.replace(/^-+|-+$/g, "");
+		});
 
-    // SUBMIT
-    document.getElementById("form-editar-noticia").onsubmit = async (e) => {
-      e.preventDefault();
+		// SUBMIT
+		document.getElementById("form-editar-noticia").onsubmit = async (e) => {
+			e.preventDefault();
 
-      const formData = new FormData(e.target);
+			const formData = new FormData(e.target);
 
       const updateRes = await fetch(`${API_URL}/edit/${id}`, {
         method: "PUT",
@@ -200,16 +200,16 @@ async function editarNoticia(id) {
         credentials: "include",
       });
 
-      if (updateRes.ok) {
-        closeModal();
-        cargarNoticias();
-      } else {
-        alert("Error al actualizar noticia");
-      }
-    };
-  } catch (error) {
-    console.error("Error al editar noticia", error);
-  }
+			if (updateRes.ok) {
+				closeModal();
+				cargarNoticias();
+			} else {
+				alert("Error al actualizar noticia");
+			}
+		};
+	} catch (error) {
+		console.error("Error al editar noticia", error);
+	}
 }
 
 // ===============================
@@ -225,21 +225,17 @@ async function cargarProgramacion() {
 		const programas = await res.json();
 		const lista = document.getElementById("tabla-programacion");
 
-		if (!Array.isArray(programas) || programas.length === 0) {
-			lista.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-gray-400 italic">No hay programas cargados</td></tr>`;
+		// 1. Obtener todas las horas únicas y ordenarlas
+		const horasUnicas = [
+			...new Set(programas.map((p) => p.hora.substring(0, 5))),
+		].sort();
+
+		if (horasUnicas.length === 0) {
+			lista.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-gray-400 italic">No hay programas cargados en la grilla</td></tr>`;
 			return;
 		}
 
-		// 1. Extraer horas únicas de inicio (HH:mm)
-		const horasUnicas = [
-			...new Set(
-				programas
-					.filter((p) => p && p.hora_inicio) // Aseguramos que el objeto y la hora existan
-					.map((p) => p.hora_inicio.substring(0, 5)),
-			),
-		].sort();
-
-		// 2. Renderizar filas
+		// 2. Generar el HTML de la tabla semanal
 		lista.innerHTML = horasUnicas
 			.map((hora) => {
 				return `
@@ -249,44 +245,52 @@ async function cargarProgramacion() {
           </td>
           ${[0, 1, 2, 3, 4, 5, 6]
 						.map((diaIndex) => {
-							// BUSQUEDA SEGURA:
-							const programa = programas.find((p) => {
-								if (!p || !p.hora_inicio) return false;
-								const hInicio = p.hora_inicio.substring(0, 5);
-								return p.dia_semana === diaIndex && hInicio === hora;
-							});
+							// Buscamos si hay un programa este día a esta hora
+							const programa = programas.find(
+								(p) => p.dia_semana === diaIndex && p.hora.startsWith(hora),
+							);
 
-							if (programa) {
-								return `
-                <td class="p-2 border-r min-w-[140px] align-top">
-                  <div class="relative group bg-white p-2 rounded-lg shadow-sm border-l-4 border-pink-500">
-                    <div class="text-[9px] font-black text-gray-400 uppercase mb-1">
-                      ${programa.hora_inicio.substring(0, 5)} - ${programa.hora_fin ? programa.hora_fin.substring(0, 5) : "??"}
-                    </div>
-                    <div class="font-bold text-slate-800 text-sm leading-tight">${programa.nombre}</div>
-                    <div class="text-[10px] text-gray-500 italic line-clamp-1">${programa.staff || ""}</div>
-                    
-                    <div class="absolute -top-2 -right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button onclick="editarPrograma(${programa.id})" class="bg-blue-500 text-white w-6 h-6 rounded-full flex items-center justify-center shadow-md">
-                        <i class="fas fa-edit text-[10px]"></i>
-                      </button>
-                      <button onclick="eliminarPrograma(${programa.id})" class="bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center shadow-md">
-                        <i class="fas fa-times text-[10px]"></i>
-                      </button>
-                    </div>
-                  </div>
-                </td>`;
-							} else {
-								return `<td class="p-2 border-r opacity-20 text-center"><i class="fas fa-minus text-gray-300"></i></td>`;
-							}
+							return `
+          <td class="p-2 border-r min-w-[120px] vertical-align-top">
+          ${
+						programa
+							? `
+          <div class="relative group bg-white p-2 rounded-lg shadow-sm border-l-4 border-pink-500">
+           <div class="text-[10px] font-black text-pink-500 uppercase leading-none mb-1">En Vivo</div>
+          <div class="font-bold text-slate-800 text-sm leading-tight">${programa.nombre}</div>
+          <div class="text-[10px] text-gray-500 italic line-clamp-1">${programa.staff || ""}</div>
+      
+          <div class="absolute -top-2 -right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+             <button onclick="editarPrograma(${programa.id})" 
+                  title="Editar"
+                  class="bg-blue-500 text-white w-6 h-6 rounded-full flex items-center justify-center shadow-md hover:bg-blue-600 transition-colors">
+            <i class="fas fa-edit text-[10px]"></i>
+          </button>
+        
+          <button onclick="eliminarPrograma(${programa.id})" 
+                title="Eliminar"
+                class="bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center shadow-md hover:bg-red-600 transition-colors">
+          <i class="fas fa-times text-[10px]"></i>
+        </button>
+        </div>
+        </div>
+      `
+							: `
+      <div class="h-full w-full py-4 opacity-10 flex items-center justify-center">
+       <i class="fas fa-minus text-gray-400"></i>
+     </div>
+    `
+					}
+    </td>
+    `;
 						})
 						.join("")}
-        </tr>`;
+        </tr>
+      `;
 			})
 			.join("");
 	} catch (error) {
-		console.error("Error al cargar programas:", error);
-		lista.innerHTML = `<tr><td colspan="8" class="p-4 text-red-500 text-center">Error crítico al renderizar la grilla.</td></tr>`;
+		console.error("Error al cargar programas", error);
 	}
 }
 // ===============================
@@ -399,17 +403,16 @@ async function eliminarPrograma(id) {
 // 📦 MODALES
 // ===============================
 async function openModal(tipo) {
-  const modal = document.getElementById("modal");
-  const content = document.getElementById("modal-content");
+	const modal = document.getElementById("modal");
+	const content = document.getElementById("modal-content");
 
-  modal.classList.remove("hidden");
+	modal.classList.remove("hidden");
 
-  // ================= NOTICIA =================
-  if (tipo === "noticia") {
-    const catRes = await fetch(API_CATEGORIAS);
-    const categorias = await catRes.json();
+	if (tipo === "noticia") {
+		const catRes = await fetch(API_CATEGORIAS);
+		const categorias = await catRes.json();
 
-    content.innerHTML = `
+		content.innerHTML = `
       <h3 class="text-2xl font-black mb-4 text-pink-600">Nueva Noticia</h3>
 
       <form id="form-noticia" class="space-y-4" enctype="multipart/form-data">
@@ -440,12 +443,12 @@ async function openModal(tipo) {
       </form>
     `;
 
-     const inputTitulo = document.getElementById("tit-noticia");
-    const inputSlug = document.getElementById("slug-noticia");
+		const inputTitulo = document.getElementById("tit-noticia");
+		const inputSlug = document.getElementById("slug-noticia");
 
-    inputTitulo.addEventListener("input", () => {
-      inputSlug.value = inputTitulo.value.toLowerCase().replace(/\s+/g, "-");
-    });
+		inputTitulo.addEventListener("input", () => {
+			inputSlug.value = inputTitulo.value.toLowerCase().replace(/\s+/g, "-");
+		});
 
 
 
@@ -632,28 +635,28 @@ async function cargarUsuarios() {
   
 
 function closeModal() {
-  document.getElementById("modal").classList.add("hidden");
+	document.getElementById("modal").classList.add("hidden");
 }
 
 // ===============================
 // 🚀 INIT
 // ===============================
 document.addEventListener("DOMContentLoaded", async () => {
-  await verificarSesion();
-  showSection("noticias");
+	await verificarSesion();
+	showSection("noticias");
 
-  const logoutBtn = document.getElementById("logoutBtn");
+	const logoutBtn = document.getElementById("logoutBtn");
 
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", async () => {
-      await fetch(API_LOGOUT, {
-        method: "POST",
-        credentials: "include",
-      });
+	if (logoutBtn) {
+		logoutBtn.addEventListener("click", async () => {
+			await fetch(API_LOGOUT, {
+				method: "POST",
+				credentials: "include",
+			});
 
-      window.location.href = "/login.html";
-    });
-  }
+			window.location.href = "/login.html";
+		});
+	}
 });
 
 
