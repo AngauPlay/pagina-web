@@ -11,7 +11,6 @@ const getProgramasHoy = async (req, res) => {
 		const programas = await Programa.findAll({
 			where: {
 				dia_semana: hoy,
-				activo: true,
 				// Cambiamos la lógica:
 				// Queremos programas que aún no hayan terminado
 				hora_fin: {
