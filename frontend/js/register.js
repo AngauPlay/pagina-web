@@ -1,4 +1,4 @@
-const API_REGISTER = "http://localhost:3000/auth/register";
+const API_REGISTER = "http://localhost:3000/usuarios";
 
 const form = document.getElementById("registerForm");
 const mensaje = document.getElementById("mensaje");
