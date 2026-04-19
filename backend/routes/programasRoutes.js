@@ -7,7 +7,7 @@ const auth = require("../middlewares/authMiddleware");
 router.get("/hoy", programasController.getProgramasHoy);
 
 // Rutas para gestión de programas (Admin)
-router.get("/", auth, programasController.getAllProgramas);
+router.get("/", programasController.getAllProgramas);
 router.get("/:id", auth, programasController.getProgramasForId);
 router.post("/", auth, programasController.savePrograma);
 router.put("/:id", auth, programasController.updatePrograma);

@@ -152,7 +152,9 @@
 								alt="Instagram"
 							/>
 						</a>
-					</div>
+						<a href="https://wa.me/5493704808722" target="_blank">
+  <i class="fab fa-whatsapp text-white text-xl hover:scale-125 transition duration-300"></i>
+</a>					</div>
 
 					<img
 						src="/assets/matesito@4x.png"
@@ -183,29 +185,27 @@
 						class="text-yellow-neon border-l-4 border-yellow-neon pl-2"
 						>INICIO</a
 					>
-					<a href="politica.html" class="hover:text-blue-200 transition-colors"
-						>Política</a
-					>
+					
+
+					<a href="categoria.html?categoria=politica" class="hover:text-blue-200 transition-colors">Política</a>
+					
+					<a href="categoria.html?categoria=tecnologia" class="hover:text-blue-200 transition-colors"> Tecnología</a>
+					<a href="categoria.html?categoria=deportes" class="hover:text-blue-200 transition-colors"
+						>Deportes</a>
+
+					
+					<a href="categoria.html?categoria=economia" class="hover:text-blue-200 transition-colors">Economía</a>
+					
+					<a href="categoria.html?categoria=cultura" class="hover:text-blue-200 transition-colors"
+						>Cultura</a>
+
+
 					<a
-						href="tecnologia.html"
-						class="hover:text-blue-200 transition-colors"
-						>Tecnología</a
-					>
-					<a href="deportes.html" class="hover:text-blue-200 transition-colors"
-						>Deportes</a
-					>
-					<a href="Economia.html" class="hover:text-blue-200 transition-colors"
-						>Economía</a
-					>
-					<a href="cultura.html" class="hover:text-blue-200 transition-colors"
-						>Cultura</a
-					>
-					<a
-						href="actualidad.html"
+						href="categoria.html?categoria=actualidad"
 						class="hover:text-blue-200 transition-colors"
 						>Actualidad</a
 					>
-					<a href="salud.html" class="hover:text-blue-200 transition-colors"
+					<a href="categoria.html?categoria=salud" class="hover:text-blue-200 transition-colors"
 						>Salud</a
 					>
 				</nav>
@@ -284,6 +284,19 @@
 						PROGRAMACIÓN EN VIVO
 					</h2>
 					<div id="programacion-container" class="space-y-4"></div>
+					<!-- BOTÓN -->
+<button 
+  id="btn-ver-grilla"
+  class="w-full mt-4 bg-yellow-neon text-black font-bold py-2 rounded-lg hover:scale-105 transition"
+>
+  Ver programación completa
+</button>
+
+<!-- GRILLA COMPLETA (OCULTA) -->
+<div id="grilla-semanal" class="hidden mt-6 bg-white text-black rounded-xl p-4 space-y-4 max-h-[400px] overflow-y-auto"></div>
+
+
+
 				</aside>
 			</div>
 			<section class="mb-16" id="noticia-principal-section">
@@ -331,6 +344,27 @@
 				</div>
 			</section>
 		</main>
+
+<!-- MODAL PROGRAMACIÓN -->
+<div id="modal-programacion" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-[200] flex items-center justify-center">
+
+  <div class="bg-white w-[95%] h-[90%] rounded-2xl shadow-2xl p-6 relative overflow-hidden flex flex-col">
+    
+    <!-- BOTÓN CERRAR -->
+    <button id="cerrar-modal" class="absolute top-4 right-4 text-black text-2xl font-bold">
+      ✕
+    </button>
+
+    <!-- TÍTULO -->
+    <h2 class="text-2xl font-black mb-4 text-center">
+      Programación Semanal
+    </h2>
+
+    <!-- CONTENEDOR GRILLA -->
+    <div id="grilla-modal-contenido" class="flex-1 overflow-auto"></div>
+
+  </div>
+</div>
 
 		<footer
 			class="bg-gradient-to-r from-[rgb(198,29,102)] via-[rgb(104,89,165)] to-[rgb(68,99,174)] text-white mt-16"
