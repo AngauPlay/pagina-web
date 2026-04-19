@@ -15,7 +15,7 @@ const dias = [
 ];
 
 // ===============================
-// 🔐 PROTEGER ADMIN
+//  PROTEGER ADMIN
 // ===============================
 async function verificarSesion() {
 	try {
@@ -32,7 +32,7 @@ async function verificarSesion() {
 }
 
 // ===============================
-// 📑 NAVEGACIÓN
+//  NAVEGACIÓN
 // ===============================
 function showSection(section) {
 	document
@@ -42,20 +42,20 @@ function showSection(section) {
 	const target = document.getElementById(`sec-${section}`);
 	if (target) target.classList.remove("hidden");
 
-  if (section === "noticias") cargarNoticias();
-  if (section === "programacion") cargarProgramacion();
-  if (section === "usuarios") cargarUsuarios();
+	if (section === "noticias") cargarNoticias();
+	if (section === "programacion") cargarProgramacion();
+	if (section === "usuarios") cargarUsuarios();
 }
 
 // ===============================
-// 👤 IR A REGISTRO
+//  IR A REGISTRO
 // ===============================
 function irARegistro() {
 	window.location.href = "/register.html";
 }
 
 // ===============================
-// 📰 GESTIÓN DE NOTICIAS
+//  GESTIÓN DE NOTICIAS
 // ===============================
 async function cargarNoticias() {
 	try {
@@ -106,7 +106,7 @@ async function cargarNoticias() {
 async function eliminarNoticia(id) {
 	if (!confirm("¿Seguro que deseas eliminar esta noticia?")) return;
 
-	const res = await fetch(`${API_URL}/${id}`, {
+	const res = await fetch(`${API_URL}/delete/${id}`, {
 		method: "DELETE",
 		credentials: "include",
 	});
@@ -115,70 +115,70 @@ async function eliminarNoticia(id) {
 }
 
 // ===============================
-// ✏️ EDITAR NOTICIA (NUEVO)
+//  EDITAR NOTICIA
 // ===============================
 async function editarNoticia(id) {
 	try {
 		const modal = document.getElementById("modal");
 		const content = document.getElementById("modal-content");
 
-    // Traer noticia
-    const res = await fetch(`${API_URL}/${id}`);
-    const noticia = await res.json();
+		// Traer noticia y categorías en paralelo para mayor velocidad
+		const [res, catRes] = await Promise.all([
+			fetch(`${API_URL}/${id}`),
+			fetch(API_CATEGORIAS),
+		]);
 
-		// Traer categorías
-		const catRes = await fetch(API_CATEGORIAS);
+		const noticia = await res.json();
 		const categorias = await catRes.json();
 
 		modal.classList.remove("hidden");
 
 		content.innerHTML = `
-      <h3 class="text-2xl font-black mb-4 text-blue-600">Editar Noticia</h3>
+            <h3 class="text-2xl font-black mb-4 text-blue-600">Editar Noticia</h3>
+            <form id="form-editar-noticia" class="space-y-4" enctype="multipart/form-data">
+                <input name="titulo" id="tit-noticia" value="${noticia.titulo}" class="w-full border p-2 rounded" required>
+                <textarea name="copete" class="w-full border p-2 rounded h-20" required>${noticia.copete}</textarea>
+                
+                <select name="categoria_id" class="w-full border p-2 rounded" required>
+                    <option value="">Seleccionar Categoría</option>
+                    ${categorias
+											.map(
+												(c) => `
+                        <option value="${c.id}" ${c.id === noticia.categoria_id ? "selected" : ""}>${c.nombre}</option>
+                    `,
+											)
+											.join("")}
+                </select>
 
-      <form id="form-editar-noticia" class="space-y-4" enctype="multipart/form-data">
+                <textarea name="cuerpo" class="w-full border p-2 rounded h-40" required>${noticia.cuerpo}</textarea>
+                <input name="autor" value="${noticia.autor}" class="w-full border p-2 rounded" required>
 
-        <input name="titulo" id="tit-noticia"
-          value="${noticia.titulo}"
-          class="w-full border p-2 rounded" required>
+                <div class="border-t pt-4 mt-4 bg-gray-50 p-3 rounded-lg">
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Imagen de Portada (Principal)</label>
+                    <input type="file" name="portada" class="w-full border p-2 rounded mb-4 bg-white">
+                
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Añadir a Galería (Múltiple)</label>
+                    <input type="file" name="galeria" multiple class="w-full border p-2 rounded bg-white">
+                    <p class="text-[10px] text-gray-500 mt-1 uppercase italic">Puedes seleccionar varias imágenes nuevas</p>
+                </div>
+				
+				
+					<label class="block text-sm font-bold text-gray-700">Estado de la Noticia</label>
+					<select name="estado" class="w-full border p-2 rounded bg-white">
+						<option value="publicado" ${noticia.estado === "publicado" ? "selected" : ""}>Publicado</option>
+						<option value="borrador" ${noticia.estado === "borrador" ? "selected" : ""}>Borrador</option>
+					</select>
+                <input type="hidden" name="slug" id="slug-noticia" value="${noticia.slug}">
 
-        <textarea name="copete"
-          class="w-full border p-2 rounded h-20" required>${noticia.copete}</textarea>
+                <button type="submit" id="btn-guardar-edit" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition">
+                    GUARDAR CAMBIOS
+                </button>
+            </form>
+        `;
 
-        <select name="categoria_id" class="w-full border p-2 rounded" required>
-          <option value="">Seleccionar Categoría</option>
-          ${categorias
-						.map(
-							(c) => `
-            <option value="${c.id}" ${c.id === noticia.categoria_id ? "selected" : ""}>
-              ${c.nombre}
-            </option>
-          `,
-						)
-						.join("")}
-        </select>
-
-        <textarea name="cuerpo"
-          class="w-full border p-2 rounded h-40" required>${noticia.cuerpo}</textarea>
-
-        <input name="autor"
-          value="${noticia.autor}"
-          class="w-full border p-2 rounded" required>
-
-        <input type="file" name="imagen"
-          class="w-full border p-2 rounded">
-
-        <input type="hidden" name="slug" id="slug-noticia" value="${noticia.slug}">
-
-        <button class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold">
-          GUARDAR CAMBIOS
-        </button>
-      </form>
-    `;
-
-		// AUTO SLUG (igual que crear)
+		// Lógica de Auto-Slug
 		const inputTitulo = document.getElementById("tit-noticia");
 		const inputSlug = document.getElementById("slug-noticia");
-
 		inputTitulo.addEventListener("input", () => {
 			inputSlug.value = inputTitulo.value
 				.toLowerCase()
@@ -188,82 +188,95 @@ async function editarNoticia(id) {
 				.replace(/^-+|-+$/g, "");
 		});
 
-		// SUBMIT
-		document.getElementById("form-editar-noticia").onsubmit = async (e) => {
+		// Evento Submit corregido
+		const formEditar = document.getElementById("form-editar-noticia");
+		formEditar.onsubmit = async (e) => {
 			e.preventDefault();
+			const btnGuardar = document.getElementById("btn-guardar-edit");
+			const textoOriginal = btnGuardar.innerText;
 
-			const formData = new FormData(e.target);
+			btnGuardar.innerText = "GUARDANDO...";
+			btnGuardar.disabled = true;
 
-      const updateRes = await fetch(`${API_URL}/edit/${id}`, {
-        method: "PUT",
-        body: formData,
-        credentials: "include",
-      });
+			try {
+				const formData = new FormData(formEditar);
 
-			if (updateRes.ok) {
-				closeModal();
-				cargarNoticias();
-			} else {
-				alert("Error al actualizar noticia");
+				const updateRes = await fetch(`${API_URL}/edit/${id}`, {
+					method: "PUT",
+					body: formData,
+					credentials: "include",
+				});
+
+				if (updateRes.ok) {
+					alert("Noticia actualizada con éxito");
+					closeModal();
+					cargarNoticias();
+				} else {
+					const errData = await updateRes.json();
+					alert("Error: " + (errData.mensaje || "No se pudo actualizar"));
+				}
+			} catch (error) {
+				console.error("Error al actualizar:", error);
+				alert("Falla de conexión con el servidor");
+			} finally {
+				btnGuardar.innerText = textoOriginal;
+				btnGuardar.disabled = false;
 			}
 		};
 	} catch (error) {
-		console.error("Error al editar noticia", error);
+		console.error("Error al cargar edición", error);
 	}
 }
-
 // ===============================
-// 📺 GESTIÓN DE PROGRAMACIÓN
-// ===============================
-
-// 📺 GESTIÓN DE PROGRAMACIÓN
+//  GESTIÓN DE PROGRAMACIÓN
 // ===============================
 
 async function cargarProgramacion() {
-  try {
-    const res = await fetch(`${API_BASE}/programas`);
-    const programas = await res.json();
-    const lista = document.getElementById("tabla-programacion");
+	try {
+		const res = await fetch(`${API_BASE}/programas`);
+		const programas = await res.json();
+		const lista = document.getElementById("tabla-programacion");
 
-    if (!Array.isArray(programas) || programas.length === 0) {
-      lista.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-gray-400 italic">No hay programas cargados</td></tr>`;
-      return;
-    }
+		if (!Array.isArray(programas) || programas.length === 0) {
+			lista.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-gray-400 italic">No hay programas cargados</td></tr>`;
+			return;
+		}
 
-    // 1. Extraer horas únicas de inicio (HH:mm)
-    const horasUnicas = [
-      ...new Set(
-        programas
-          .filter(p => p && p.hora_inicio) // Aseguramos que el objeto y la hora existan
-          .map(p => p.hora_inicio.substring(0, 5))
-      )
-    ].sort();
+		// 1. Extraer horas únicas de inicio (HH:mm)
+		const horasUnicas = [
+			...new Set(
+				programas
+					.filter((p) => p && p.hora_inicio) // Aseguramos que el objeto y la hora existan
+					.map((p) => p.hora_inicio.substring(0, 5)),
+			),
+		].sort();
 
-    // 2. Renderizar filas
-    lista.innerHTML = horasUnicas.map(hora => {
-      return `
+		// 2. Renderizar filas
+		lista.innerHTML = horasUnicas
+			.map((hora) => {
+				return `
         <tr class="border-b hover:bg-gray-50">
           <td class="p-3 font-black text-purple-600 bg-purple-50 border-r w-24 text-center">
             ${hora} hs
           </td>
-          ${[0, 1, 2, 3, 4, 5, 6].map(diaIndex => {
-            
-            // BUSQUEDA SEGURA:
-            const programa = programas.find(p => {
-              if (!p || !p.hora_inicio) return false;
-              const hInicio = p.hora_inicio.substring(0, 5);
-              return p.dia_semana === diaIndex && hInicio === hora;
-            });
+          ${[0, 1, 2, 3, 4, 5, 6]
+						.map((diaIndex) => {
+							// BUSQUEDA SEGURA:
+							const programa = programas.find((p) => {
+								if (!p || !p.hora_inicio) return false;
+								const hInicio = p.hora_inicio.substring(0, 5);
+								return p.dia_semana === diaIndex && hInicio === hora;
+							});
 
-            if (programa) {
-              return `
+							if (programa) {
+								return `
                 <td class="p-2 border-r min-w-[140px] align-top">
                   <div class="relative group bg-white p-2 rounded-lg shadow-sm border-l-4 border-pink-500">
                     <div class="text-[9px] font-black text-gray-400 uppercase mb-1">
-                      ${programa.hora_inicio.substring(0, 5)} - ${programa.hora_fin ? programa.hora_fin.substring(0, 5) : '??'}
+                      ${programa.hora_inicio.substring(0, 5)} - ${programa.hora_fin ? programa.hora_fin.substring(0, 5) : "??"}
                     </div>
                     <div class="font-bold text-slate-800 text-sm leading-tight">${programa.nombre}</div>
-                    <div class="text-[10px] text-gray-500 italic line-clamp-1">${programa.staff || ''}</div>
+                    <div class="text-[10px] text-gray-500 italic line-clamp-1">${programa.staff || ""}</div>
                     
                     <div class="absolute -top-2 -right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button onclick="editarPrograma(${programa.id})" class="bg-blue-500 text-white w-6 h-6 rounded-full flex items-center justify-center shadow-md">
@@ -275,17 +288,18 @@ async function cargarProgramacion() {
                     </div>
                   </div>
                 </td>`;
-            } else {
-              return `<td class="p-2 border-r opacity-20 text-center"><i class="fas fa-minus text-gray-300"></i></td>`;
-            }
-          }).join("")}
+							} else {
+								return `<td class="p-2 border-r opacity-20 text-center"><i class="fas fa-minus text-gray-300"></i></td>`;
+							}
+						})
+						.join("")}
         </tr>`;
-    }).join("");
-
-  } catch (error) {
-    console.error("Error al cargar programas:", error);
-    lista.innerHTML = `<tr><td colspan="8" class="p-4 text-red-500 text-center">Error crítico al renderizar la grilla.</td></tr>`;
-  }
+			})
+			.join("");
+	} catch (error) {
+		console.error("Error al cargar programas:", error);
+		lista.innerHTML = `<tr><td colspan="8" class="p-4 text-red-500 text-center">Error crítico al renderizar la grilla.</td></tr>`;
+	}
 }
 // ===============================
 // ✏️ EDITAR PROGRAMA
@@ -295,7 +309,7 @@ async function editarPrograma(id) {
 		const modal = document.getElementById("modal");
 		const content = document.getElementById("modal-content");
 
-		// Traer datos del programa (Asumiendo que tienes una ruta /programas/:id)
+		// Traer datos del programa desde tu API
 		const res = await fetch(`${API_BASE}/programas/${id}`);
 		const programa = await res.json();
 
@@ -305,39 +319,52 @@ async function editarPrograma(id) {
       <h3 class="text-2xl font-black mb-4 text-purple-600">Editar Programa</h3>
 
       <form id="form-editar-programa" class="space-y-4">
-        <input name="nombre" value="${programa.nombre}" placeholder="Nombre"
-          class="w-full border p-2 rounded" required>
-
-        <input name="staff" value="${programa.staff || ""}" placeholder="Conductores"
-          class="w-full border p-2 rounded">
-
-        <input type="time" name="hora" value="${programa.hora.substring(0, 5)}"
-          class="w-full border p-2 rounded" required>
-
-        <select name="dia_semana" class="w-full border p-2 rounded">
-          ${dias
-						.map(
-							(d, i) => `
-            <option value="${i}" ${programa.dia_semana === i ? "selected" : ""}>
-              ${d}
-            </option>
-          `,
-						)
-						.join("")}
-        </select>
-
-        <div class="flex items-center space-x-2">
-          <input type="checkbox" name="activo" id="prog-activo" ${programa.activo ? "checked" : ""}>
-          <label for="prog-activo">Programa Activo</label>
+        <div>
+          <label class="block text-sm font-bold mb-1">Nombre del Programa</label>
+          <input name="nombre" value="${programa.nombre}" 
+            class="w-full border p-2 rounded focus:ring-2 focus:ring-purple-400 outline-none" required>
         </div>
 
-        <button class="w-full bg-purple-600 text-white py-3 rounded-xl font-bold">
+        <div>
+          <label class="block text-sm font-bold mb-1">Staff / Conductores</label>
+          <input name="staff" value="${programa.staff || ""}" 
+            class="w-full border p-2 rounded focus:ring-2 focus:ring-purple-400 outline-none">
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-bold mb-1">Hora Inicio</label>
+            <input type="time" name="hora_inicio" value="${programa.hora_inicio.substring(0, 5)}"
+              class="w-full border p-2 rounded" required>
+          </div>
+          <div>
+            <label class="block text-sm font-bold mb-1">Hora Fin</label>
+            <input type="time" name="hora_fin" value="${programa.hora_fin.substring(0, 5)}"
+              class="w-full border p-2 rounded" required>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-bold mb-1">Día de la Semana</label>
+          <select name="dia_semana" class="w-full border p-2 rounded">
+            ${dias
+							.map(
+								(d, i) => `
+              <option value="${i}" ${programa.dia_semana === i ? "selected" : ""}>
+                ${d}
+              </option>
+            `,
+							)
+							.join("")}
+          </select>
+        </div>
+
+        <button class="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-xl font-bold transition-colors">
           GUARDAR CAMBIOS
         </button>
       </form>
     `;
 
-		// Manejar el envío del formulario
 		document.getElementById("form-editar-programa").onsubmit = async (e) => {
 			e.preventDefault();
 
@@ -345,9 +372,10 @@ async function editarPrograma(id) {
 			const data = {
 				nombre: formData.get("nombre"),
 				staff: formData.get("staff"),
-				hora: formData.get("hora"),
-				dia_semana: formData.get("dia_semana"),
-				activo: e.target.activo.checked,
+				hora_inicio: formData.get("hora_inicio"),
+				hora_fin: formData.get("hora_fin"),
+				dia_semana: parseInt(formData.get("dia_semana")),
+				// Si tu backend lo requiere, puedes agregar updatedAt aquí o dejar que el servidor lo maneje
 			};
 
 			const updateRes = await fetch(`${API_BASE}/programas/${id}`, {
@@ -359,7 +387,7 @@ async function editarPrograma(id) {
 
 			if (updateRes.ok) {
 				closeModal();
-				cargarProgramacion(); // Recargar la grilla
+				cargarProgramacion();
 			} else {
 				alert("Error al actualizar el programa");
 			}
@@ -368,7 +396,6 @@ async function editarPrograma(id) {
 		console.error("Error al editar programa", error);
 	}
 }
-
 // ===============================
 // 🗑️ ELIMINAR PROGRAMA
 // ===============================
@@ -391,8 +418,6 @@ async function eliminarPrograma(id) {
 	}
 }
 
-
-
 // ===============================
 // 📦 MODALES
 // ===============================
@@ -406,6 +431,32 @@ async function openModal(tipo) {
 		const catRes = await fetch(API_CATEGORIAS);
 		const categorias = await catRes.json();
 
+		// Dentro de openModal('noticia'), busca donde configuras el submit
+		function setupFormNoticia() {
+			const form = document.getElementById("form-noticia");
+			form.onsubmit = async (e) => {
+				e.preventDefault();
+				const formData = new FormData(form);
+
+				try {
+					const res = await fetch(`${API_URL}/add`, {
+						method: "POST",
+						body: formData, // FormData enviará 'portada' y el array 'galeria'
+						credentials: "include",
+					});
+
+					if (res.ok) {
+						closeModal();
+						cargarNoticias();
+					} else {
+						alert("Error al publicar noticia");
+					}
+				} catch (error) {
+					console.error("Error:", error);
+				}
+			};
+		}
+
 		content.innerHTML = `
       <h3 class="text-2xl font-black mb-4 text-pink-600">Nueva Noticia</h3>
 
@@ -413,7 +464,7 @@ async function openModal(tipo) {
         <input name="titulo" id="tit-noticia" placeholder="Título"
           class="w-full border p-2 rounded" required>
 
-        <textarea name="copete" placeholder="Resumen"
+        <textarea name="copete" placeholder="Copete"
           class="w-full border p-2 rounded h-20" required></textarea>
 
         <select name="categoria_id" class="w-full border p-2 rounded" required>
@@ -427,7 +478,18 @@ async function openModal(tipo) {
         <input name="autor" placeholder="Autor"
           class="w-full border p-2 rounded" required>
 
-        <input type="file" name="imagen" class="w-full border p-2 rounded">
+		  <div class="border-t pt-4 mt-4">
+		  <label class="block text-sm font-bold text-gray-700 mb-2">Imagen de Portada (Principal)</label>
+		  <input type="file" name="portada" class="w-full border p-2 rounded mb-4">
+	  
+		  <label class="block text-sm font-bold text-gray-700 mb-2">Galería de Fotos (Opcional - Selecciona varias)</label>
+		  <input type="file" name="galeria" multiple class="w-full border p-2 rounded">
+		  <p class="text-[10px] text-gray-500 mt-1 uppercase italic">Puedes seleccionar varias imágenes a la vez</p>
+	  </div>
+	  <select name="estado" class="w-full border p-2 rounded">
+                    <option value="publicado">Publicado</option>
+                    <option value="borrador">Borrador</option>
+                </select>
 
         <input type="hidden" name="slug" id="slug-noticia">
 
@@ -444,14 +506,12 @@ async function openModal(tipo) {
 			inputSlug.value = inputTitulo.value.toLowerCase().replace(/\s+/g, "-");
 		});
 
+		setupFormNoticia();
+	}
 
-
-    setupFormNoticia();
-  }
-
-  // ================= PROGRAMA =================
-else if (tipo === "programa") {
-    content.innerHTML = `
+	// ================= PROGRAMA =================
+	else if (tipo === "programa") {
+		content.innerHTML = `
     <h3 class="text-2xl font-black mb-4 text-purple-600">Nuevo Programa</h3>
     <form id="form-programa" class="space-y-4">
       <input name="nombre" placeholder="Nombre" class="w-full border p-2 rounded" required>
@@ -475,51 +535,45 @@ else if (tipo === "programa") {
       <button class="w-full bg-purple-600 text-white py-2 rounded font-bold">GUARDAR</button>
     </form>
   `;
-    
-  
 
-  document.getElementById("form-programa").onsubmit = async (e) => {
-  e.preventDefault();
+		document.getElementById("form-programa").onsubmit = async (e) => {
+			e.preventDefault();
 
-  const formData = new FormData(e.target);
+			const formData = new FormData(e.target);
 
-  const data = {
-  nombre: formData.get("nombre"),
-  staff: formData.get("staff"),
-  hora_inicio: formData.get("hora_inicio"),
-  hora_fin: formData.get("hora_fin"),
-  dia_semana: parseInt(formData.get("dia_semana")),
-};
+			const data = {
+				nombre: formData.get("nombre"),
+				staff: formData.get("staff"),
+				hora_inicio: formData.get("hora_inicio"),
+				hora_fin: formData.get("hora_fin"),
+				dia_semana: parseInt(formData.get("dia_semana")),
+			};
 
-  try {
-    const res = await fetch(`${API_BASE}/programas`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-      credentials: "include",
-    });
+			try {
+				const res = await fetch(`${API_BASE}/programas`, {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify(data),
+					credentials: "include",
+				});
 
-    if (res.ok) {
-      closeModal();
-      cargarProgramacion();
-    } else {
-      alert("Error al crear programa");
-    }
-  } catch (error) {
-    console.error("Error:", error);
-  }
-};
-}
+				if (res.ok) {
+					closeModal();
+					cargarProgramacion();
+				} else {
+					alert("Error al crear programa");
+				}
+			} catch (error) {
+				console.error("Error:", error);
+			}
+		};
+	}
 
-  
-
-    // ================= USUARIO (NUEVO) =================
-
-    
-  else if (tipo === "usuario") {
-    content.innerHTML = `
+	// ================= USUARIO (NUEVO) =================
+	else if (tipo === "usuario") {
+		content.innerHTML = `
       <h3 class="text-2xl font-black mb-4 text-pink-600">Nuevo Usuario</h3>
 
       <form id="form-usuario" class="space-y-4">
@@ -542,50 +596,48 @@ else if (tipo === "programa") {
       </form>
     `;
 
-    document.getElementById("form-usuario").onsubmit = async (e) => {
-      e.preventDefault();
+		document.getElementById("form-usuario").onsubmit = async (e) => {
+			e.preventDefault();
 
-      const formData = new FormData(e.target);
+			const formData = new FormData(e.target);
 
-const data = {
-  nombre: formData.get("username"), // 👈 CAMBIO CLAVE
-  password: formData.get("password"),
-  rol: formData.get("rol"),
-};
+			const data = {
+				nombre: formData.get("username"),
+				password: formData.get("password"),
+				rol: formData.get("rol"),
+			};
 
+			const res = await fetch(`${API_BASE}/usuarios`, {
+				method: "POST",
+				headers: {"Content-Type": "application/json"},
+				body: JSON.stringify(data),
+				credentials: "include",
+			});
 
-
-      const res = await fetch(`${API_BASE}/usuarios`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-        credentials: "include",
-      });
-
-      if (res.ok) {
-        closeModal();
-        cargarUsuarios();
-      } else {
-        alert("Error al crear usuario");
-      }
-    };
-  }
+			if (res.ok) {
+				closeModal();
+				cargarUsuarios();
+			} else {
+				alert("Error al crear usuario");
+			}
+		};
+	}
 }
 
 async function cargarUsuarios() {
-  try {
-    const res = await fetch(`${API_BASE}/usuarios`, {
-      credentials: "include",
-    });
+	try {
+		const res = await fetch(`${API_BASE}/usuarios`, {
+			credentials: "include",
+		});
 
-    const usuarios = await res.json();
-    const lista = document.getElementById("tabla-usuarios");
+		const usuarios = await res.json();
+		const lista = document.getElementById("tabla-usuarios");
 
-    if (!lista) return;
+		if (!lista) return;
 
-    lista.innerHTML = usuarios
-  .map(
-    (u) => `
+		lista.innerHTML = usuarios
+			.map(
+				(u) => `
     <tr class="border-b hover:bg-gray-50">
       <td class="p-3">${u.id}</td>
       <td class="p-3">${u.nombre}</td>
@@ -607,26 +659,13 @@ async function cargarUsuarios() {
         </button>
       </td>
     </tr>
-  `
-  )
-  .join("");
-  } catch (error) {
-    console.error("Error al cargar usuarios", error);
-  }
+  `,
+			)
+			.join("");
+	} catch (error) {
+		console.error("Error al cargar usuarios", error);
+	}
 }
-
-
-   
-
- 
-
-
-
-
-
-  
-
-  
 
 function closeModal() {
 	document.getElementById("modal").classList.add("hidden");
@@ -653,42 +692,32 @@ document.addEventListener("DOMContentLoaded", async () => {
 	}
 });
 
-
-
-
-
-
-
 async function eliminarUsuario(id) {
-  if (!confirm("¿Seguro que querés eliminar este usuario?")) return;
+	if (!confirm("¿Seguro que querés eliminar este usuario?")) return;
 
-  try {
-    const res = await fetch(`${API_BASE}/usuarios/${id}`, {
-      method: "DELETE",
-      credentials: "include",
-    });
+	try {
+		const res = await fetch(`${API_BASE}/usuarios/${id}`, {
+			method: "DELETE",
+			credentials: "include",
+		});
 
-    if (res.ok) {
-      cargarUsuarios();
-    } else {
-      alert("Error al eliminar usuario");
-    }
-  } catch (error) {
-    console.error("Error:", error);
-  }
+		if (res.ok) {
+			cargarUsuarios();
+		} else {
+			alert("Error al eliminar usuario");
+		}
+	} catch (error) {
+		console.error("Error:", error);
+	}
 }
 
-
-
-
-
 async function editarUsuario(id) {
-  const modal = document.getElementById("modal");
-  const content = document.getElementById("modal-content");
+	const modal = document.getElementById("modal");
+	const content = document.getElementById("modal-content");
 
-  modal.classList.remove("hidden");
+	modal.classList.remove("hidden");
 
-  content.innerHTML = `
+	content.innerHTML = `
     <h3 class="text-2xl font-black mb-4 text-blue-600">Editar Usuario</h3>
 
     <form id="form-editar-usuario" class="space-y-4">
@@ -710,23 +739,23 @@ async function editarUsuario(id) {
     </form>
   `;
 
-  document.getElementById("form-editar-usuario").onsubmit = async (e) => {
-    e.preventDefault();
+	document.getElementById("form-editar-usuario").onsubmit = async (e) => {
+		e.preventDefault();
 
-    const data = Object.fromEntries(new FormData(e.target));
+		const data = Object.fromEntries(new FormData(e.target));
 
-    const res = await fetch(`${API_BASE}/usuarios/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-      credentials: "include",
-    });
+		const res = await fetch(`${API_BASE}/usuarios/${id}`, {
+			method: "PUT",
+			headers: {"Content-Type": "application/json"},
+			body: JSON.stringify(data),
+			credentials: "include",
+		});
 
-    if (res.ok) {
-      closeModal();
-      cargarUsuarios();
-    } else {
-      alert("Error al actualizar usuario");
-    }
-  };
+		if (res.ok) {
+			closeModal();
+			cargarUsuarios();
+		} else {
+			alert("Error al actualizar usuario");
+		}
+	};
 }

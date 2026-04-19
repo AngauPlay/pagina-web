@@ -7,7 +7,8 @@
 		<script src="https://cdn.tailwindcss.com"></script>
 		<link
 			rel="stylesheet"
-			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+		/>
 		<style>
 			:root {
 				--pink-accent: rgb(224, 35, 117);
@@ -62,11 +63,28 @@
 					opacity: 0.5;
 				}
 			}
+			/* Estilo para que el cursor indique que la imagen se puede ampliar */
+			#articulo-imagen,
+			.galeria-item img {
+				cursor: zoom-in;
+			}
+
+			/* Personalización opcional del fondo de PhotoSwipe para que coincida con tu tema */
+			.pswp__bg {
+				background: rgba(
+					10,
+					10,
+					15,
+					0.95
+				); /* Un tono muy oscuro de tu paleta */
+				backdrop-filter: blur(5px);
+			}
 		</style>
 	</head>
 	<body class="bg-gray-50 font-sans text-slate-900">
 		<header
-			class="bg-purple-main text-white p-4 sticky top-0 z-[100] shadow-xl border-b border-white/10">
+			class="bg-purple-main text-white p-4 sticky top-0 z-[100] shadow-xl border-b border-white/10"
+		>
 			<div class="container mx-auto flex justify-between items-center">
 				<div class="flex items-center gap-4">
 					<button
@@ -75,12 +93,14 @@
 								? window.history.back()
 								: (window.location.href = 'index.html')
 						"
-						class="text-2xl hover:text-yellow-neon transition-all p-2 rounded-lg">
+						class="text-2xl hover:text-yellow-neon transition-all p-2 rounded-lg"
+					>
 						<i class="fas fa-arrow-left"></i>
 					</button>
 
 					<span
-						class="hidden md:block text-[10px] font-bold text-white/80 uppercase tracking-wider">
+						class="hidden md:block text-[10px] font-bold text-white/80 uppercase tracking-wider"
+					>
 						El primer canal de streaming formoseño
 					</span>
 				</div>
@@ -90,7 +110,8 @@
 						<img
 							src="/assets/cmpleto logo@4x.png"
 							alt="Angau Play"
-							class="h-10 md:h-12 object-contain cursor-pointer hover:scale-110 transition" />
+							class="h-10 md:h-12 object-contain cursor-pointer hover:scale-110 transition"
+						/>
 					</a>
 				</div>
 
@@ -153,35 +174,42 @@
 
 			<div
 				id="overlay"
-				class="fixed inset-0 bg-black/60 hidden z-[105] backdrop-blur-sm"></div>
+				class="fixed inset-0 bg-black/60 hidden z-[105] backdrop-blur-sm"
+			></div>
 		</header>
 
 		<main class="container mx-auto px-4 py-8 max-w-6xl">
 			<div id="loading-state" class="text-center py-20">
 				<div
-					class="loading-pulse text-purple-main text-xl font-black italic uppercase tracking-widest">
+					class="loading-pulse text-purple-main text-xl font-black italic uppercase tracking-widest"
+				>
 					Sincronizando señal...
 				</div>
 			</div>
 
 			<div
 				id="articulo-content"
-				class="hidden flex flex-col lg:flex-row gap-12">
+				class="hidden flex flex-col lg:flex-row gap-12"
+			>
 				<article class="lg:w-2/3">
 					<span
 						id="articulo-categoria"
-						class="bg-pink-accent text-white text-[10px] font-black px-4 py-1 rounded-full uppercase tracking-widest shadow-lg shadow-pink-500/20"></span>
+						class="bg-pink-accent text-white text-[10px] font-black px-4 py-1 rounded-full uppercase tracking-widest shadow-lg shadow-pink-500/20"
+					></span>
 
 					<h1
 						id="articulo-titulo"
-						class="text-4xl md:text-5xl font-black mt-6 mb-8 leading-tight text-slate-900 italic tracking-tighter"></h1>
+						class="text-4xl md:text-5xl font-black mt-6 mb-8 leading-tight text-slate-900 italic tracking-tighter"
+					></h1>
 
 					<div
-						class="flex items-center gap-4 mb-10 text-sm text-slate-500 border-b border-slate-200 pb-8">
+						class="flex items-center gap-4 mb-10 text-sm text-slate-500 border-b border-slate-200 pb-8"
+					>
 						<div class="flex items-center gap-3">
 							<div
 								class="w-10 h-10 bg-purple-main rounded-xl flex items-center justify-center text-yellow-neon font-black text-xs shadow-lg"
-								id="autor-iniciales">
+								id="autor-iniciales"
+							>
 								AP
 							</div>
 							<div>
@@ -198,42 +226,68 @@
 						<span class="text-slate-300">|</span>
 						<time
 							id="articulo-fecha"
-							class="font-mono font-bold text-purple-main"></time>
+							class="font-mono font-bold text-purple-main"
+						></time>
 					</div>
 
 					<div
-						class="rounded-3xl overflow-hidden shadow-2xl mb-12 border-4 border-white">
-						<img
-							id="articulo-imagen"
-							src=""
-							alt=""
-							class="w-full h-auto object-cover" />
+						id="galeria-principal"
+						class="rounded-3xl overflow-hidden shadow-2xl mb-12 border-4 border-white relative group"
+					>
+						<a
+							id="articulo-imagen-link"
+							href=""
+							data-pswp-width=""
+							data-pswp-height=""
+							target="_blank"
+						>
+							<img
+								id="articulo-imagen"
+								src=""
+								alt=""
+								class="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
+							/>
+
+							<div
+								class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+							>
+								<i
+									class="fas fa-search-plus text-white text-4xl bg-purple-main/80 p-4 rounded-full shadow-lg"
+								></i>
+							</div>
+						</a>
 					</div>
 
 					<div
 						id="articulo-cuerpo"
-						class="prose prose-slate prose-lg max-w-none"></div>
+						class="prose prose-slate prose-lg max-w-none"
+					></div>
 
 					<div
 						id="video-container"
-						class="mt-16 p-8 bg-pink-accent rounded-3xl shadow-2xl relative overflow-hidden hidden">
+						class="mt-16 p-8 bg-pink-accent rounded-3xl shadow-2xl relative overflow-hidden hidden"
+					>
 						<div class="absolute top-0 right-0 p-4 opacity-10">
 							<i class="fas fa-play text-8xl text-white"></i>
 						</div>
 						<h3
-							class="text-white text-sm font-black mb-6 uppercase flex items-center gap-3 relative z-10">
+							class="text-white text-sm font-black mb-6 uppercase flex items-center gap-3 relative z-10"
+						>
 							<span
-								class="w-3 h-3 bg-yellow-neon rounded-full animate-pulse shadow-[0_0_10px_#e5eb35]"></span>
+								class="w-3 h-3 bg-yellow-neon rounded-full animate-pulse shadow-[0_0_10px_#e5eb35]"
+							></span>
 							Contenido Multimedia
 						</h3>
 						<div
-							class="aspect-video rounded-2xl overflow-hidden border-2 border-white/20 shadow-inner relative z-10">
+							class="aspect-video rounded-2xl overflow-hidden border-2 border-white/20 shadow-inner relative z-10"
+						>
 							<iframe
 								id="articulo-video"
 								class="w-full h-full"
 								src=""
 								frameborder="0"
-								allowfullscreen></iframe>
+								allowfullscreen
+							></iframe>
 						</div>
 					</div>
 				</article>
@@ -241,11 +295,14 @@
 				<aside class="lg:w-1/3">
 					<div class="sticky top-28 space-y-8">
 						<div
-							class="bg-white p-8 rounded-3xl shadow-xl border border-slate-100 relative overflow-hidden">
+							class="bg-white p-8 rounded-3xl shadow-xl border border-slate-100 relative overflow-hidden"
+						>
 							<div
-								class="absolute top-0 left-0 w-2 h-full bg-purple-main"></div>
+								class="absolute top-0 left-0 w-2 h-full bg-purple-main"
+							></div>
 							<h4
-								class="font-black text-slate-900 mb-8 uppercase italic flex items-center justify-between">
+								class="font-black text-slate-900 mb-8 uppercase italic flex items-center justify-between"
+							>
 								LO ÚLTIMO <i class="fas fa-bolt text-yellow-500"></i>
 							</h4>
 							<div id="sidebar-recientes" class="space-y-8"></div>
@@ -253,16 +310,19 @@
 
 						<div
 							class="bg-purple-main p-8 rounded-3xl text-white shadow-2xl text-center group cursor-pointer"
-							onclick="window.location.href = 'index.html'">
+							onclick="window.location.href = 'index.html'"
+						>
 							<h5
-								class="font-black text-xl italic mb-2 group-hover:text-yellow-neon transition-colors">
+								class="font-black text-xl italic mb-2 group-hover:text-yellow-neon transition-colors"
+							>
 								¿TE PERDISTE ALGO?
 							</h5>
 							<p class="text-xs text-white/70 mb-4 uppercase tracking-widest">
 								Explora toda la portada de hoy
 							</p>
 							<div
-								class="inline-block bg-pink-accent px-6 py-2 rounded-full font-black text-[10px] tracking-widest uppercase">
+								class="inline-block bg-pink-accent px-6 py-2 rounded-full font-black text-[10px] tracking-widest uppercase"
+							>
 								VOLVER AL VIVO
 							</div>
 						</div>

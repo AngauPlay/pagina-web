@@ -75,7 +75,14 @@ INSERT INTO `noticias` (`id`, `titulo`, `slug`, `copete`, `cuerpo`, `imagen_url`
 (3, 'Nuevas tendencias en el mercado digital', 'tendencias-mercado-digital', 'La economía se transforma hacia modelos de suscripción y servicios en la nube.', 'Analistas aseguran que las empresas que no se adapten a la transformación digital perderán competitividad en los próximos dos años.', 'https://picsum.photos/800/400?random=3', '2026-03-21 22:06:51', 5, 'Carlos Slim', 'borrador');
 
 -- --------------------------------------------------------
+-- Estructura de tabla para la tabla `noticias_imagenes`
+-- --------------------------------------------------------  
 
+CREATE TABLE `noticias_imagenes` (
+  `id` int(11) NOT NULL,
+  `noticia_id` int(11) NOT NULL,
+  `url` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 --
 -- Estructura de tabla para la tabla `programas`
 --
@@ -115,71 +122,57 @@ INSERT INTO `usuarios` (`id`, `nombre`, `password`, `rol`) VALUES
 -- Índices para tablas volcadas
 --
 
---
--- Indices de la tabla `categorias`
---
+-- --------------------------------------------------------
+-- Índices y Restricciones
+-- --------------------------------------------------------
+
+-- Índices de la tabla `categorias`
 ALTER TABLE `categorias`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `slug` (`slug`);
 
---
--- Indices de la tabla `noticias`
---
+-- Índices de la tabla `noticias`
 ALTER TABLE `noticias`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `slug_unico` (`slug`),
   ADD KEY `fk_categoria` (`categoria_id`);
 
---
--- Indices de la tabla `programas`
---
+-- Índices de la tabla `noticias_imagenes`
+ALTER TABLE `noticias_imagenes`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_noticia_galeria` (`noticia_id`);
+
+-- Índices de la tabla `programas`
 ALTER TABLE `programas`
   ADD PRIMARY KEY (`id`);
 
---
--- Indices de la tabla `usuarios`
---
+-- Índices de la tabla `usuarios`
 ALTER TABLE `usuarios`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `nombre_unico` (`nombre`);
 
---
--- AUTO_INCREMENT de las tablas volcadas
---
+-- --------------------------------------------------------
+-- AUTO_INCREMENT
+-- --------------------------------------------------------
 
---
--- AUTO_INCREMENT de la tabla `categorias`
---
-ALTER TABLE `categorias`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+ALTER TABLE `categorias` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+ALTER TABLE `noticias` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+ALTER TABLE `noticias_imagenes` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `programas` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `usuarios` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
---
--- AUTO_INCREMENT de la tabla `noticias`
---
-ALTER TABLE `noticias`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+-- --------------------------------------------------------
+-- Llaves Foráneas (Restricciones)
+-- --------------------------------------------------------
 
---
--- AUTO_INCREMENT de la tabla `programas`
---
-ALTER TABLE `programas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de la tabla `usuarios`
---
-ALTER TABLE `usuarios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
--- Restricciones para tablas volcadas
---
-
---
--- Filtros para la tabla `noticias`
---
+-- Filtro para noticias -> categorías
 ALTER TABLE `noticias`
   ADD CONSTRAINT `fk_categoria` FOREIGN KEY (`categoria_id`) REFERENCES `categorias` (`id`) ON DELETE CASCADE;
+
+-- Filtro para noticias_imagenes -> noticias
+ALTER TABLE `noticias_imagenes`
+  ADD CONSTRAINT `fk_noticia_galeria` FOREIGN KEY (`noticia_id`) REFERENCES `noticias` (`id`) ON DELETE CASCADE;
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
