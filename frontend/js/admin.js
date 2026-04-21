@@ -45,6 +45,7 @@ function showSection(section) {
 	if (section === "noticias") cargarNoticias();
 	if (section === "programacion") cargarProgramacion();
 	if (section === "usuarios") cargarUsuarios();
+	if (section === "publicidad") cargarPublicidad();
 }
 
 // ===============================
@@ -113,6 +114,18 @@ async function eliminarNoticia(id) {
 
 	if (res.ok) cargarNoticias();
 }
+// Función global para generar slugs limpios en el Front
+function generarSlug(texto) {
+	return texto
+		.toString()
+		.normalize("NFD") // Separa letras de acentos
+		.replace(/[\u0300-\u036f]/g, "") // Elimina los acentos
+		.toLowerCase()
+		.trim()
+		.replace(/[^a-z0-9 -]/g, "") // Quita caracteres especiales
+		.replace(/\s+/g, "-") // Espacios por guiones
+		.replace(/-+/g, "-"); // Quita guiones duplicados
+}
 
 // ===============================
 //  EDITAR NOTICIA
@@ -122,21 +135,36 @@ async function editarNoticia(id) {
 		const modal = document.getElementById("modal");
 		const content = document.getElementById("modal-content");
 
-		// Traer noticia y categorías en paralelo para mayor velocidad
+		// 1. Carga paralela de datos
 		const [res, catRes] = await Promise.all([
 			fetch(`${API_URL}/${id}`),
 			fetch(API_CATEGORIAS),
 		]);
+
+		if (!res.ok || !catRes.ok)
+			throw new Error("Error al obtener datos del servidor");
 
 		const noticia = await res.json();
 		const categorias = await catRes.json();
 
 		modal.classList.remove("hidden");
 
+		// 2. Renderizado del formulario
 		content.innerHTML = `
             <h3 class="text-2xl font-black mb-4 text-blue-600">Editar Noticia</h3>
             <form id="form-editar-noticia" class="space-y-4" enctype="multipart/form-data">
-                <input name="titulo" id="tit-noticia" value="${noticia.titulo}" class="w-full border p-2 rounded" required>
+                
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase">Título</label>
+                    <input name="titulo" id="tit-noticia" value="${noticia.titulo}" class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none" required>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-medium text-gray-500">Slug (URL amigable):</label>
+                    <input type="text" name="slug" id="slug-noticia" value="${noticia.slug}" 
+                        class="w-full bg-gray-100 border p-1 text-xs rounded text-gray-600 italic outline-none" readonly title="El slug se genera automáticamente">
+                </div>
+
                 <textarea name="copete" class="w-full border p-2 rounded h-20" required>${noticia.copete}</textarea>
                 
                 <select name="categoria_id" class="w-full border p-2 rounded" required>
@@ -154,21 +182,18 @@ async function editarNoticia(id) {
                 <input name="autor" value="${noticia.autor}" class="w-full border p-2 rounded" required>
 
                 <div class="border-t pt-4 mt-4 bg-gray-50 p-3 rounded-lg">
-                    <label class="block text-sm font-bold text-gray-700 mb-2">Imagen de Portada (Principal)</label>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Imagen de Portada</label>
                     <input type="file" name="portada" class="w-full border p-2 rounded mb-4 bg-white">
                 
-                    <label class="block text-sm font-bold text-gray-700 mb-2">Añadir a Galería (Múltiple)</label>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Añadir a Galería</label>
                     <input type="file" name="galeria" multiple class="w-full border p-2 rounded bg-white">
-                    <p class="text-[10px] text-gray-500 mt-1 uppercase italic">Puedes seleccionar varias imágenes nuevas</p>
                 </div>
-				
-				
-					<label class="block text-sm font-bold text-gray-700">Estado de la Noticia</label>
-					<select name="estado" class="w-full border p-2 rounded bg-white">
-						<option value="publicado" ${noticia.estado === "publicado" ? "selected" : ""}>Publicado</option>
-						<option value="borrador" ${noticia.estado === "borrador" ? "selected" : ""}>Borrador</option>
-					</select>
-                <input type="hidden" name="slug" id="slug-noticia" value="${noticia.slug}">
+                
+                <label class="block text-sm font-bold text-gray-700">Estado</label>
+                <select name="estado" class="w-full border p-2 rounded bg-white">
+                    <option value="publicado" ${noticia.estado === "publicado" ? "selected" : ""}>Publicado</option>
+                    <option value="borrador" ${noticia.estado === "borrador" ? "selected" : ""}>Borrador</option>
+                </select>
 
                 <button type="submit" id="btn-guardar-edit" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition">
                     GUARDAR CAMBIOS
@@ -176,19 +201,16 @@ async function editarNoticia(id) {
             </form>
         `;
 
-		// Lógica de Auto-Slug
+		// 3. Lógica de Auto-Slug en Edición
 		const inputTitulo = document.getElementById("tit-noticia");
 		const inputSlug = document.getElementById("slug-noticia");
+
 		inputTitulo.addEventListener("input", () => {
-			inputSlug.value = inputTitulo.value
-				.toLowerCase()
-				.trim()
-				.replace(/[^\w\s-]/g, "")
-				.replace(/[\s_-]+/g, "-")
-				.replace(/^-+|-+$/g, "");
+			// Actualiza el slug mientras escribes
+			inputSlug.value = generarSlug(inputTitulo.value);
 		});
 
-		// Evento Submit corregido
+		// 4. Manejo del Submit
 		const formEditar = document.getElementById("form-editar-noticia");
 		formEditar.onsubmit = async (e) => {
 			e.preventDefault();
@@ -225,6 +247,7 @@ async function editarNoticia(id) {
 		};
 	} catch (error) {
 		console.error("Error al cargar edición", error);
+		alert("No se pudo cargar la información para editar");
 	}
 }
 // ===============================
@@ -417,6 +440,80 @@ async function eliminarPrograma(id) {
 		console.error("Error al eliminar programa", error);
 	}
 }
+// publicidad
+async function cargarPublicidad() {
+	try {
+		const res = await fetch(`${API_BASE}/publicidad`, {
+			credentials: "include",
+		});
+		const datos = await res.json();
+		const lista = document.getElementById("tabla-publicidad"); // Asegúrate de que este ID exista en tu HTML
+
+		if (!lista) return;
+
+		lista.innerHTML = datos
+			.map(
+				(p) => `
+			<tr class="border-b hover:bg-gray-50">
+				<td class="p-3">
+					<img src="${API_BASE}${p.imagen_url}" class="h-12 w-20 object-cover rounded border">
+				</td>
+				<td class="p-3 font-bold">${p.nombre}</td>
+				<td class="p-3 text-xs text-gray-500">${p.ubicacion}</td>
+				<td class="p-3 text-center">
+					<button onclick="eliminarPublicidad(${p.id})" class="text-red-500 hover:underline">Eliminar</button>
+				</td>
+			</tr>
+		`,
+			)
+			.join("");
+	} catch (error) {
+		console.error("Error al cargar publicidades:", error);
+	}
+}
+
+async function eliminarPublicidad(id) {
+	if (!confirm("¿Seguro que deseas eliminar esta publicidad?")) return;
+	try {
+		const res = await fetch(`${API_BASE}/publicidad/${id}`, {
+			method: "DELETE",
+			credentials: "include",
+		});
+		if (res.ok) {
+			cargarPublicidad();
+		} else {
+			alert("Error al eliminar publicidad");
+		}
+	} catch (error) {
+		console.error("Error:", error);
+	}
+}
+
+function setupFormPublicidad() {
+	const form = document.getElementById("form-publicidad");
+	form.onsubmit = async (e) => {
+		e.preventDefault();
+		const formData = new FormData(form);
+
+		try {
+			const res = await fetch(`${API_BASE}/publicidad/add`, {
+				method: "POST",
+				body: formData,
+				credentials: "include", // Importante para la sesión
+			});
+
+			if (res.ok) {
+				alert("Publicidad subida con éxito");
+				closeModal();
+				cargarPublicidad(); // Función para refrescar la lista
+			} else {
+				alert("Error al subir publicidad");
+			}
+		} catch (error) {
+			console.error("Error:", error);
+		}
+	};
+}
 
 // ===============================
 // 📦 MODALES
@@ -457,53 +554,59 @@ async function openModal(tipo) {
 			};
 		}
 
+		// ... dentro de openModal(tipo === 'noticia')
+
 		content.innerHTML = `
-      <h3 class="text-2xl font-black mb-4 text-pink-600">Nueva Noticia</h3>
+    <h3 class="text-2xl font-black mb-4 text-pink-600">Nueva Noticia</h3>
+    <form id="form-noticia" class="space-y-4" enctype="multipart/form-data">
+        <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase">Título</label>
+            <input name="titulo" id="tit-noticia" placeholder="Ej: Gran inauguración en el centro"
+                class="w-full border p-2 rounded focus:ring-2 focus:ring-pink-500 outline-none" required>
+        </div>
 
-      <form id="form-noticia" class="space-y-4" enctype="multipart/form-data">
-        <input name="titulo" id="tit-noticia" placeholder="Título"
-          class="w-full border p-2 rounded" required>
+        <div>
+            <label class="block text-[10px] font-medium text-gray-500">URL Amigable (Slug):</label>
+            <input type="text" name="slug" id="slug-noticia" 
+                class="w-full bg-gray-50 border p-1 text-xs rounded text-gray-600 italic" readonly>
+        </div>
 
-        <textarea name="copete" placeholder="Copete"
-          class="w-full border p-2 rounded h-20" required></textarea>
+        <textarea name="copete" placeholder="Resumen corto..." class="w-full border p-2 rounded h-20" required></textarea>
 
         <select name="categoria_id" class="w-full border p-2 rounded" required>
-          <option value="">Seleccionar Categoría</option>
-          ${categorias.map((c) => `<option value="${c.id}">${c.nombre}</option>`).join("")}
+            <option value="">Seleccionar Categoría</option>
+            ${categorias.map((c) => `<option value="${c.id}">${c.nombre}</option>`).join("")}
         </select>
 
-        <textarea name="cuerpo" placeholder="Contenido"
-          class="w-full border p-2 rounded h-40" required></textarea>
+        <textarea name="cuerpo" placeholder="Contenido de la noticia..." class="w-full border p-2 rounded h-40" required></textarea>
 
-        <input name="autor" placeholder="Autor"
-          class="w-full border p-2 rounded" required>
+        <input name="autor" placeholder="Nombre del Autor" class="w-full border p-2 rounded" required>
 
-		  <div class="border-t pt-4 mt-4">
-		  <label class="block text-sm font-bold text-gray-700 mb-2">Imagen de Portada (Principal)</label>
-		  <input type="file" name="portada" class="w-full border p-2 rounded mb-4">
-	  
-		  <label class="block text-sm font-bold text-gray-700 mb-2">Galería de Fotos (Opcional - Selecciona varias)</label>
-		  <input type="file" name="galeria" multiple class="w-full border p-2 rounded">
-		  <p class="text-[10px] text-gray-500 mt-1 uppercase italic">Puedes seleccionar varias imágenes a la vez</p>
-	  </div>
-	  <select name="estado" class="w-full border p-2 rounded">
-                    <option value="publicado">Publicado</option>
-                    <option value="borrador">Borrador</option>
-                </select>
+        <div class="border-t pt-4 mt-4 bg-gray-50 p-3 rounded-lg">
+            <label class="block text-sm font-bold text-gray-700 mb-2">Imagen de Portada</label>
+            <input type="file" name="portada" class="w-full border p-2 rounded mb-4 bg-white">
+      
+            <label class="block text-sm font-bold text-gray-700 mb-2">Galería (Múltiple)</label>
+            <input type="file" name="galeria" multiple class="w-full border p-2 rounded bg-white">
+        </div>
 
-        <input type="hidden" name="slug" id="slug-noticia">
+        <select name="estado" class="w-full border p-2 rounded">
+            <option value="publicado">Publicado</option>
+            <option value="borrador">Borrador</option>
+        </select>
 
-        <button class="w-full bg-pink-600 text-white py-3 rounded-xl font-bold">
-          PUBLICAR
+        <button type="submit" id="btn-publicar" class="w-full bg-pink-600 hover:bg-pink-700 text-white py-3 rounded-xl font-bold transition-all">
+            PUBLICAR NOTICIA
         </button>
-      </form>
-    `;
+    </form>
+`;
 
+		// Lógica de escucha para el Título
 		const inputTitulo = document.getElementById("tit-noticia");
 		const inputSlug = document.getElementById("slug-noticia");
 
 		inputTitulo.addEventListener("input", () => {
-			inputSlug.value = inputTitulo.value.toLowerCase().replace(/\s+/g, "-");
+			inputSlug.value = generarSlug(inputTitulo.value);
 		});
 
 		setupFormNoticia();
@@ -621,6 +724,32 @@ async function openModal(tipo) {
 				alert("Error al crear usuario");
 			}
 		};
+	} else if (tipo === "publicidad") {
+		content.innerHTML = `
+        <h3 class="text-2xl font-black mb-4 text-orange-600">Nueva Publicidad</h3>
+        <form id="form-publicidad" class="space-y-4" enctype="multipart/form-data">
+            <input name="nombre" placeholder="Nombre del Cliente/Campaña" class="w-full border p-2 rounded" required>
+            
+            <input name="link_url" placeholder="URL de destino (https://...)" class="w-full border p-2 rounded">
+            
+            <select name="ubicacion" class="w-full border p-2 rounded">
+                <option value="encabezado">Encabezado (Banner Superior)</option>
+                <option value="lateral">Lateral (Sidebar)</option>
+                <option value="intermedia">Intermedia (Entre noticias)</option>
+            </select>
+
+            <div class="bg-gray-50 p-4 rounded-lg border-2 border-dashed">
+                <label class="block text-sm font-bold mb-2">Banner Publicitario</label>
+                <input type="file" name="imagen" class="w-full" required>
+            </div>
+
+            <button type="submit" class="w-full bg-orange-600 text-white py-3 rounded-xl font-bold">
+                SUBIR PUBLICIDAD
+            </button>
+        </form>
+    `;
+
+		setupFormPublicidad();
 	}
 }
 
@@ -715,23 +844,28 @@ async function editarUsuario(id) {
 	const modal = document.getElementById("modal");
 	const content = document.getElementById("modal-content");
 
+	const res = await fetch(`${API_BASE}/usuarios/${id}`, {
+		credentials: "include",
+	});
+	const usuario = await res.json();
+
 	modal.classList.remove("hidden");
 
 	content.innerHTML = `
+  
     <h3 class="text-2xl font-black mb-4 text-blue-600">Editar Usuario</h3>
 
     <form id="form-editar-usuario" class="space-y-4">
-      <input name="nombre" placeholder="Nuevo nombre"
-        class="w-full border p-2 rounded" required>
+      <input name="nombre" value="${usuario.nombre}" class="w-full border p-2 rounded" required>
 
       <input type="password" name="password"
         placeholder="Nueva contraseña"
         class="w-full border p-2 rounded">
 
-      <select name="rol" class="w-full border p-2 rounded">
-        <option value="admin">Admin</option>
-        <option value="editor">Editor</option>
-      </select>
+		<select name="rol" class="w-full border p-2 rounded">
+		<option value="admin" ${usuario.rol === "admin" ? "selected" : ""}>Admin</option>
+		<option value="editor" ${usuario.rol === "editor" ? "selected" : ""}>Editor</option>
+	</select>
 
       <button class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold">
         GUARDAR CAMBIOS
@@ -743,6 +877,7 @@ async function editarUsuario(id) {
 		e.preventDefault();
 
 		const data = Object.fromEntries(new FormData(e.target));
+		if (!data.password) delete data.password;
 
 		const res = await fetch(`${API_BASE}/usuarios/${id}`, {
 			method: "PUT",

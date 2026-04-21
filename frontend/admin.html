@@ -1,168 +1,194 @@
 <!doctype html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin - ANGAU PLAY</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-      :root {
-        --pink: #e02375;
-        --purple: #6859a5;
-      }
-      .bg-main {
-        background-color: var(--purple);
-      }
-      .text-accent {
-        color: var(--pink);
-      }
-      .btn-pink {
-        background-color: var(--pink);
-        color: white;
-        transition: 0.3s;
-      }
-      .btn-pink:hover {
-        opacity: 0.9;
-        transform: scale(1.02);
-      }
-    </style>
-  </head>
-  <body class="bg-gray-100 flex min-h-screen">
-    <aside class="w-64 bg-main text-white flex flex-col shadow-xl">
-      <div class="p-6 text-2xl font-black border-b border-purple-400">
-        ANGAU PLAY
-      </div>
-      <nav class="flex-1 p-4 space-y-2">
-        <button
-          onclick="showSection('noticias')"
-          class="w-full text-left p-3 rounded hover:bg-purple-500 font-bold"
-        >
-          📰 Noticias
-        </button>
-        <button
-          onclick="showSection('programacion')"
-          class="w-full text-left p-3 rounded hover:bg-purple-500 font-bold"
-        >
-          📺 Programación
-        </button>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Admin - ANGAU PLAY</title>
+		<script src="https://cdn.tailwindcss.com"></script>
+		<style>
+			:root {
+				--pink: #e02375;
+				--purple: #6859a5;
+			}
+			.bg-main {
+				background-color: var(--purple);
+			}
+			.text-accent {
+				color: var(--pink);
+			}
+			.btn-pink {
+				background-color: var(--pink);
+				color: white;
+				transition: 0.3s;
+			}
+			.btn-pink:hover {
+				opacity: 0.9;
+				transform: scale(1.02);
+			}
+		</style>
+	</head>
+	<body class="bg-gray-100 flex min-h-screen">
+		<aside class="w-64 bg-main text-white flex flex-col shadow-xl">
+			<div class="p-6 text-2xl font-black border-b border-purple-400">
+				ANGAU PLAY
+			</div>
+			<nav class="flex-1 p-4 space-y-2">
+				<button
+					onclick="showSection('noticias')"
+					class="w-full text-left p-3 rounded hover:bg-purple-500 font-bold"
+				>
+					📰 Noticias
+				</button>
+				<button
+					onclick="showSection('programacion')"
+					class="w-full text-left p-3 rounded hover:bg-purple-500 font-bold"
+				>
+					📺 Programación
+				</button>
 
-        <button
-  onclick="showSection('usuarios')"
-  class="w-full text-left p-3 rounded hover:bg-purple-500 font-bold"
->
-  👤 Usuarios
-</button>
-      </nav>
-      <button id="logoutBtn" class="p-4 bg-red-600 hover:bg-red-700 font-bold">
-        Cerrar Sesión
-      </button>
-    </aside>
+				<button
+					onclick="showSection('usuarios')"
+					class="w-full text-left p-3 rounded hover:bg-purple-500 font-bold"
+				>
+					👤 Usuarios
+				</button>
+				<button
+					onclick="showSection('publicidad')"
+					class="w-full text-left p-3 rounded hover:bg-purple-500 font-bold"
+				>
+					📢 Publicidad
+				</button>
+			</nav>
+			<button id="logoutBtn" class="p-4 bg-red-600 hover:bg-red-700 font-bold">
+				Cerrar Sesión
+			</button>
+		</aside>
 
-    <main class="flex-1 p-8">
-      <section id="sec-noticias" class="content-section">
-        <div class="flex justify-between items-center mb-6">
-          <h2 class="text-3xl font-black text-accent">Gestión de Noticias</h2>
-          <button
-            onclick="openModal('noticia')"
-            class="btn-pink px-6 py-2 rounded-lg font-bold"
-          >
-            + Nueva Noticia
-          </button>
-        </div>
-        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-          <table class="w-full">
-            <thead class="bg-gray-200 text-gray-700">
-              <tr>
-                <th class="p-4 text-left">Título</th>
-                <th class="p-4 text-left">Autor</th>
-                <th class="p-4 text-center">Contenido</th>
-              </tr>
-            </thead>
-            <tbody id="tabla-noticias"></tbody>
-          </table>
-        </div>
-      </section>
+		<main class="flex-1 p-8">
+			<section id="sec-noticias" class="content-section">
+				<div class="flex justify-between items-center mb-6">
+					<h2 class="text-3xl font-black text-accent">Gestión de Noticias</h2>
+					<button
+						onclick="openModal('noticia')"
+						class="btn-pink px-6 py-2 rounded-lg font-bold"
+					>
+						+ Nueva Noticia
+					</button>
+				</div>
+				<div class="bg-white rounded-xl shadow-lg overflow-hidden">
+					<table class="w-full">
+						<thead class="bg-gray-200 text-gray-700">
+							<tr>
+								<th class="p-4 text-left">Título</th>
+								<th class="p-4 text-left">Autor</th>
+								<th class="p-4 text-center">Contenido</th>
+							</tr>
+						</thead>
+						<tbody id="tabla-noticias"></tbody>
+					</table>
+				</div>
+			</section>
 
-      <section id="sec-programacion" class="content-section hidden">
-        <div class="flex justify-between items-center mb-6">
-          <h2 class="text-3xl font-black text-accent">
-            Grilla de Programación
-          </h2>
-          <button
-            onclick="openModal('programa')"
-            class="btn-pink px-6 py-2 rounded-lg font-bold"
-          >
-            + Nuevo Programa
-          </button>
-        </div>
-        <div
-          class="overflow-x-auto rounded-3xl border border-gray-200 shadow-sm bg-white"
-        >
-          <table class="w-full text-left border-collapse">
-            <thead>
-              <tr
-                class="bg-slate-900 text-white text-[10px] uppercase tracking-widest"
-              >
-                <th class="p-4 text-center bg-purple-600">HORARIO</th>
-                <th class="p-4 border-r border-white/10">Domingo</th>
-                <th class="p-4 border-r border-white/10">Lunes</th>
-                <th class="p-4 border-r border-white/10">Martes</th>
-                <th class="p-4 border-r border-white/10">Miércoles</th>
-                <th class="p-4 border-r border-white/10">Jueves</th>
-                <th class="p-4 border-r border-white/10">Viernes</th>
-                <th class="p-4">Sábado</th>
-              </tr>
-            </thead>
-            <tbody id="tabla-programacion" class="text-sm"></tbody>
-          </table>
-        </div>
-      </section>
+			<section id="sec-programacion" class="content-section hidden">
+				<div class="flex justify-between items-center mb-6">
+					<h2 class="text-3xl font-black text-accent">
+						Grilla de Programación
+					</h2>
+					<button
+						onclick="openModal('programa')"
+						class="btn-pink px-6 py-2 rounded-lg font-bold"
+					>
+						+ Nuevo Programa
+					</button>
+				</div>
+				<div
+					class="overflow-x-auto rounded-3xl border border-gray-200 shadow-sm bg-white"
+				>
+					<table class="w-full text-left border-collapse">
+						<thead>
+							<tr
+								class="bg-slate-900 text-white text-[10px] uppercase tracking-widest"
+							>
+								<th class="p-4 text-center bg-purple-600">HORARIO</th>
+								<th class="p-4 border-r border-white/10">Domingo</th>
+								<th class="p-4 border-r border-white/10">Lunes</th>
+								<th class="p-4 border-r border-white/10">Martes</th>
+								<th class="p-4 border-r border-white/10">Miércoles</th>
+								<th class="p-4 border-r border-white/10">Jueves</th>
+								<th class="p-4 border-r border-white/10">Viernes</th>
+								<th class="p-4">Sábado</th>
+							</tr>
+						</thead>
+						<tbody id="tabla-programacion" class="text-sm"></tbody>
+					</table>
+				</div>
+			</section>
 
-      <section id="sec-usuarios" class="content-section hidden">
-  <div class="flex justify-between items-center mb-6">
-    <h2 class="text-3xl font-black text-accent">Gestión de Usuarios</h2>
-    <button
-      onclick="openModal('usuario')"
-      class="btn-pink px-6 py-2 rounded-lg font-bold"
-    >
-      + Nuevo Usuario
-    </button>
-  </div>
+			<section id="sec-usuarios" class="content-section hidden">
+				<div class="flex justify-between items-center mb-6">
+					<h2 class="text-3xl font-black text-accent">Gestión de Usuarios</h2>
+					<button
+						onclick="openModal('usuario')"
+						class="btn-pink px-6 py-2 rounded-lg font-bold"
+					>
+						+ Nuevo Usuario
+					</button>
+				</div>
 
-  <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-    <table class="w-full">
-      <thead class="bg-gray-200 text-gray-700">
-        <tr>
-          <th class="p-4 text-left">ID</th>
-          <th class="p-4 text-left">Usuario</th>
-          <th class="p-4 text-center">Rol</th>
-          <th class="p-4 text-center">Acciones</th>
-        </tr>
-      </thead>
-      <tbody id="tabla-usuarios"></tbody>
-    </table>
-  </div>
-</section>
+				<div class="bg-white rounded-xl shadow-lg overflow-hidden">
+					<table class="w-full">
+						<thead class="bg-gray-200 text-gray-700">
+							<tr>
+								<th class="p-4 text-left">ID</th>
+								<th class="p-4 text-left">Usuario</th>
+								<th class="p-4 text-center">Rol</th>
+								<th class="p-4 text-center">Acciones</th>
+							</tr>
+						</thead>
+						<tbody id="tabla-usuarios"></tbody>
+					</table>
+				</div>
+			</section>
+			<section id="sec-publicidad" class="content-section hidden">
+				<div class="flex justify-between items-center mb-6">
+					<h2 class="text-3xl font-black text-accent">Gestión de Publicidad</h2>
+					<button
+						onclick="openModal('publicidad')"
+						class="btn-pink px-6 py-2 rounded-lg font-bold"
+					>
+						+ Nueva Publicidad
+					</button>
+				</div>
 
+				<div class="bg-white rounded-xl shadow-lg overflow-hidden">
+					<table class="w-full">
+						<thead class="bg-gray-200 text-gray-700">
+							<tr>
+								<th class="p-4 text-left">ID</th>
+								<th class="p-4 text-left">Imagen</th>
+								<th class="p-4 text-center">Acciones</th>
+							</tr>
+						</thead>
+						<tbody id="tabla-publicidad"></tbody>
+					</table>
+				</div>
+			</section>
+		</main>
 
+		<div
+			id="modal"
+			class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4"
+		>
+			<div
+				class="bg-white rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto relative"
+			>
+				<button onclick="closeModal()" class="absolute top-4 right-4 text-2xl">
+					&times;
+				</button>
+				<div id="modal-content"></div>
+			</div>
+		</div>
 
-
-    </main>
-
-    <div
-      id="modal"
-      class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4"
-    >
-      <div
-        class="bg-white rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto relative"
-      >
-        <button onclick="closeModal()" class="absolute top-4 right-4 text-2xl">
-          &times;
-        </button>
-        <div id="modal-content"></div>
-      </div>
-    </div>
-
-    <script src="js/admin.js"></script>
-  </body>
+		<script src="js/admin.js"></script>
+	</body>
 </html>
