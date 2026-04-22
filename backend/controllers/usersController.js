@@ -57,13 +57,28 @@ const usersController = {
 	},
 
 	// Estos métodos parecen ser funciones de utilidad, asegúrate de llamarlos correctamente
-	getUserById: async (id) => {
+	// usersController.js
+	getUserById: async (req, res) => {
 		try {
-			return await Usuario.findByPk(id, {
+			const {id} = req.params;
+
+			// Validación rápida: ¿el ID es un número?
+			if (isNaN(id)) {
+				return res.status(400).json({mensaje: "ID inválido"});
+			}
+
+			const usuario = await Usuario.findByPk(id, {
 				attributes: ["id", "nombre", "rol"],
 			});
+
+			if (!usuario) {
+				return res.status(404).json({mensaje: "Usuario no existe"});
+			}
+
+			res.json(usuario);
 		} catch (error) {
-			throw new Error("Error al obtener usuario por ID");
+			console.error("ERROR REAL:", error); // Esto te dirá la verdad en la terminal
+			res.status(500).json({mensaje: "Error al obtener usuario por ID"});
 		}
 	},
 

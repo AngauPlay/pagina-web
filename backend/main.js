@@ -17,6 +17,7 @@ const newsRoutes = require("./routes/newsRoutes");
 const authRoutes = require("./routes/authRoutes");
 const usersRoutes = require("./routes/usersRoutes");
 const programasRoutes = require("./routes/programasRoutes");
+const publicidadRoutes = require("./routes/publicidadRoutes");
 const Noticia = require("./models/Noticia");
 const app = express();
 const parser = new Parser();
@@ -53,6 +54,8 @@ app.use("/noticias", newsRoutes);
 app.use("/auth", authRoutes);
 app.use("/programas", programasRoutes);
 app.use("/usuarios", usersRoutes);
+app.use("/public/uploads", express.static("public/uploads"));
+app.use("/publicidad", publicidadRoutes);
 // Ruta para generar el RSS de Angau
 app.get("/rss", async (req, res) => {
 	const feed = new RSS({

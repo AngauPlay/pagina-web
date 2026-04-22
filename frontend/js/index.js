@@ -1,45 +1,44 @@
+// ===== PROGRAMACIÓN =====
+function obtenerProgramacion() {
+	return fetch("http://localhost:3000/programas/hoy")
+		.then((res) => res.json())
+		.catch((err) => {
+			console.error("Error al obtener programación:", err);
+			return [];
+		});
+}
 
-      // ===== PROGRAMACIÓN =====
-      function obtenerProgramacion() {
-        return fetch("http://localhost:3000/programas/hoy")
-          .then((res) => res.json())
-          .catch((err) => {
-            console.error("Error al obtener programación:", err);
-            return [];
-          });
-      }
+function estaEnVivo(inicio, fin) {
+	if (!inicio || !fin) return false;
 
-      function estaEnVivo(inicio, fin) {
-        if (!inicio || !fin) return false;
-        
-        const ahora = new Date();
-        const actual = ahora.getHours() * 60 + ahora.getMinutes();
+	const ahora = new Date();
+	const actual = ahora.getHours() * 60 + ahora.getMinutes();
 
-        const [hi, mi] = inicio.split(":").map(Number);
-        const [hf, mf] = fin.split(":").map(Number);
+	const [hi, mi] = inicio.split(":").map(Number);
+	const [hf, mf] = fin.split(":").map(Number);
 
-        const ini = hi * 60 + mi;
-        const finM = hf * 60 + mf;
+	const ini = hi * 60 + mi;
+	const finM = hf * 60 + mf;
 
-        return actual >= ini && actual <= finM;
-      }
-      async function renderProgramacion() {
-        const contenedor = document.getElementById("programacion-container");
+	return actual >= ini && actual <= finM;
+}
+async function renderProgramacion() {
+	const contenedor = document.getElementById("programacion-container");
 
-        try {
-          const res = await fetch("http://localhost:3000/programas/hoy");
-          const data = await res.json();
+	try {
+		const res = await fetch("http://localhost:3000/programas/hoy");
+		const data = await res.json();
 
-          if (!data || data.length === 0) {
-            contenedor.innerHTML = "<p>No hay programación hoy</p>";
-            return;
-          }
+		if (!data || data.length === 0) {
+			contenedor.innerHTML = "<p>No hay programación hoy</p>";
+			return;
+		}
 
-          contenedor.innerHTML = data
-            .map((p) => {
-              const vivo = estaEnVivo(p.hora_inicio, p.hora_fin);
+		contenedor.innerHTML = data
+			.map((p) => {
+				const vivo = estaEnVivo(p.hora_inicio, p.hora_fin);
 
-              return `
+				return `
         <div class="relative rounded-xl overflow-hidden group cursor-pointer">
 
           <div class="w-full aspect-[2/1] overflow-hidden">
@@ -53,8 +52,8 @@
 
           <div class="absolute bottom-3 left-3 text-white">
             <span class="text-[10px] font-bold ${
-              vivo ? "text-yellow-neon" : "text-white/80"
-            } uppercase">
+							vivo ? "text-yellow-neon" : "text-white/80"
+						} uppercase">
              ${vivo ? "EN VIVO 🔴" : `${p.hora_inicio} - ${p.hora_fin}`}
             </span>
             <h3 class="font-bold text-sm">${p.nombre}</h3>
@@ -62,13 +61,13 @@
 
         </div>
       `;
-            })
-            .join("");
-        } catch (error) {
-          console.error("Error cargando programación:", error);
-          contenedor.innerHTML = "<p>Error cargando programación</p>";
-        }
-      }
+			})
+			.join("");
+	} catch (error) {
+		console.error("Error cargando programación:", error);
+		contenedor.innerHTML = "<p>Error cargando programación</p>";
+	}
+}
 
       async function cargarGrillaEnModal() {
   try {
@@ -162,25 +161,25 @@ cerrarModal.addEventListener("click", () => {
           document.getElementById("noticias-container");
         const contenedorHero = document.getElementById("hero-noticia");
 
-        try {
-          const respuesta = await fetch("http://localhost:3000/noticias");
-          const noticias = await respuesta.json();
+	try {
+		const respuesta = await fetch("http://localhost:3000/noticias");
+		const noticias = await respuesta.json();
 
-          if (!noticias || noticias.length === 0) {
-            contenedorHero.innerHTML =
-              "<p class='text-white italic'>No hay noticias destacadas.</p>";
-            contenedorNoticias.innerHTML = "<p>No hay noticias publicadas.</p>";
-            return;
-          }
+		if (!noticias || noticias.length === 0) {
+			contenedorHero.innerHTML =
+				"<p class='text-white italic'>No hay noticias destacadas.</p>";
+			contenedorNoticias.innerHTML = "<p>No hay noticias publicadas.</p>";
+			return;
+		}
 
-          // 1. NOTICIA PRINCIPAL (Indice 0)
-          const principal = noticias[0];
-          // Accedemos a Categorium.nombre según tu JSON
-          const catPrincipal = principal.Categorium
-            ? principal.Categorium.nombre
-            : "General";
+		// 1. NOTICIA PRINCIPAL (Indice 0)
+		const principal = noticias[0];
+		// Accedemos a Categorium.nombre según tu JSON
+		const catPrincipal = principal.Categorium
+			? principal.Categorium.nombre
+			: "General";
 
-          contenedorHero.innerHTML = `
+		contenedorHero.innerHTML = `
       <article class="relative group overflow-hidden rounded-3xl bg-slate-900 shadow-2xl cursor-pointer" 
                onclick="window.location.href='articulo.html?slug=${principal.slug}'">
         <img
@@ -202,17 +201,17 @@ cerrarModal.addEventListener("click", () => {
       </article>
     `;
 
-          // 2. RESTO DE NOTICIAS (Slice desde 1)
-          const restoNoticias = noticias.slice(1);
+		// 2. RESTO DE NOTICIAS (Slice desde 1)
+		const restoNoticias = noticias.slice(1);
 
-          if (restoNoticias.length > 0) {
-            contenedorNoticias.innerHTML = restoNoticias
-              .map((noticia) => {
-                const catNombre = noticia.Categorium
-                  ? noticia.Categorium.nombre
-                  : "General";
+		if (restoNoticias.length > 0) {
+			contenedorNoticias.innerHTML = restoNoticias
+				.map((noticia) => {
+					const catNombre = noticia.Categorium
+						? noticia.Categorium.nombre
+						: "General";
 
-                return `
+					return `
           <article class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all border border-slate-100 group">
             <div class="relative overflow-hidden">
               <img src="${noticia.imagen_url}" alt="${noticia.titulo}" class="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500" />
@@ -231,39 +230,74 @@ cerrarModal.addEventListener("click", () => {
             </div>
           </article>
         `;
-              })
-              .join("");
-          } else {
-            contenedorNoticias.innerHTML =
-              "<p class='col-span-3 text-center text-slate-400'>No hay más noticias anteriores.</p>";
-          }
-        } catch (error) {
-          console.error("Error al cargar noticias:", error);
-          if (contenedorNoticias)
-            contenedorNoticias.innerHTML =
-              "<p>Error al conectar con el servidor.</p>";
-        }
-      }
+				})
+				.join("");
+		} else {
+			contenedorNoticias.innerHTML =
+				"<p class='col-span-3 text-center text-slate-400'>No hay más noticias anteriores.</p>";
+		}
+	} catch (error) {
+		console.error("Error al cargar noticias:", error);
+		if (contenedorNoticias)
+			contenedorNoticias.innerHTML =
+				"<p>Error al conectar con el servidor.</p>";
+	}
+}
 
-      // IMPORTANTE: Asegúrate de llamar a la función al cargar la página
-      document.addEventListener("DOMContentLoaded", () => {
-        cargarNoticias();
-        renderProgramacion(); 
-        
-      });
-      // LÓGICA DEL MENÚ
-      const menuBtn = document.getElementById("menu-btn");
-      const closeMenu = document.getElementById("close-menu");
-      const mobileMenu = document.getElementById("mobile-menu");
-      const overlay = document.getElementById("overlay");
+// IMPORTANTE: Asegúrate de llamar a la función al cargar la página
+document.addEventListener("DOMContentLoaded", () => {
+	cargarNoticias();
+	renderProgramacion();
+	cargarPromos();
+});
+// LÓGICA DEL MENÚ
+const menuBtn = document.getElementById("menu-btn");
+const closeMenu = document.getElementById("close-menu");
+const mobileMenu = document.getElementById("mobile-menu");
+const overlay = document.getElementById("overlay");
 
-      function toggleMenu() {
-        mobileMenu.classList.toggle("-translate-x-full");
-        overlay.classList.toggle("hidden");
-        document.body.classList.toggle("menu-open");
-      }
+function toggleMenu() {
+	mobileMenu.classList.toggle("-translate-x-full");
+	overlay.classList.toggle("hidden");
+	document.body.classList.toggle("menu-open");
+}
 
-      menuBtn.addEventListener("click", toggleMenu);
-      closeMenu.addEventListener("click", toggleMenu);
-      overlay.addEventListener("click", toggleMenu);
-    
+menuBtn.addEventListener("click", toggleMenu);
+closeMenu.addEventListener("click", toggleMenu);
+overlay.addEventListener("click", toggleMenu);
+
+async function cargarPromos() {
+	try {
+		// 1. Cargamos la promo del encabezado
+		const resSup = await fetch(
+			`http://localhost:3000/publicidad/activa/encabezado`,
+		);
+		const promosSup = await resSup.json();
+
+		const contenedorSup = document.getElementById("hero-promos-wrapper");
+		if (contenedorSup && promosSup.length > 0) {
+			const p = promosSup[0];
+			contenedorSup.innerHTML = `
+                <a href="${p.link_url}" target="_blank" class="block w-full overflow-hidden rounded-2xl shadow-lg hover:opacity-95 transition">
+                    <img src="${p.imagen_url}" alt="Promoción" class="w-full h-auto object-cover border-b-4 border-purple-main">
+                </a>
+            `;
+		}
+
+		// 2. Cargamos la promo de abajo (si tienes)
+		const resInf = await fetch(`http://localhost:3000/publicidad/activa/pie`);
+		const promosInf = await resInf.json();
+
+		const contenedorInf = document.getElementById("bottom-promos-wrapper");
+		if (contenedorInf && promosInf.length > 0) {
+			const p = promosInf[0];
+			contenedorInf.innerHTML = `
+                <a href="${p.link_url}" target="_blank" class="block w-full overflow-hidden rounded-2xl shadow-lg hover:opacity-95 transition">
+                    <img src="${p.imagen_url}" alt="Promoción" class="w-full h-auto object-cover border-t-4 border-pink-accent">
+                </a>
+            `;
+		}
+	} catch (error) {
+		console.error("Error cargando promos:", error);
+	}
+}
