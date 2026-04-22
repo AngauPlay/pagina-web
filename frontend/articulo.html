@@ -18,7 +18,6 @@
 				--green-light: rgb(140, 199, 73);
 			}
 
-			/* Clases personalizadas para igualar la Home */
 			.bg-purple-main {
 				background-color: var(--purple-main);
 			}
@@ -38,12 +37,35 @@
 				border-color: var(--purple-main);
 			}
 
-			/* Estilo del cuerpo del artículo */
+			/* Estilo para los contenedores de patrocinadores */
+			.sponsor-slot {
+				background: #f8fafc;
+				border: 2px dashed #e2e8f0;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				position: relative;
+				overflow: hidden;
+				transition: all 0.3s ease;
+			}
+			.sponsor-label {
+				position: absolute;
+				top: 0;
+				right: 0;
+				background: #e2e8f0;
+				color: #94a3b8;
+				font-size: 9px;
+				padding: 2px 8px;
+				text-transform: uppercase;
+				font-weight: 900;
+				letter-spacing: 0.05em;
+			}
+
 			#articulo-cuerpo p {
 				margin-bottom: 1.5rem;
 				line-height: 1.8;
 				font-size: 1.125rem;
-				color: #334155; /* slate-700 */
+				color: #334155;
 			}
 
 			#articulo-cuerpo strong {
@@ -63,21 +85,10 @@
 					opacity: 0.5;
 				}
 			}
-			/* Estilo para que el cursor indique que la imagen se puede ampliar */
+
 			#articulo-imagen,
 			.galeria-item img {
 				cursor: zoom-in;
-			}
-
-			/* Personalización opcional del fondo de PhotoSwipe para que coincida con tu tema */
-			.pswp__bg {
-				background: rgba(
-					10,
-					10,
-					15,
-					0.95
-				); /* Un tono muy oscuro de tu paleta */
-				backdrop-filter: blur(5px);
 			}
 		</style>
 	</head>
@@ -115,29 +126,62 @@
 					</a>
 				</div>
 
-				<div class="flex items-center gap-4">
-					<div class="hidden lg:flex gap-3 items-center">
+				<div class="flex items-center justify-end gap-4">
+					<!-- REDES -->
+					<div class="flex gap-3 items-center">
 						<a href="https://www.youtube.com/@AngauPlay" target="_blank">
 							<img
 								src="/assets/logo-youtube.png"
-								class="w-6 h-6 hover:scale-125 transition"
+								class="w-6 h-6 hover:scale-125 transition duration-300"
 								alt="YouTube"
 							/>
 						</a>
+
+						<a href="https://www.facebook.com/angauplay" target="_blank">
+							<img
+								src="/assets/logo-facebook.png"
+								class="w-6 h-6 hover:scale-125 transition duration-300"
+								alt="Facebook"
+							/>
+						</a>
+
+						<a href="https://kick.com/angauplay" target="_blank">
+							<img
+								src="/assets/logo-kick.png"
+								class="w-6 h-6 hover:scale-125 transition duration-300"
+								alt="Kick"
+							/>
+						</a>
+
+						<a href="https://www.twitch.tv/angauplay" target="_blank">
+							<img
+								src="/assets/logo-twitch.png"
+								class="w-6 h-6 hover:scale-125 transition duration-300"
+								alt="Twitch"
+							/>
+						</a>
+
+						<a href="https://www.tiktok.com/@angauplay" target="_blank">
+							<img
+								src="/assets/logo-tik-tok.png"
+								class="w-6 h-6 hover:scale-125 transition duration-300"
+								alt="TikTok"
+							/>
+						</a>
+
 						<a href="https://www.instagram.com/angauplay.ok/" target="_blank">
 							<img
 								src="/assets/logo-instagram.png"
-								class="w-6 h-6 hover:scale-125 transition"
+								class="w-6 h-6 hover:scale-125 transition duration-300"
 								alt="Instagram"
 							/>
 						</a>
 					</div>
-
-					<img
-						src="/assets/matesito@4x.png"
-						class="h-10 md:h-12 object-contain hover:scale-110 transition-transform"
-					/>
 				</div>
+				<img
+					src="/assets/matesito@4x.png"
+					class="h-10 md:h-12 object-contain hover:scale-110 transition-transform"
+				/>
 			</div>
 
 			<div
@@ -145,6 +189,13 @@
 				class="fixed inset-0 bg-black/60 hidden z-[105] backdrop-blur-sm"
 			></div>
 		</header>
+
+		<div class="container mx-auto px-4 mt-6">
+			<div
+				id="hero-promos-wrapper"
+				class="w-full h-24 md:h-32 rounded-2xl shadow-sm"
+			></div>
+		</div>
 
 		<main class="container mx-auto px-4 py-8 max-w-6xl">
 			<div id="loading-state" class="text-center py-20">
@@ -202,27 +253,13 @@
 						id="galeria-principal"
 						class="rounded-3xl overflow-hidden shadow-2xl mb-12 border-4 border-white relative group"
 					>
-						<a
-							id="articulo-imagen-link"
-							href=""
-							data-pswp-width=""
-							data-pswp-height=""
-							target="_blank"
-						>
+						<a id="articulo-imagen-link" href="" target="_blank">
 							<img
 								id="articulo-imagen"
 								src=""
 								alt=""
 								class="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
 							/>
-
-							<div
-								class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-							>
-								<i
-									class="fas fa-search-plus text-white text-4xl bg-purple-main/80 p-4 rounded-full shadow-lg"
-								></i>
-							</div>
 						</a>
 					</div>
 
@@ -231,13 +268,12 @@
 						class="prose prose-slate prose-lg max-w-none"
 					></div>
 
+					<div class="my-10 sponsor-slot h-40 rounded-3xl"></div>
+
 					<div
 						id="video-container"
 						class="mt-16 p-8 bg-pink-accent rounded-3xl shadow-2xl relative overflow-hidden hidden"
 					>
-						<div class="absolute top-0 right-0 p-4 opacity-10">
-							<i class="fas fa-play text-8xl text-white"></i>
-						</div>
 						<h3
 							class="text-white text-sm font-black mb-6 uppercase flex items-center gap-3 relative z-10"
 						>
@@ -263,6 +299,10 @@
 				<aside class="lg:w-1/3">
 					<div class="sticky top-28 space-y-8">
 						<div
+							class="sponsor-slot h-80 rounded-3xl shadow-xl bg-white border-none"
+						></div>
+
+						<div
 							class="bg-white p-8 rounded-3xl shadow-xl border border-slate-100 relative overflow-hidden"
 						>
 							<div
@@ -285,9 +325,6 @@
 							>
 								¿TE PERDISTE ALGO?
 							</h5>
-							<p class="text-xs text-white/70 mb-4 uppercase tracking-widest">
-								Explora toda la portada de hoy
-							</p>
 							<div
 								class="inline-block bg-pink-accent px-6 py-2 rounded-full font-black text-[10px] tracking-widest uppercase"
 							>
@@ -299,6 +336,64 @@
 			</div>
 		</main>
 
-		<script src="js/articulo.js"></script>
+		<footer
+			class="bg-gradient-to-r from-[rgb(198,29,102)] via-[rgb(104,89,165)] to-[rgb(68,99,174)] text-white mt-16"
+		>
+			<div class="flex justify-center pt-8">
+				<img
+					src="/assets/logo blanco@4x.png"
+					alt="Angau Play"
+					class="h-14 object-contain hover:scale-110 transition-transform duration-300"
+				/>
+			</div>
+			<div class="container mx-auto px-4 py-10 grid md:grid-cols-2 gap-10">
+				<div>
+					<h3 class="text-xl font-bold mb-4">Contacto</h3>
+					<ul class="space-y-2 text-white/80">
+						<li>
+							<a
+								href="mailto:angauplay@gmail.com"
+								class="flex items-center gap-2 hover:text-yellow-neon transition"
+								><i class="fas fa-envelope"></i> angauplay@gmail.com</a
+							>
+						</li>
+						<li>
+							<i class="fas fa-map-marker-alt mr-2"></i> Formosa, Argentina
+						</li>
+						<li>
+							<a
+								href="https://wa.me/5493704808722"
+								target="_blank"
+								class="flex items-center gap-2 hover:text-green-300 transition"
+								><i class="fab fa-whatsapp text-green-400"></i> +54 9 370
+								480-8722</a
+							>
+						</li>
+					</ul>
+				</div>
+				<div class="text-center md:text-right">
+					<h3 class="text-xl font-bold mb-4">Desarrollado por</h3>
+					<p class="text-white/80 text-sm leading-relaxed">
+						Franco Mirna & Ocampo Emiliano <br /><span
+							class="text-yellow-neon font-semibold"
+							>Egresados del Instituto Politécnico Formosa</span
+						>
+					</p>
+					<div class="mt-4 flex justify-center md:justify-end">
+						<img
+							src="assets/logo-ipf.png"
+							alt="IPF"
+							class="w-24 h-auto bg-white/10 p-2 rounded-xl"
+						/>
+					</div>
+				</div>
+			</div>
+			<div
+				class="text-center text-sm py-4 border-t border-white/20 uppercase tracking-widest font-bold"
+			>
+				© 2026 Angau Play
+			</div>
+		</footer>
+		<script src="/js/articulo.js"></script>
 	</body>
 </html>
