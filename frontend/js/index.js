@@ -69,10 +69,97 @@ async function renderProgramacion() {
 	}
 }
 
-// ===== NOTICIAS =====
-async function cargarNoticias() {
-	const contenedorNoticias = document.getElementById("noticias-container");
-	const contenedorHero = document.getElementById("hero-noticia");
+      async function cargarGrillaEnModal() {
+  try {
+    const res = await fetch("http://localhost:3000/programas");
+    const data = await res.json();
+
+    const diasNombres = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+
+    const horasSet = new Set();
+    data.forEach((p) => {
+      horasSet.add(p.hora_inicio.slice(0, 5));
+    });
+
+    const horas = Array.from(horasSet).sort();
+
+    const grilla = {};
+    horas.forEach((h) => {
+      grilla[h] = Array(7).fill(null);
+    });
+
+    data.forEach((p) => {
+      const hora = p.hora_inicio.slice(0, 5);
+      grilla[hora][p.dia_semana] = p;
+    });
+
+    contenedorModal.innerHTML = `
+      <table class="w-full text-sm border">
+        <thead>
+          <tr class="bg-purple-main text-white">
+            <th class="p-3">Hora</th>
+            ${diasNombres.map((d) => `<th class="p-3">${d}</th>`).join("")}
+          </tr>
+        </thead>
+        <tbody>
+          ${horas
+            .map(
+              (hora) => `
+            <tr class="border-t">
+              <td class="p-3 font-bold bg-gray-100">${hora}</td>
+              ${grilla[hora]
+                .map((p) => {
+                  if (!p) return `<td></td>`;
+
+                  return `
+                    <td class="p-2">
+                      <div class="bg-pink-accent text-white p-3 rounded-xl text-center font-bold">
+                        ${p.nombre}
+                      </div>
+                    </td>
+                  `;
+                })
+                .join("")}
+            </tr>
+          `
+            )
+            .join("")}
+        </tbody>
+      </table>
+    `;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+
+
+const btnGrilla = document.getElementById("btn-ver-grilla");
+const modal = document.getElementById("modal-programacion");
+const cerrarModal = document.getElementById("cerrar-modal");
+const contenedorModal = document.getElementById("grilla-modal-contenido");
+
+btnGrilla.addEventListener("click", async () => {
+  modal.classList.remove("hidden");
+
+  // Cargar solo una vez
+  if (contenedorModal.innerHTML === "") {
+    await cargarGrillaEnModal();
+  }
+});
+
+cerrarModal.addEventListener("click", () => {
+  modal.classList.add("hidden");
+});
+
+
+
+
+      // ===== NOTICIAS =====
+      async function cargarNoticias() {
+        const contenedorNoticias =
+          document.getElementById("noticias-container");
+        const contenedorHero = document.getElementById("hero-noticia");
 
 	try {
 		const respuesta = await fetch("http://localhost:3000/noticias");
