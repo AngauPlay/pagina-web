@@ -300,4 +300,38 @@ async function cargarPromos() {
 	} catch (error) {
 		console.error("Error cargando promos:", error);
 	}
+
+
+
+const API = "http://localhost:3000";
+
+async function cargarMarquee() {
+  try {
+    const res = await fetch(`${API}/noticias`);
+    const noticias = await res.json();
+
+    const contenedor = document.getElementById("marquee-container");
+
+    // Filtrar solo publicadas
+    const publicadas = noticias.filter(n => n.estado === "publicado");
+
+    const htmlNoticias = publicadas
+      .map(n => `
+        <span class="mx-4 text-white/90 cursor-pointer hover:underline"
+          onclick="window.location.href='articulo.html?slug=${n.slug}'">
+          ${n.titulo}
+        </span>
+        <span class="mx-4 opacity-30">|</span>
+      `)
+      .join("");
+
+    contenedor.innerHTML += htmlNoticias;
+
+  } catch (error) {
+    console.error("Error cargando marquee:", error);
+  }
 }
+
+// Ejecutar
+cargarMarquee();
+      }
