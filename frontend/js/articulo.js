@@ -16,105 +16,64 @@ document.addEventListener("DOMContentLoaded", async () => {
 	}
 
 	try {
-		// 1. Obtener datos de la API
 		const response = await fetch(`${API_BASE}/noticias/detalle/${slug}`);
-
-		if (!response.ok) {
-			window.location.href = "error.html";
-			return;
-		}
+		if (!response.ok) throw new Error("Noticia no encontrada");
 
 		const noticia = await response.json();
 
-		// 2. Gestionar estados de carga y visibilidad
+		// UI Updates
 		document.getElementById("loading-state").classList.add("hidden");
 		document.getElementById("articulo-content").classList.remove("hidden");
 
-		// 3. Títulos y Metadatos
+		// Títulos y Meta
 		document.title = `${noticia.titulo} | ANGAU PLAY`;
 		document.getElementById("articulo-titulo").textContent = noticia.titulo;
 
-		// Categoría dinámica
-		const catNombre =
+		// Categoría (Uso de Optional Chaining para mayor seguridad)
+		document.getElementById("articulo-categoria").textContent =
 			noticia.Categorium?.nombre || noticia.categoria?.nombre || "General";
-		document.getElementById("articulo-categoria").textContent = catNombre;
 
-		// 4. Lógica de Imagen Principal y Pantalla Completa (PhotoSwipe)
-		const galeriaPrincipal = document.getElementById("galeria-principal");
+		// --- Lógica de Imagen Principal ---
 		const imgUrl = noticia.imagen_url || "assets/default-img.jpg";
 		const imgElement = document.getElementById("articulo-imagen");
 		const linkElement = document.getElementById("articulo-imagen-link");
 
-		// Configurar imagen principal
 		if (imgElement && linkElement) {
 			imgElement.src = imgUrl;
 			linkElement.href = imgUrl;
 
+			// Obtener dimensiones de forma asíncrona
 			const imgTemp = new Image();
-			imgTemp.onload = function () {
-				linkElement.setAttribute("data-pswp-width", this.width);
-				linkElement.setAttribute("data-pswp-height", this.height);
-
-				// Si hay galería extra, la cargamos antes de inicializar PhotoSwipe
-				if (noticia.galeria && noticia.galeria.length > 0) {
-					renderizarGaleriaExtra(noticia.galeria);
-				}
-
-				inicializarPhotoSwipe();
-			};
 			imgTemp.src = imgUrl;
+			await imgTemp.decode(); // Espera a que la imagen sea decodificable
+			linkElement.setAttribute("data-pswp-width", imgTemp.width);
+			linkElement.setAttribute("data-pswp-height", imgTemp.height);
 		}
-		// 5. Formatear Fecha
-		const opciones = {day: "numeric", month: "long", year: "numeric"};
-		const fechaObj = new Date(noticia.fecha_publicacion);
-		document.getElementById("articulo-fecha").textContent = !isNaN(fechaObj)
-			? fechaObj.toLocaleDateString("es-AR", opciones)
-			: "Fecha no disponible";
 
-		// 6. Formatear Cuerpo (Saltos de línea a párrafos HTML)
+		// --- Cuerpo del Artículo ---
 		if (noticia.cuerpo) {
-			const cuerpoProcesado = noticia.cuerpo
+			document.getElementById("articulo-cuerpo").innerHTML = noticia.cuerpo
 				.split("\n")
-				.filter((parrafo) => parrafo.trim() !== "")
-				.map((parrafo) => `<p class="mb-6">${parrafo}</p>`)
+				.filter((p) => p.trim())
+				.map((p) => `<p class="mb-6">${p}</p>`)
 				.join("");
-			document.getElementById("articulo-cuerpo").innerHTML = cuerpoProcesado;
 		}
 
-		// 7. Autor e Iniciales
-		const autorNombre = noticia.autor || "Redacción Angau";
-		document.getElementById("articulo-autor").textContent = autorNombre;
-
-		const iniciales = autorNombre
-			.split(" ")
-			.filter((n) => n.length > 0)
-			.map((n) => n[0])
-			.join("")
-			.toUpperCase()
-			.substring(0, 2);
-		document.getElementById("autor-iniciales").textContent = iniciales || "AP";
-
-		// 8. Integración de Video YouTube
-		if (noticia.video_url) {
-			let videoId = "";
-			if (noticia.video_url.includes("v=")) {
-				videoId = noticia.video_url.split("v=")[1]?.split("&")[0];
-			} else {
-				videoId = noticia.video_url.split("/").pop();
-			}
-
-			if (videoId) {
-				document.getElementById("articulo-video").src =
-					`https://www.youtube.com/embed/${videoId}`;
-				document.getElementById("video-container").classList.remove("hidden");
-			}
+		// --- Galería y PhotoSwipe ---
+		if (noticia.galeria?.length > 0) {
+			renderizarGaleriaExtra(noticia.galeria);
 		}
 
-		// 9. Cargar noticias laterales
-		cargarSugeridas();
+		// Inicializar siempre al final de la carga de datos
+		inicializarPhotoSwipe();
+
+		// --- Cargas secundarias ---
+		cargarSugeridas(slug); // Pasar slug para filtrar
+		cargarPromos();
 	} catch (error) {
-		console.error("Falla crítica en la carga del artículo:", error);
-		// Opcional: mostrar un mensaje de error amigable en la UI
+		console.error("Falla crítica:", error);
+		// Redirigir o mostrar error amigable
+		// window.location.href = "error.html";
 	}
 });
 
@@ -166,14 +125,20 @@ function renderizarGaleriaExtra(fotos) {
  * Inicializa PhotoSwipe para que reconozca la principal y la galería
  */
 function inicializarPhotoSwipe() {
-	const lightbox = new PhotoSwipeLightbox({
-		// Seleccionamos ambos: el link principal y los de la galería extra
-		gallery: "#articulo-content",
-		children: "#articulo-imagen-link, .galeria-link",
-		pswpModule: () =>
-			import("https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe.esm.min.js"),
-	});
-	lightbox.init();
+	// Importamos dinámicamente el Lightbox desde la CDN
+	import("https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe-lightbox.esm.min.js")
+		.then((module) => {
+			const PhotoSwipeLightbox = module.default;
+			const lightbox = new PhotoSwipeLightbox({
+				gallery: "#articulo-content",
+				children: "#articulo-imagen-link, .galeria-link",
+				// El core también debe ser cargado correctamente
+				pswpModule: () =>
+					import("https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe.esm.min.js"),
+			});
+			lightbox.init();
+		})
+		.catch((err) => console.error("Error cargando PhotoSwipe:", err));
 }
 
 /**
@@ -215,3 +180,50 @@ async function cargarSugeridas() {
 		console.error("Error cargando sugeridas:", e);
 	}
 }
+
+async function cargarPromos() {
+	try {
+		// 1. Cargamos la promo del encabezado
+		const resSup = await fetch(
+			`http://localhost:3000/publicidad/activa/encabezado`,
+		);
+		const promosSup = await resSup.json();
+
+		const contenedorSup = document.getElementById("hero-promos-wrapper");
+		if (contenedorSup && promosSup.length > 0) {
+			const p = promosSup[0];
+			contenedorSup.innerHTML = `
+                <a href="${p.link_url}" target="_blank" class="block w-full overflow-hidden rounded-2xl shadow-lg hover:opacity-95 transition">
+                    <img src="${p.imagen_url}" alt="Promoción" class="w-full h-auto object-cover border-b-4 border-purple-main">
+                </a>
+            `;
+		}
+
+		// 2. Cargamos la promo de abajo (si tienes)
+		const resInf = await fetch(`http://localhost:3000/publicidad/activa/pie`);
+		const promosInf = await resInf.json();
+
+		const contenedorInf = document.getElementById("footer-promos-wrapper");
+		if (contenedorInf && promosInf.length > 0) {
+			const p = promosInf[0];
+			contenedorInf.innerHTML = `
+                <a href="${p.link_url}" target="_blank" class="block w-full overflow-hidden rounded-2xl shadow-lg hover:opacity-95 transition">
+                    <img src="${p.imagen_url}" alt="Promoción" class="w-full h-auto object-cover border-t-4 border-pink-accent">
+                </a>
+            `;
+		}
+		const contenedorAside = document.querySelectorAll(".sponsor-slot");
+		if (contenedorAside) {
+			contenedorAside.forEach((slot) => {
+				slot.innerHTML = `
+					<a href="https://www.angau.com.ar" target="_blank" class="block w-full h-full overflow-hidden rounded-2xl shadow-lg hover:opacity-95 transition">
+						<img src="assets/patrocinador-ejemplo.jpg" alt="Patrocinador" class="w-full h-full object-cover border-4 border-purple-main">
+					</a>
+				`;
+			});
+		}
+	} catch (error) {
+		console.error("Error cargando promos:", error);
+	}
+}
+cargarPromos();
