@@ -664,23 +664,16 @@ async function openModal(tipo) {
 		document.getElementById("form-programa").onsubmit = async (e) => {
 			e.preventDefault();
 
+			// 1. Capturamos TODO el formulario (incluyendo el archivo 'imagen')
 			const formData = new FormData(e.target);
-
-			const data = {
-				nombre: formData.get("nombre"),
-				staff: formData.get("staff"),
-				hora_inicio: formData.get("hora_inicio"),
-				hora_fin: formData.get("hora_fin"),
-				dia_semana: parseInt(formData.get("dia_semana")),
-			};
 
 			try {
 				const res = await fetch(`${API_BASE}/programas`, {
 					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify(data),
+					// IMPORTANTE: NO pongas headers: { "Content-Type": "application/json" }
+					// Al pasarle el objeto formData directamente, el navegador configura
+					// automáticamente el Content-Type como 'multipart/form-data'
+					body: formData,
 					credentials: "include",
 				});
 
@@ -688,10 +681,12 @@ async function openModal(tipo) {
 					closeModal();
 					cargarProgramacion();
 				} else {
+					const errorMsg = await res.text();
+					console.error("Error del servidor:", errorMsg);
 					alert("Error al crear programa");
 				}
 			} catch (error) {
-				console.error("Error:", error);
+				console.error("Error en la petición:", error);
 			}
 		};
 	}
