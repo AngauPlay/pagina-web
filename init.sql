@@ -93,6 +93,7 @@ CREATE TABLE `programas` (
   `hora_inicio` time NOT NULL,
   `hora_fin` time NOT NULL,
   `staff` varchar(255) DEFAULT NULL,
+  `imagen_url` varchar(255) DEFAULT NULL,
   `dia_semana` int(11) NOT NULL,
   `createdAt` datetime NOT NULL,
   `updatedAt` datetime NOT NULL

@@ -291,26 +291,39 @@ async function cargarProgramacion() {
 								return p.dia_semana === diaIndex && hInicio === hora;
 							});
 
+							// ... dentro del find de programa ...
 							if (programa) {
+								// Definimos la imagen: si existe en la DB la usamos, si no, ponemos un placeholder
+								const imagenSrc = programa.imagen
+									? programa.imagen
+									: "https://via.placeholder.com/40";
+
 								return `
-                <td class="p-2 border-r min-w-[140px] align-top">
-                  <div class="relative group bg-white p-2 rounded-lg shadow-sm border-l-4 border-pink-500">
-                    <div class="text-[9px] font-black text-gray-400 uppercase mb-1">
-                      ${programa.hora_inicio.substring(0, 5)} - ${programa.hora_fin ? programa.hora_fin.substring(0, 5) : "??"}
-                    </div>
-                    <div class="font-bold text-slate-800 text-sm leading-tight">${programa.nombre}</div>
-                    <div class="text-[10px] text-gray-500 italic line-clamp-1">${programa.staff || ""}</div>
-                    
-                    <div class="absolute -top-2 -right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button onclick="editarPrograma(${programa.id})" class="bg-blue-500 text-white w-6 h-6 rounded-full flex items-center justify-center shadow-md">
-                        <i class="fas fa-edit text-[10px]"></i>
-                      </button>
-                      <button onclick="eliminarPrograma(${programa.id})" class="bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center shadow-md">
-                        <i class="fas fa-times text-[10px]"></i>
-                      </button>
-                    </div>
-                  </div>
-                </td>`;
+								<td class="p-2 border-r min-w-[140px] align-top">
+								  <div class="relative group bg-white p-2 rounded-lg shadow-sm border-l-4 border-pink-500">
+									<div class="flex items-center gap-2 mb-1">
+										<img src="${imagenSrc}" 
+											 class="w-8 h-8 rounded-md object-cover border border-gray-100 shadow-sm" 
+											 alt="${programa.nombre}">
+											 
+										<div class="text-[9px] font-black text-gray-400 uppercase">
+										  ${programa.hora_inicio.substring(0, 5)} - ${programa.hora_fin ? programa.hora_fin.substring(0, 5) : "??"}
+										</div>
+									</div>
+									
+									<div class="font-bold text-slate-800 text-sm leading-tight">${programa.nombre}</div>
+									<div class="text-[10px] text-gray-500 italic line-clamp-1">${programa.staff || ""}</div>
+									
+									<div class="absolute -top-2 -right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+									  <button onclick="editarPrograma(${programa.id})" class="bg-blue-500 text-white w-6 h-6 rounded-full flex items-center justify-center shadow-md hover:scale-110 transition-transform">
+										<i class="fas fa-edit text-[10px]"></i>
+									  </button>
+									  <button onclick="eliminarPrograma(${programa.id})" class="bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center shadow-md hover:scale-110 transition-transform">
+										<i class="fas fa-times text-[10px]"></i>
+									  </button>
+									</div>
+								  </div>
+								</td>`;
 							} else {
 								return `<td class="p-2 border-r opacity-20 text-center"><i class="fas fa-minus text-gray-300"></i></td>`;
 							}
@@ -381,6 +394,11 @@ async function editarPrograma(id) {
 							.join("")}
           </select>
         </div>
+		<div class="border-t pt-4 mt-4 bg-gray-50 p-3 rounded-lg">
+		<label class="block text-sm font-bold text-gray-700 mb-2">Imagen de Programa</label>
+		<input type="file" name="imagen" class="w-full border p-2 rounded mb-4 bg-white">
+  
+	</div>
 
         <button class="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-xl font-bold transition-colors">
           GUARDAR CAMBIOS
@@ -391,32 +409,31 @@ async function editarPrograma(id) {
 		document.getElementById("form-editar-programa").onsubmit = async (e) => {
 			e.preventDefault();
 
+			// 1. Creamos el FormData a partir del formulario
 			const formData = new FormData(e.target);
-			const data = {
-				nombre: formData.get("nombre"),
-				staff: formData.get("staff"),
-				hora_inicio: formData.get("hora_inicio"),
-				hora_fin: formData.get("hora_fin"),
-				dia_semana: parseInt(formData.get("dia_semana")),
-				// Si tu backend lo requiere, puedes agregar updatedAt aquí o dejar que el servidor lo maneje
-			};
+
+			// No es necesario crear un objeto 'data' ni usar JSON.stringify
+			// El navegador se encarga de empaquetar todo (incluida la imagen)
 
 			const updateRes = await fetch(`${API_BASE}/programas/${id}`, {
 				method: "PUT",
-				headers: {"Content-Type": "application/json"},
-				body: JSON.stringify(data),
+				// IMPORTANTE: Al enviar FormData NO debes poner "Content-Type"
+				body: formData,
 				credentials: "include",
 			});
 
 			if (updateRes.ok) {
 				closeModal();
-				cargarProgramacion();
+				cargarProgramacion(); // Recarga la tabla
 			} else {
+				const errorText = await updateRes.text();
+				console.error("Respuesta de error:", errorText);
 				alert("Error al actualizar el programa");
 			}
 		};
 	} catch (error) {
-		console.error("Error al editar programa", error);
+		console.error("Error en la petición:", error);
+		alert("Falla de conexión con el servidor");
 	}
 }
 // ===============================
@@ -630,7 +647,12 @@ async function openModal(tipo) {
           <input type="time" name="hora_fin" class="w-full border p-2 rounded" required>
         </div>
       </div>
-  
+
+	  <div class="border-t pt-4 mt-4 bg-gray-50 p-3 rounded-lg">
+            <label class="block text-sm font-bold text-gray-700 mb-2">Imagen de Programa</label>
+            <input type="file" name="imagen" class="w-full border p-2 rounded mb-4 bg-white">
+        </div>
+
       <select name="dia_semana" class="w-full border p-2 rounded">
         ${dias.map((d, i) => `<option value="${i}">${d}</option>`).join("")}
       </select>

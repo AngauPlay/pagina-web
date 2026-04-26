@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const Publicidad = require("../models/Publicidad");
-const upload = require("../middlewares/uploadPublicidad");
-const auth = require("../middlewares/authMiddleware"); // Tu middleware de sesión
+const upload = require("../config/cloudinaryPublicidad");
+const auth = require("../middlewares/authMiddleware");
 const publicidadController = require("../controllers/publicidadController");
 // Obtener todas las publicidades (para el panel admin)
 router.get("/", publicidadController.getAll);

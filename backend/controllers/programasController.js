@@ -11,14 +11,12 @@ const getProgramasHoy = async (req, res) => {
 		const programas = await Programa.findAll({
 			where: {
 				dia_semana: hoy,
-				// Cambiamos la lógica:
-				// Queremos programas que aún no hayan terminado
 				hora_fin: {
 					[Op.gt]: horaActual,
 				},
 			},
 			order: [["hora_inicio", "ASC"]],
-			limit: 2, // El que está al aire + el que sigue
+			limit: 3,
 		});
 
 		res.json(programas);
@@ -45,20 +43,27 @@ const getProgramasForId = async (req, res) => {
 };
 
 const savePrograma = async (req, res) => {
+	let {nombre, hora_inicio, hora_fin, staff, dia_semana, imagen_url} = req.body;
+
+	// La URL de la imagen vendrá en req.file gracias a Multer
+	const imagenUrl = req.file ? req.file.path : null;
+	// Normalizar formato de hora si viene en el body (HH:mm -> HH:mm:00)
+	if (hora_inicio && hora_inicio.length === 5) {
+		hora_inicio = `${hora_inicio}:00`;
+	}
+	if (hora_fin && hora_fin.length === 5) {
+		hora_fin = `${hora_fin}:00`;
+	}
 	try {
-		let {nombre, hora_inicio, hora_fin, staff, dia_semana} = req.body;
-
-		// Validación básica de campos obligatorios
-		if (!nombre || !hora_inicio || !hora_fin || dia_semana === undefined) {
-			return res.status(400).json({error: "Faltan campos obligatorios"});
-		}
-
-		// Normalizar formato de hora HH:mm a HH:mm:ss
-		if (/^\d{2}:\d{2}$/.test(hora_inicio)) {
-			hora_inicio = `${hora_inicio}:00`;
-		}
-		if (/^\d{2}:\d{2}$/.test(hora_fin)) {
-			hora_fin = `${hora_fin}:00`;
+		if (req.files && req.files["programa_imagen"]) {
+			const result = await cloudinary.uploader.upload(
+				req.files["programa_imagen"][0].path,
+				{
+					folder: "angau_play/programas",
+				},
+			);
+			imagenUrl = result.secure_url;
+			await fs.unlink(req.files["programa_imagen"][0].path); // Limpiar temp
 		}
 
 		const nuevoPrograma = await Programa.create({
@@ -67,11 +72,11 @@ const savePrograma = async (req, res) => {
 			hora_fin,
 			staff,
 			dia_semana: parseInt(dia_semana),
+			imagen_url: imagenUrl, // Guardamos la URL de Cloudinary
 		});
 
 		res.status(201).json(nuevoPrograma);
 	} catch (error) {
-		console.error("Error al guardar programa:", error);
 		res.status(400).json({error: error.message});
 	}
 };
@@ -79,8 +84,18 @@ const savePrograma = async (req, res) => {
 const deletePrograma = async (req, res) => {
 	try {
 		const {id} = req.params;
+		const programa = await Programa.findByPk(id);
 
-		// Es buena práctica validar que el ID sea un número antes de consultar
+		if (!programa) {
+			return res.status(404).json({message: "Programa no encontrado"});
+		}
+
+		const imagenUrl = programa.imagen_url;
+		if (programa.imagen_url) {
+			const publicId = programa.imagen_url.split("/").pop().split(".")[0];
+			await cloudinary.uploader.destroy(`angau_play/programas/${publicId}`);
+		}
+
 		const eliminado = await Programa.destroy({where: {id}});
 
 		if (!eliminado) {
@@ -110,14 +125,15 @@ const getAllProgramas = async (req, res) => {
 const updatePrograma = async (req, res) => {
 	try {
 		const {id} = req.params;
-		let {nombre, hora_inicio, hora_fin, staff, dia_semana} = req.body;
+		let {nombre, hora_inicio, hora_fin, staff, dia_semana, imagen_url} =
+			req.body;
 
 		// 1. Buscar si el programa existe
 		const programa = await Programa.findByPk(id);
 		if (!programa) {
 			return res.status(404).json({message: "Programa no encontrado"});
 		}
-
+		const nuevaImagenUrl = req.file ? req.file.path : programa.imagen_url;
 		// 2. Normalizar formato de hora si viene en el body (HH:mm -> HH:mm:00)
 		if (hora_inicio && hora_inicio.length === 5) {
 			hora_inicio = `${hora_inicio}:00`;
@@ -134,11 +150,11 @@ const updatePrograma = async (req, res) => {
 			staff: staff || programa.staff,
 			dia_semana:
 				dia_semana !== undefined ? parseInt(dia_semana) : programa.dia_semana,
+			imagen_url: nuevaImagenUrl, // <--- Se actualiza aquí
 		});
 
-		res.json({message: "Programa actualizado correctamente", programa});
+		res.json({message: "Actualizado", programa});
 	} catch (error) {
-		console.error("Error al actualizar programa:", error);
 		res.status(400).json({error: error.message});
 	}
 };

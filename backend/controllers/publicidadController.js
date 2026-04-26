@@ -1,5 +1,5 @@
 const Publicidad = require("../models/Publicidad");
-const upload = require("../middlewares/uploadPublicidad");
+const upload = require("../config/cloudinaryPublicidad");
 
 const publicidadController = {
 	// Listar todas las publicidades (para el panel admin)

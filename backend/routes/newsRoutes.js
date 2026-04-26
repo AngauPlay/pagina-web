@@ -1,14 +1,14 @@
 const {Router} = require("express");
 const router = Router();
+const {upload} = require("../config/cloudinaryNoticias");
 const newsController = require("../controllers/newsController");
 const categoryController = require("../controllers/categoryController");
 
 // Middlewares
 const auth = require("../middlewares/authMiddleware");
-const upload = require("../middlewares/uploadMiddleware");
 const uploadFields = upload.fields([
-	{name: "portada", maxCount: 1}, // Coincide con name="portada"
-	{name: "galeria", maxCount: 10}, // Coincide con name="galeria"
+	{name: "portada", maxCount: 1},
+	{name: "galeria", maxCount: 10},
 ]);
 // --- RUTAS PÚBLICAS (Lectores) ---
 router.get("/", newsController.getAll);

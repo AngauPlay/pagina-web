@@ -1,7 +1,7 @@
 const Noticia = require("../models/Noticia");
-const cloudinary = require("../config/cloudinary"); // Importamos tu config de Cloudinary
 const fs = require("fs-extra"); // Para limpiar archivos temporales
-const Categoria = require("../models/Categoria"); // Importamos el modelo de Categoría para los joins
+const Categoria = require("../models/Categoria");
+const cloudinary = require("../config/cloudinaryNoticias"); // Configuración de Cloudinary para noticias
 const NoticiaImagen = require("../models/NoticiaImagen"); // Modelo para imágenes adicionales
 const newsController = {
 	// Listar todas las noticias publicadas
@@ -84,20 +84,13 @@ const newsController = {
 		try {
 			const {titulo, copete, cuerpo, categoria_id, autor, estado} = req.body;
 
-			// 1. Subir Portada a Cloudinary
+			// El middleware ya subió la foto a Cloudinary.
+			// La URL está en req.files['portada'][0].path
 			let portadaUrl = null;
 			if (req.files && req.files["portada"]) {
-				const result = await cloudinary.uploader.upload(
-					req.files["portada"][0].path,
-					{
-						folder: "angau_play/noticias",
-					},
-				);
-				portadaUrl = result.secure_url;
-				await fs.unlink(req.files["portada"][0].path); // Limpiar temp
+				portadaUrl = req.files["portada"][0].path;
 			}
 
-			// 2. Crear la Noticia
 			const noticia = await Noticia.create({
 				titulo,
 				copete,
@@ -108,24 +101,20 @@ const newsController = {
 				imagen_url: portadaUrl,
 			});
 
-			// 3. Subir Galería a Cloudinary y guardar en DB
+			// Procesar Galería
 			if (req.files && req.files["galeria"]) {
-				for (const file of req.files["galeria"]) {
-					const resCloud = await cloudinary.uploader.upload(file.path, {
-						folder: "angau_play/galeria",
-					});
-					await NoticiaImagen.create({
+				const promesas = req.files["galeria"].map((file) =>
+					NoticiaImagen.create({
 						noticia_id: noticia.id,
-						url: resCloud.secure_url,
-					});
-					await fs.unlink(file.path); // Limpiar temp
-				}
+						url: file.path, // URL de Cloudinary
+					}),
+				);
+				await Promise.all(promesas);
 			}
 
 			res.status(201).json(noticia);
 		} catch (error) {
-			console.error(error);
-			res.status(500).json({mensaje: "Error al crear", error: error.message});
+			res.status(500).json({error: error.message});
 		}
 	},
 
@@ -184,22 +173,18 @@ const newsController = {
 
 	delete: async (req, res) => {
 		try {
-			const noticia = await Noticia.findByPk(req.params.id, {
-				include: [{model: NoticiaImagen, as: "galeria"}],
-			});
-
+			const noticia = await Noticia.findByPk(req.params.id);
 			if (!noticia) return res.status(404).json({mensaje: "No existe"});
 
-			// 1. Borrar imagen de portada en Cloudinary (opcional pero recomendado)
 			if (noticia.imagen_url) {
+				// Extraemos el public_id de la URL
 				const publicId = noticia.imagen_url.split("/").pop().split(".")[0];
-				await cloudinary.uploader.destroy(`angau_play/noticias/${publicId}`);
+				// Borramos de la carpeta 'noticias' en Cloudinary
+				await cloudinary.uploader.destroy(`noticias/${publicId}`);
 			}
 
-			// 2. Borrar la noticia (el CASCADE de tu SQL borrará los registros de noticias_imagenes)
 			await noticia.destroy();
-
-			res.json({mensaje: "Noticia e imágenes eliminadas"});
+			res.json({mensaje: "Noticia eliminada de DB y Cloudinary"});
 		} catch (error) {
 			res.status(500).json({error: error.message});
 		}

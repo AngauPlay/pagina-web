@@ -20,6 +20,12 @@ const Programa = sequelize.define(
 		staff: {
 			type: DataTypes.STRING,
 		},
+		imagen_url: {
+			type: DataTypes.STRING,
+			allowNull: true,
+			defaultValue: null,
+			validate: {isUrl: true},
+		},
 		dia_semana: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
@@ -27,10 +33,8 @@ const Programa = sequelize.define(
 		},
 	},
 	{
-		// MUY IMPORTANTE: Sequelize por defecto busca la tabla "Programas" (plural).
-		// Tu SQL usa "programas" (minúscula), forzamos el nombre aquí:
 		tableName: "programas",
-		timestamps: true, // Tu SQL tiene createdAt y updatedAt, así que esto debe ser true.
+		timestamps: true,
 	},
 );
 

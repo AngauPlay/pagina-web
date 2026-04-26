@@ -34,33 +34,38 @@ async function renderProgramacion() {
 			return;
 		}
 
+		// Cambiamos (p) por (programa) para que coincida con el resto de tu código
 		contenedor.innerHTML = data
-			.map((p) => {
-				const vivo = estaEnVivo(p.hora_inicio, p.hora_fin);
+			.map((programa) => {
+				const vivo = estaEnVivo(programa.hora_inicio, programa.hora_fin);
+				const claseVivo = vivo ? "border-green-500" : "border-pink-500";
+
+				// Ahora 'programa.imagen_url' sí funcionará
+				const imagenSrc = programa.imagen_url
+					? programa.imagen_url
+					: "assets/img/default-programa.jpg";
 
 				return `
-        <div class="relative rounded-xl overflow-hidden group cursor-pointer">
-
-          <div class="w-full aspect-[2/1] overflow-hidden">
-            <img 
-              src="${p.imagen || "/assets/programa2-banner.jpg"}" 
-              class="w-full h-full object-cover group-hover:scale-105 transition duration-500"
-            />
+        <div class="relative group bg-white p-2 rounded-lg shadow-sm border-l-4 ${claseVivo} mb-2">
+          <div class="flex items-center gap-3 mb-2">
+              <img src="${imagenSrc}" 
+                   class="w-10 h-10 rounded-full object-cover border-2 border-purple-100" 
+                   alt="${programa.nombre}">
+                   
+              <div class="text-[9px] font-black text-gray-400 uppercase">
+                ${programa.hora_inicio.substring(0, 5)} - ${programa.hora_fin.substring(0, 5)}
+              </div>
           </div>
-
-          <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
-
-          <div class="absolute bottom-3 left-3 text-white">
-            <span class="text-[10px] font-bold ${
-							vivo ? "text-yellow-neon" : "text-white/80"
-						} uppercase">
-             ${vivo ? "EN VIVO 🔴" : `${p.hora_inicio} - ${p.hora_fin}`}
-            </span>
-            <h3 class="font-bold text-sm">${p.nombre}</h3>
+          
+          <div class="font-bold text-slate-800 text-sm leading-tight">${programa.nombre}</div>
+          <div class="text-[10px] text-gray-500 italic">${programa.staff || "Sin staff"}</div>
+          
+          <div class="absolute -top-2 -right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
+              <button onclick="editarPrograma(${programa.id})" class="bg-blue-600 text-white w-7 h-7 rounded-full shadow-lg hover:scale-110">
+                  <i class="fas fa-pen text-[10px]"></i>
+              </button>
           </div>
-
-        </div>
-      `;
+        </div>`;
 			})
 			.join("");
 	} catch (error) {
@@ -68,32 +73,39 @@ async function renderProgramacion() {
 		contenedor.innerHTML = "<p>Error cargando programación</p>";
 	}
 }
+async function cargarGrillaEnModal() {
+	try {
+		const res = await fetch("http://localhost:3000/programas");
+		const data = await res.json();
 
-      async function cargarGrillaEnModal() {
-  try {
-    const res = await fetch("http://localhost:3000/programas");
-    const data = await res.json();
+		const diasNombres = [
+			"Domingo",
+			"Lunes",
+			"Martes",
+			"Miércoles",
+			"Jueves",
+			"Viernes",
+			"Sábado",
+		];
 
-    const diasNombres = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+		const horasSet = new Set();
+		data.forEach((p) => {
+			horasSet.add(p.hora_inicio.slice(0, 5));
+		});
 
-    const horasSet = new Set();
-    data.forEach((p) => {
-      horasSet.add(p.hora_inicio.slice(0, 5));
-    });
+		const horas = Array.from(horasSet).sort();
 
-    const horas = Array.from(horasSet).sort();
+		const grilla = {};
+		horas.forEach((h) => {
+			grilla[h] = Array(7).fill(null);
+		});
 
-    const grilla = {};
-    horas.forEach((h) => {
-      grilla[h] = Array(7).fill(null);
-    });
+		data.forEach((p) => {
+			const hora = p.hora_inicio.slice(0, 5);
+			grilla[hora][p.dia_semana] = p;
+		});
 
-    data.forEach((p) => {
-      const hora = p.hora_inicio.slice(0, 5);
-      grilla[hora][p.dia_semana] = p;
-    });
-
-    contenedorModal.innerHTML = `
+		contenedorModal.innerHTML = `
       <table class="w-full text-sm border">
         <thead>
           <tr class="bg-purple-main text-white">
@@ -103,36 +115,34 @@ async function renderProgramacion() {
         </thead>
         <tbody>
           ${horas
-            .map(
-              (hora) => `
+						.map(
+							(hora) => `
             <tr class="border-t">
               <td class="p-3 font-bold bg-gray-100">${hora}</td>
               ${grilla[hora]
-                .map((p) => {
-                  if (!p) return `<td></td>`;
+								.map((p) => {
+									if (!p) return `<td></td>`;
 
-                  return `
+									return `
                     <td class="p-2">
                       <div class="bg-pink-accent text-white p-3 rounded-xl text-center font-bold">
                         ${p.nombre}
                       </div>
                     </td>
                   `;
-                })
-                .join("")}
+								})
+								.join("")}
             </tr>
-          `
-            )
-            .join("")}
+          `,
+						)
+						.join("")}
         </tbody>
       </table>
     `;
-  } catch (error) {
-    console.error(error);
-  }
+	} catch (error) {
+		console.error(error);
+	}
 }
-
-
 
 const btnGrilla = document.getElementById("btn-ver-grilla");
 const modal = document.getElementById("modal-programacion");
@@ -140,26 +150,22 @@ const cerrarModal = document.getElementById("cerrar-modal");
 const contenedorModal = document.getElementById("grilla-modal-contenido");
 
 btnGrilla.addEventListener("click", async () => {
-  modal.classList.remove("hidden");
+	modal.classList.remove("hidden");
 
-  // Cargar solo una vez
-  if (contenedorModal.innerHTML === "") {
-    await cargarGrillaEnModal();
-  }
+	// Cargar solo una vez
+	if (contenedorModal.innerHTML === "") {
+		await cargarGrillaEnModal();
+	}
 });
 
 cerrarModal.addEventListener("click", () => {
-  modal.classList.add("hidden");
+	modal.classList.add("hidden");
 });
 
-
-
-
-      // ===== NOTICIAS =====
-      async function cargarNoticias() {
-        const contenedorNoticias =
-          document.getElementById("noticias-container");
-        const contenedorHero = document.getElementById("hero-noticia");
+// ===== NOTICIAS =====
+async function cargarNoticias() {
+	const contenedorNoticias = document.getElementById("noticias-container");
+	const contenedorHero = document.getElementById("hero-noticia");
 
 	try {
 		const respuesta = await fetch("http://localhost:3000/noticias");
@@ -301,37 +307,36 @@ async function cargarPromos() {
 		console.error("Error cargando promos:", error);
 	}
 
+	const API = "http://localhost:3000";
 
+	async function cargarMarquee() {
+		try {
+			const res = await fetch(`${API}/noticias`);
+			const noticias = await res.json();
 
-const API = "http://localhost:3000";
+			const contenedor = document.getElementById("marquee-container");
 
-async function cargarMarquee() {
-  try {
-    const res = await fetch(`${API}/noticias`);
-    const noticias = await res.json();
+			// Filtrar solo publicadas
+			const publicadas = noticias.filter((n) => n.estado === "publicado");
 
-    const contenedor = document.getElementById("marquee-container");
-
-    // Filtrar solo publicadas
-    const publicadas = noticias.filter(n => n.estado === "publicado");
-
-    const htmlNoticias = publicadas
-      .map(n => `
+			const htmlNoticias = publicadas
+				.map(
+					(n) => `
         <span class="mx-4 text-white/90 cursor-pointer hover:underline"
           onclick="window.location.href='articulo.html?slug=${n.slug}'">
           ${n.titulo}
         </span>
         <span class="mx-4 opacity-30">|</span>
-      `)
-      .join("");
+      `,
+				)
+				.join("");
 
-    contenedor.innerHTML += htmlNoticias;
+			contenedor.innerHTML += htmlNoticias;
+		} catch (error) {
+			console.error("Error cargando marquee:", error);
+		}
+	}
 
-  } catch (error) {
-    console.error("Error cargando marquee:", error);
-  }
+	// Ejecutar
+	cargarMarquee();
 }
-
-// Ejecutar
-cargarMarquee();
-      }
