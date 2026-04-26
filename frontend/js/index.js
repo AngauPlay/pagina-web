@@ -46,26 +46,45 @@ async function renderProgramacion() {
 					: "assets/img/default-programa.jpg";
 
 				return `
-        <div class="relative group bg-white p-2 rounded-lg shadow-sm border-l-4 ${claseVivo} mb-2">
-          <div class="flex items-center gap-3 mb-2">
-              <img src="${imagenSrc}" 
-                   class="w-10 h-10 rounded-full object-cover border-2 border-purple-100" 
-                   alt="${programa.nombre}">
-                   
-              <div class="text-[9px] font-black text-gray-400 uppercase">
-                ${programa.hora_inicio.substring(0, 5)} - ${programa.hora_fin.substring(0, 5)}
-              </div>
-          </div>
+        <div class="relative rounded-xl overflow-hidden shadow-lg cursor-pointer group h-28">
+
+    <!-- IMAGEN DE FONDO -->
+    <div 
+      class="absolute inset-0 bg-cover bg-center"
+      style="background-image: url('${imagenSrc}')"
+    ></div>
+
+    <!-- OVERLAY OSCURO -->
+    <div class="absolute inset-0 bg-black/50"></div>
+
+    <!-- CONTENIDO -->
+    <div class="absolute bottom-2 left-3 right-3 text-white z-10">
+      
+      <span class="text-[10px] font-bold ${
+        vivo ? "text-yellow-neon" : "text-white/80"
+      } uppercase">
+        ${
+          vivo
+            ? "EN VIVO 🔴"
+            : `${programa.hora_inicio.substring(0,5)} - ${programa.hora_fin.substring(0,5)}`
+        }
+      </span>
+
+      <h3 class="font-bold text-sm leading-tight">
+        ${programa.nombre}
+      </h3>
+
+      <p class="text-[10px] text-white/80 italic">
+        ${programa.staff || ""}
+      </p>
+
+    </div>
+
+  </div>
+`;
           
-          <div class="font-bold text-slate-800 text-sm leading-tight">${programa.nombre}</div>
-          <div class="text-[10px] text-gray-500 italic">${programa.staff || "Sin staff"}</div>
           
-          <div class="absolute -top-2 -right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
-              <button onclick="editarPrograma(${programa.id})" class="bg-blue-600 text-white w-7 h-7 rounded-full shadow-lg hover:scale-110">
-                  <i class="fas fa-pen text-[10px]"></i>
-              </button>
-          </div>
-        </div>`;
+         
 			})
 			.join("");
 	} catch (error) {

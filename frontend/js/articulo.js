@@ -80,45 +80,80 @@ document.addEventListener("DOMContentLoaded", async () => {
 /**
  * Renderiza las fotos adicionales debajo del contenido
  */
+
 function renderizarGaleriaExtra(fotos) {
-	// Creamos un contenedor para la galería si no existe
 	const cuerpo = document.getElementById("articulo-cuerpo");
+
 	const divGaleria = document.createElement("div");
-	divGaleria.className =
-		"grid grid-cols-2 md:grid-cols-3 gap-4 mt-12 border-t pt-8";
-	divGaleria.id = "galeria-extra";
+	divGaleria.className = "mt-12 border-t pt-8";
 
-	// Título de la sección
-	const tituloGaleria = document.createElement("h3");
-	tituloGaleria.className =
-		"col-span-full text-xl font-black italic uppercase mb-4 text-purple-main";
-	tituloGaleria.innerText = "Galería de imágenes";
-	divGaleria.appendChild(tituloGaleria);
+	divGaleria.innerHTML = `
+		<h3 class="text-xl font-black italic uppercase mb-4 text-purple-main">
+			Galería de imágenes
+		</h3>
 
-	fotos.forEach((foto) => {
-		const item = document.createElement("div");
-		item.className = "overflow-hidden rounded-xl bg-slate-200 aspect-video";
+		<div class="relative overflow-hidden rounded-2xl">
+			
+			<!-- CONTENEDOR SLIDER -->
+			<div id="carousel-galeria" class="flex transition-transform duration-500">
+				${fotos
+					.map(
+						(f) => `
+					<div class="min-w-full">
+						<a href="${f.url}" class="galeria-link">
+							<img src="${f.url}" class="w-full h-[300px] object-cover">
+						</a>
+					</div>
+				`,
+					)
+					.join("")}
+			</div>
 
-		// El enlace debe estar dentro de #galeria-principal o compartir el mismo selector
-		// Para simplificar, haremos que PhotoSwipe busque en todo el artículo
-		item.innerHTML = `
-            <a href="${foto.url}" target="_blank" class="galeria-link">
-                <img src="${foto.url}" class="w-full h-full object-cover hover:scale-110 transition duration-500 shadow-lg">
-            </a>
-        `;
-		divGaleria.appendChild(item);
+			<!-- BOTONES -->
+			<button id="prev-galeria" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white px-3 py-1 rounded-full">
+				‹
+			</button>
 
-		// Obtener dimensiones de cada foto de la galería
-		const imgT = new Image();
-		imgT.onload = () => {
-			const a = item.querySelector("a");
-			a.setAttribute("data-pswp-width", imgT.width);
-			a.setAttribute("data-pswp-height", imgT.height);
-		};
-		imgT.src = foto.url;
-	});
+			<button id="next-galeria" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white px-3 py-1 rounded-full">
+				›
+			</button>
+
+		</div>
+	`;
 
 	cuerpo.appendChild(divGaleria);
+
+	inicializarCarruselGaleria();
+}
+
+function inicializarCarruselGaleria() {
+	const contenedor = document.getElementById("carousel-galeria");
+	const slides = contenedor.children;
+
+	let index = 0;
+
+	document.getElementById("next-galeria").onclick = () => {
+		index++;
+		if (index >= slides.length) index = 0;
+		actualizar();
+	};
+
+	document.getElementById("prev-galeria").onclick = () => {
+		index--;
+		if (index < 0) index = slides.length - 1;
+		actualizar();
+	};
+
+	function actualizar() {
+		contenedor.style.transform = `translateX(-${index * 100}%)`;
+	}
+
+	// autoplay opcional
+	setInterval(() => {
+		index++;
+		if (index >= slides.length) index = 0;
+		actualizar();
+	}, 4000);
 }
 
 /**
