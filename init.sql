@@ -38,7 +38,7 @@ CREATE TABLE `categorias` (
 --
 
 INSERT INTO `categorias` (`id`, `nombre`, `slug`) VALUES
-(1, 'Actualidad', 'actualidad'),
+(1, 'Política', 'politica'),
 (2, 'Deportes', 'deportes'),
 (3, 'Tecnología', 'tecnologia'),
 (4, 'Cultura', 'cultura'),

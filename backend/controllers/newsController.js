@@ -21,7 +21,7 @@ const newsController = {
 	},
 	getByCategory: async (req, res) => {
 		try {
-			const {nombreCat} = req.params; // Ejemplo: "Cultura"
+			const {nombreCat} = req.params;
 
 			const noticias = await Noticia.findAll({
 				where: {estado: "publicado"},
@@ -29,7 +29,6 @@ const newsController = {
 					{
 						model: Categoria,
 						where: {
-							// Esto hace que filtre por el nombre de la categoría en la otra tabla
 							nombre: nombreCat,
 						},
 					},
