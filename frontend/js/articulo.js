@@ -160,22 +160,33 @@ function inicializarCarruselGaleria() {
  * Inicializa PhotoSwipe para que reconozca la principal y la galería
  */
 function inicializarPhotoSwipe() {
-	// Importamos dinámicamente el Lightbox desde la CDN
 	import("https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe-lightbox.esm.min.js")
 		.then((module) => {
 			const PhotoSwipeLightbox = module.default;
 			const lightbox = new PhotoSwipeLightbox({
 				gallery: "#articulo-content",
 				children: "#articulo-imagen-link, .galeria-link",
-				// El core también debe ser cargado correctamente
 				pswpModule: () =>
 					import("https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe.esm.min.js"),
+				// Añadimos estas opciones para mejor experiencia
+				padding: {top: 20, bottom: 20, left: 20, right: 20},
+				wheelToZoom: true,
 			});
+
+			// FILTRO CRÍTICO: Si la imagen no tiene tamaño definido, lo busca al vuelo
+			lightbox.addFilter("itemData", (itemData) => {
+				const img = itemData.element.querySelector("img");
+				if (img && (!itemData.width || !itemData.height)) {
+					itemData.width = img.naturalWidth || 1920;
+					itemData.height = img.naturalHeight || 1080;
+				}
+				return itemData;
+			});
+
 			lightbox.init();
 		})
 		.catch((err) => console.error("Error cargando PhotoSwipe:", err));
 }
-
 /**
  * Carga las noticias recomendadas en el sidebar
  */
