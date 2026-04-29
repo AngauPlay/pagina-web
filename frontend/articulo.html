@@ -9,6 +9,10 @@
 			rel="stylesheet"
 			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
 		/>
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe.min.css"
+		/>
 		<style>
 			:root {
 				--pink-accent: rgb(224, 35, 117);
@@ -256,13 +260,13 @@
 						id="galeria-principal"
 						class="rounded-3xl overflow-hidden shadow-2xl mb-12 border-4 border-white relative group"
 					>
-						<a id="articulo-imagen-link" href="" target="_blank">
-							<img
-								id="articulo-imagen"
-								src=""
-								alt=""
-								class="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
-							/>
+						<a
+							id="articulo-imagen-link"
+							href=""
+							target="_blank"
+							data-pswp-src=""
+						>
+							<img id="articulo-imagen" src="" class="..." />
 						</a>
 					</div>
 
@@ -270,7 +274,11 @@
 						id="articulo-cuerpo"
 						class="prose prose-slate prose-lg max-w-none"
 					></div>
+					<div id="articulo-cuerpo" class="..."></div>
 
+					<div id="contenedor-galeria-dinamica"></div>
+
+					<div class="my-10 sponsor-slot h-40"></div>
 					<div class="my-10 sponsor-slot h-40"></div>
 
 					<div
