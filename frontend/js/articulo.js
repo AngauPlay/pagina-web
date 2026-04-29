@@ -228,8 +228,8 @@ async function cargarPromos() {
 		if (contenedorSup && promosSup.length > 0) {
 			const p = promosSup[0];
 			contenedorSup.innerHTML = `
-                <a href="${p.link_url}" target="_blank" class="block w-full overflow-hidden rounded-2xl shadow-lg hover:opacity-95 transition">
-                    <img src="${p.imagen_url}" alt="Promoción" class="w-full h-auto object-cover border-b-4 border-purple-main">
+                <a href="${p.link_url}" target="_blank" class="block w-full overflow-hidden hover:opacity-95 transition">
+                    <img src="${p.imagen_url}" alt="Promoción" class="w-full h-auto object-cover">
                 </a>
             `;
 		}
@@ -242,17 +242,21 @@ async function cargarPromos() {
 		if (contenedorInf && promosInf.length > 0) {
 			const p = promosInf[0];
 			contenedorInf.innerHTML = `
-                <a href="${p.link_url}" target="_blank" class="block w-full overflow-hidden rounded-2xl shadow-lg hover:opacity-95 transition">
-                    <img src="${p.imagen_url}" alt="Promoción" class="w-full h-auto object-cover border-t-4 border-pink-accent">
+                <a href="${p.link_url}" target="_blank" class="block w-full overflow-hidden hover:opacity-95 transition">
+                    <img src="${p.imagen_url}" alt="Promoción" class="w-full h-auto object-cover">
                 </a>
             `;
 		}
+		const resAside = await fetch(
+			`http://localhost:3000/publicidad/activa/aside`,
+		);
+		const promosAside = await resAside.json();
 		const contenedorAside = document.querySelectorAll(".sponsor-slot");
 		if (contenedorAside) {
 			contenedorAside.forEach((slot) => {
 				slot.innerHTML = `
-					<a href="https://www.angau.com.ar" target="_blank" class="block w-full h-full overflow-hidden rounded-2xl shadow-lg hover:opacity-95 transition">
-						<img src="assets/patrocinador-ejemplo.jpg" alt="Patrocinador" class="w-full h-full object-cover border-4 border-purple-main">
+					<a href="${p.link_url}" target="_blank" class="block w-full h-full overflow-hidden hover:opacity-95 transition">
+						<img src="${p.imagen_url}" alt="Patrocinador" class="w-full h-full object-cover ">
 					</a>
 				`;
 			});
