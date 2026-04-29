@@ -50,7 +50,7 @@ async function renderProgramacion() {
 
     <!-- IMAGEN DE FONDO -->
     <div 
-      class="absolute inset-0 bg-cover bg-center"
+      class="absolute inset-0 bg-auto bg-center"
       style="background-image: url('${imagenSrc}')"
     ></div>
 
@@ -61,13 +61,13 @@ async function renderProgramacion() {
     <div class="absolute bottom-2 left-3 right-3 text-white z-10">
       
       <span class="text-[10px] font-bold ${
-        vivo ? "text-yellow-neon" : "text-white/80"
-      } uppercase">
+				vivo ? "text-yellow-neon" : "text-white/80"
+			} uppercase">
         ${
-          vivo
-            ? "EN VIVO 🔴"
-            : `${programa.hora_inicio.substring(0,5)} - ${programa.hora_fin.substring(0,5)}`
-        }
+					vivo
+						? "EN VIVO 🔴"
+						: `${programa.hora_inicio.substring(0, 5)} - ${programa.hora_fin.substring(0, 5)}`
+				}
       </span>
 
       <h3 class="font-bold text-sm leading-tight">
@@ -82,9 +82,6 @@ async function renderProgramacion() {
 
   </div>
 `;
-          
-          
-         
 			})
 			.join("");
 	} catch (error) {
