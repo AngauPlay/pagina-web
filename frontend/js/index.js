@@ -50,10 +50,16 @@ async function renderProgramacion() {
 
     <!-- IMAGEN DE FONDO -->
     <div 
+<<<<<<< HEAD
   class="absolute inset-0 bg-cover bg-center bg-no-repeat"
   style="background-image: url('${imagenSrc}')"
 ></div>
 
+=======
+      class="absolute inset-0 bg-auto bg-center bg-no-repeat ${claseVivo} border-4 rounded-xl"
+      style="background-image: url('${imagenSrc}')"
+    ></div>
+>>>>>>> 93a7335b4a234607c1669fbf4fc7613a54b56cae
 
     <!-- OVERLAY OSCURO -->
     <div class="absolute inset-0 bg-black/50"></div>
