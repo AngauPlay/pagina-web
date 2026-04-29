@@ -50,7 +50,7 @@ async function renderProgramacion() {
 
     <!-- IMAGEN DE FONDO -->
     <div 
-      class="absolute inset-0 bg-auto bg-center"
+      class="absolute inset-0 bg-auto bg-center bg-no-repeat ${claseVivo} border-4 rounded-xl"
       style="background-image: url('${imagenSrc}')"
     ></div>
 
