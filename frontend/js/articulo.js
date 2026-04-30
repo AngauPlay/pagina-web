@@ -246,7 +246,9 @@ async function cargarPromos() {
 		}
 
 		// 2. Cargamos la promo de abajo (si tienes)
-		const resInf = await fetch(`http://localhost:3000/publicidad/activa/pie`);
+		const resInf = await fetch(
+			`http://localhost:3000/publicidad/activa/intermedia`,
+		);
 		const promosInf = await resInf.json();
 
 		const contenedorInf = document.getElementById("footer-promos-wrapper");
@@ -259,18 +261,31 @@ async function cargarPromos() {
             `;
 		}
 		const resAside = await fetch(
-			`http://localhost:3000/publicidad/activa/aside`,
+			`http://localhost:3000/publicidad/activa/lateral`,
 		);
 		const promosAside = await resAside.json();
 		const contenedorAside = document.querySelectorAll(".sponsor-slot");
 		if (contenedorAside) {
 			contenedorAside.forEach((slot) => {
 				slot.innerHTML = `
-					<a href="${p.link_url}" target="_blank" class="block w-full h-full overflow-hidden hover:opacity-95 transition">
-						<img src="${p.imagen_url}" alt="Patrocinador" class="w-full h-full object-cover ">
+					<a href="${promosAside[0].link_url}" target="_blank" class="block w-full h-full overflow-hidden hover:opacity-95 transition">
+						<img src="${promosAside[0].imagen_url}" alt="Patrocinador" class="w-full h-full object-cover ">
 					</a>
 				`;
 			});
+		}
+		const resInf2 = await fetch(
+			`http://localhost:3000/publicidad/activa/intermedia`,
+		);
+		const promosInf2 = await resInf2.json();
+		const contenedorInf2 = document.getElementById("bottom-promos-wrapper");
+		if (contenedorInf2 && promosInf2.length > 0) {
+			const p = promosInf2[0];
+			contenedorInf2.innerHTML = `
+				<a href="${p.link_url}" target="_blank" class="block w-full overflow-hidden hover:opacity-95 transition">
+					<img src="${p.imagen_url}" alt="Promoción" class="w-full h-auto object-cover">
+				</a>
+			`;
 		}
 	} catch (error) {
 		console.error("Error cargando promos:", error);
