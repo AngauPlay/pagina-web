@@ -308,7 +308,9 @@ async function cargarPromos() {
 		}
 
 		// 2. Cargamos la promo de abajo (si tienes)
-		const resInf = await fetch(`http://localhost:3000/publicidad/activa/pie`);
+		const resInf = await fetch(
+			`http://localhost:3000/publicidad/activa/intermedia`,
+		);
 		const promosInf = await resInf.json();
 
 		const contenedorInf = document.getElementById("bottom-promos-wrapper");
