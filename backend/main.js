@@ -56,6 +56,7 @@ app.use("/programas", programasRoutes);
 app.use("/usuarios", usersRoutes);
 app.use("/public/uploads", express.static("public/uploads"));
 app.use("/publicidad", publicidadRoutes);
+app.use("/agenda", require("./routes/agendaRoutes"));
 // Ruta para generar el RSS de Angau
 app.get("/rss", async (req, res) => {
 	const feed = new RSS({

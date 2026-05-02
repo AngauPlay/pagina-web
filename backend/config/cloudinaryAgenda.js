@@ -11,13 +11,7 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
 	cloudinary: cloudinary,
 	params: {
-		folder: "noticias",
-		allowed_formats: ["jpg", "png", "jpeg", "webp"],
+		folder: "agenda", // Carpeta en Cloudinary
+		allowed_formats: ["jpg", "jpeg", "png", "webp"],
 	},
 });
-
-// Exportamos un objeto con ambas herramientas
-module.exports = {
-	cloudinary, // Se usa en el controlador para borrar (destroy)
-	upload: multer({storage}), // Se usa en la ruta para recibir archivos
-};

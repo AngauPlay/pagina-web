@@ -274,19 +274,6 @@ async function cargarPromos() {
 				`;
 			});
 		}
-		const resInf2 = await fetch(
-			`http://localhost:3000/publicidad/activa/intermedia`,
-		);
-		const promosInf2 = await resInf2.json();
-		const contenedorInf2 = document.getElementById("bottom-promos-wrapper");
-		if (contenedorInf2 && promosInf2.length > 0) {
-			const p = promosInf2[0];
-			contenedorInf2.innerHTML = `
-				<a href="${p.link_url}" target="_blank" class="block w-full overflow-hidden hover:opacity-95 transition">
-					<img src="${p.imagen_url}" alt="Promoción" class="w-full h-auto object-cover">
-				</a>
-			`;
-		}
 	} catch (error) {
 		console.error("Error cargando promos:", error);
 	}

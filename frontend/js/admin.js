@@ -294,8 +294,8 @@ async function cargarProgramacion() {
 							// ... dentro del find de programa ...
 							if (programa) {
 								// Definimos la imagen: si existe en la DB la usamos, si no, ponemos un placeholder
-								const imagenSrc = programa.imagen
-									? programa.imagen
+								const imagenSrc = programa.imagen_url
+									? programa.imagen_url
 									: "https://via.placeholder.com/40";
 
 								return `
@@ -473,7 +473,7 @@ async function cargarPublicidad() {
 				(p) => `
 			<tr class="border-b hover:bg-gray-50">
 				<td class="p-3">
-					<img src="${API_BASE}${p.imagen_url}" class="h-12 w-20 object-cover rounded border">
+					<img src="${p.imagen_url}" class="h-12 w-20 object-cover rounded border">
 				</td>
 				<td class="p-3 font-bold">${p.nombre}</td>
 				<td class="p-3 text-xs text-gray-500">${p.ubicacion}</td>

@@ -11,6 +11,11 @@
 			rel="stylesheet"
 			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 		/>
+		<!-- CSS de Swiper -->
+		<link
+			rel="stylesheet"
+			href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
+		/>
 
 		<style>
 			@keyframes marquee {
@@ -311,8 +316,15 @@
 			</div>
 		</div>
 
-		<div class="container mx-auto px-4 mt-6">
-			<div id="hero-promos-wrapper"></div>
+		<!-- Contenedor principal de Swiper -->
+		<div id="hero-promos-wrapper" class="swiper">
+			<!-- Las diapositivas van aquí -->
+			<div class="swiper-wrapper" id="swiper-slides-container"></div>
+
+			<!-- Opcional: Controles de navegación -->
+			<div class="swiper-pagination"></div>
+			<div class="swiper-button-prev"></div>
+			<div class="swiper-button-next"></div>
 		</div>
 
 		<main class="container mx-auto px-4 py-8">
@@ -369,10 +381,6 @@
 					<p class="text-slate-400 italic">Cargando noticia destacada...</p>
 				</div>
 			</section>
-
-			<div class="container mx-auto px-4 mt-6">
-				<div id="bottom-promos-wrapper"></div>
-			</div>
 
 			<section>
 				<h2
@@ -486,6 +494,8 @@
 				© 2026 Angau Play
 			</div>
 		</footer>
+		<!-- JS de Swiper -->
+		<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 		<script src="/js/index.js"></script>
 	</body>
 </html>
