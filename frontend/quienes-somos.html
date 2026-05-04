@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quiénes Somos | ANGAU PLAY</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+		/>
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe.min.css"
+		/>
+
+  <style>
+    :root {
+      --pink-accent: rgb(224, 35, 117);
+      --purple-main: rgb(104, 89, 165);
+      --blue-dark: rgb(68, 99, 174);
+      --yellow-neon: rgb(229, 235, 53);
+    }
+
+    .bg-purple-main { background-color: var(--purple-main); }
+    .bg-pink-accent { background-color: var(--pink-accent); }
+    .text-yellow-neon { color: var(--yellow-neon); }
+  </style>
+</head>
+
+<body class="bg-gray-50 font-sans text-slate-900">
+
+  <!-- HEADER -->
+  <header
+			class="bg-purple-main text-white p-4 sticky top-0 z-[100] shadow-xl border-b border-white/10"
+		>
+			<div class="container mx-auto flex justify-between items-center">
+				<div class="flex items-center gap-4">
+					<button
+						onclick="
+							window.history.length > 1
+								? window.history.back()
+								: (window.location.href = 'index.html')
+						"
+						class="text-2xl hover:text-yellow-neon transition-all p-2 rounded-lg"
+					>
+						<i class="fas fa-arrow-left"></i>
+					</button>
+
+					<span
+						class="hidden md:block text-[10px] font-bold text-white/80 uppercase tracking-wider"
+					>
+						El primer canal de streaming formoseño
+					</span>
+				</div>
+
+				<div class="flex justify-center">
+					<a href="index.html">
+						<img
+							src="/assets/cmpleto logo@4x.png"
+							alt="Angau Play"
+							class="h-10 md:h-12 object-contain cursor-pointer hover:scale-110 transition"
+						/>
+					</a>
+				</div>
+
+				<div class="flex items-center justify-end gap-4">
+					<!-- REDES -->
+					<div class="flex gap-3 items-center">
+						<a href="https://www.youtube.com/@AngauPlay" target="_blank">
+							<img
+								src="/assets/logo-youtube.png"
+								class="w-6 h-6 hover:scale-125 transition duration-300"
+								alt="YouTube"
+							/>
+						</a>
+
+						<a href="https://www.facebook.com/angauplay" target="_blank">
+							<img
+								src="/assets/logo-facebook.png"
+								class="w-6 h-6 hover:scale-125 transition duration-300"
+								alt="Facebook"
+							/>
+						</a>
+
+						<a href="https://kick.com/angauplay" target="_blank">
+							<img
+								src="/assets/logo-kick.png"
+								class="w-6 h-6 hover:scale-125 transition duration-300"
+								alt="Kick"
+							/>
+						</a>
+
+						<a href="https://www.twitch.tv/angauplay" target="_blank">
+							<img
+								src="/assets/logo-twitch.png"
+								class="w-6 h-6 hover:scale-125 transition duration-300"
+								alt="Twitch"
+							/>
+						</a>
+
+						<a href="https://www.tiktok.com/@angauplay" target="_blank">
+							<img
+								src="/assets/logo-tik-tok.png"
+								class="w-6 h-6 hover:scale-125 transition duration-300"
+								alt="TikTok"
+							/>
+						</a>
+
+						<a href="https://www.instagram.com/angauplay.ok/" target="_blank">
+							<img
+								src="/assets/logo-instagram.png"
+								class="w-6 h-6 hover:scale-125 transition duration-300"
+								alt="Instagram"
+							/>
+						</a>
+						<a href="https://wa.me/5493704808722" target="_blank">
+							<i
+								class="fab fa-whatsapp text-white text-xl hover:scale-125 transition duration-300"
+							></i>
+						</a>
+					</div>
+
+					<img
+						src="/assets/matesito@4x.png"
+						class="h-10 md:h-12 object-contain hover:scale-110 transition-transform ml-6"
+					/>
+				</div>
+			</div>
+
+			<div
+				id="overlay"
+				class="fixed inset-0 bg-black/60 hidden z-[105] backdrop-blur-sm"
+			></div>
+		</header>
+
+  <!-- HERO -->
+  <section class="bg-gradient-to-r from-purple-main to-pink-accent text-white py-20 text-center">
+    <h1 class="text-5xl font-black italic mb-4">¿Quiénes somos?</h1>
+    <p class="max-w-2xl mx-auto text-lg opacity-90">
+      El primer canal de streaming formoseño que conecta información, entretenimiento y comunidad.
+    </p>
+  </section>
+
+  <!-- CONTENIDO -->
+  <main class="container mx-auto px-4 py-16 space-y-16">
+
+    <!-- INTRO -->
+    <section class="max-w-4xl mx-auto text-center">
+      <h2 class="text-3xl font-black mb-6 text-purple-main">Nuestra historia</h2>
+      <p class="text-lg text-slate-600 leading-relaxed">
+        <strong>ANGAU PLAY</strong> nace en Formosa, Argentina, como una propuesta innovadora de comunicación digital,
+        combinando streaming en vivo, noticias y contenido multimedia en una sola plataforma.
+        Nuestro objetivo es brindar un espacio moderno, dinámico y accesible donde la comunidad pueda informarse,
+        entretenerse y participar.
+      </p>
+    </section>
+
+    <!-- MISIÓN / VISIÓN -->
+    <section class="grid md:grid-cols-2 gap-10">
+      
+      <div class="bg-white p-8 rounded-2xl shadow-lg border-t-4 border-pink-accent">
+        <h3 class="text-2xl font-black mb-4">Nuestra misión</h3>
+        <p class="text-slate-600 leading-relaxed">
+          Informar, entretener y conectar a la comunidad a través de contenido digital de calidad,
+          promoviendo la cultura local y dando visibilidad a los acontecimientos más importantes de Formosa.
+        </p>
+      </div>
+
+      <div class="bg-white p-8 rounded-2xl shadow-lg border-t-4 border-purple-main">
+        <h3 class="text-2xl font-black mb-4">Nuestra visión</h3>
+        <p class="text-slate-600 leading-relaxed">
+          Ser el medio digital líder en la región, destacándonos por la innovación,
+          la cercanía con la audiencia y la producción de contenido relevante a nivel local y nacional.
+        </p>
+      </div>
+
+    </section>
+
+    <!-- VALORES -->
+    <section>
+      <h2 class="text-3xl font-black text-center mb-10 text-purple-main">Nuestros valores</h2>
+
+      <div class="grid md:grid-cols-3 gap-8 text-center">
+
+        <div class="bg-white p-6 rounded-xl shadow-md">
+          <h4 class="font-black text-lg mb-2">Compromiso</h4>
+          <p class="text-slate-500 text-sm">
+            Trabajamos con responsabilidad para brindar contenido confiable.
+          </p>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-md">
+          <h4 class="font-black text-lg mb-2">Innovación</h4>
+          <p class="text-slate-500 text-sm">
+            Apostamos a nuevas tecnologías y formatos digitales.
+          </p>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-md">
+          <h4 class="font-black text-lg mb-2">Cercanía</h4>
+          <p class="text-slate-500 text-sm">
+            Estamos conectados con la comunidad y sus necesidades.
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- EQUIPO -->
+    <section class="text-center">
+      <h2 class="text-3xl font-black mb-6 text-purple-main">Nuestro equipo</h2>
+
+      <p class="max-w-3xl mx-auto text-slate-600 mb-10">
+        Detrás de ANGAU PLAY hay un equipo de jóvenes profesionales apasionados por la comunicación,
+        el desarrollo de software y la creación de contenido digital.
+      </p>
+
+      <div class="flex flex-col md:flex-row justify-center gap-10">
+
+        <div class="bg-white p-6 rounded-2xl shadow-lg w-64">
+          <div class="w-20 h-20 bg-purple-main rounded-full mx-auto mb-4 flex items-center justify-center text-yellow-neon font-black">
+            FM
+          </div>
+          <h4 class="font-black">Franco Mirna</h4>
+          <p class="text-sm text-slate-500">Desarrollador</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl shadow-lg w-64">
+          <div class="w-20 h-20 bg-pink-accent rounded-full mx-auto mb-4 flex items-center justify-center text-white font-black">
+            EO
+          </div>
+          <h4 class="font-black">Ocampo Emiliano</h4>
+          <p class="text-sm text-slate-500">Producción & Contenido</p>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer
+			class="bg-gradient-to-r from-[rgb(198,29,102)] via-[rgb(104,89,165)] to-[rgb(68,99,174)] text-white mt-16"
+		>
+			<!-- LOGO -->
+			<div class="flex justify-center pt-8">
+				<img
+					src="/assets/logo blanco@4x.png"
+					alt="Angau Play"
+					class="h-14 object-contain hover:scale-110 transition-transform duration-300"
+				/>
+			</div>
+
+			<div class="container mx-auto px-4 py-10 grid md:grid-cols-2 gap-10">
+				<!-- CONTACTO -->
+				<div>
+					<h3 class="text-xl font-bold mb-4">Contacto</h3>
+					<ul class="space-y-2 text-white/80">
+						<li>
+							<a
+								href="mailto:angauplay@gmail.com"
+								class="flex items-center gap-2 hover:text-yellow-neon transition"
+							>
+								<i class="fas fa-envelope"></i>
+								angauplay@gmail.com
+							</a>
+						</li>
+
+						<li>
+							<i class="fas fa-map-marker-alt mr-2"></i> Formosa, Argentina
+						</li>
+
+						<!-- WHATSAPP -->
+						<li>
+							<a
+								href="https://wa.me/5493704808722"
+								target="_blank"
+								class="flex items-center gap-2 hover:text-green-300 transition"
+							>
+								<i class="fab fa-whatsapp text-green-400"></i>
+								+54 9 370 480-8722
+							</a>
+						</li>
+					</ul>
+				</div>
+
+				<!-- DESARROLLO -->
+				<div class="text-center md:text-right">
+					<h3 class="text-xl font-bold mb-4">Desarrollado por</h3>
+					<p class="text-white/80 text-sm leading-relaxed">
+						Franco Mirna & Ocampo Emiliano <br />
+						<span class="text-yellow-neon font-semibold">
+							Egresados del Instituto Politécnico Formosa
+						</span>
+					</p>
+					<div class="mt-4 flex justify-center md:justify-end">
+						<img
+							src="assets/logo-ipf.png"
+							alt="IPF"
+							class="w-24 h-auto bg-white/10 p-2 rounded-xl"
+						/>
+					</div>
+				</div>
+			</div>
+
+			<div
+				class="text-center text-sm py-4 border-t border-white/20 uppercase tracking-widest font-bold"
+			>
+				© 2026 Angau Play
+			</div>
+		</footer>
+
+</body>
+</html>
