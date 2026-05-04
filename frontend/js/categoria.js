@@ -94,22 +94,6 @@ async function cargarPromos() {
                 </a>
             `;
 		}
-
-		// 2. Cargamos la promo de abajo (si tienes)
-		const resInf = await fetch(
-			`http://localhost:3000/publicidad/activa/intermedia`,
-		);
-		const promosInf = await resInf.json();
-
-		const contenedorInf = document.querySelector(".sponsor-slot");
-		if (contenedorInf && promosInf.length > 0) {
-			const p = promosInf[0];
-			contenedorInf.innerHTML = `
-                <a href="${p.link_url}" target="_blank" class="block w-full overflow-hidden shadow-lg hover:opacity-95 transition">
-                    <img src="${p.imagen_url}" alt="Promoción" class="w-full h-auto object-cover border-t-4 ">
-                </a>
-            `;
-		}
 	} catch (error) {
 		console.error("Error cargando promos:", error);
 	}

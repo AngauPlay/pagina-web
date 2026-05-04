@@ -291,71 +291,77 @@ overlay.addEventListener("click", toggleMenu);
 
 async function cargarPromos() {
 	try {
-		// 1. Cargamos la promo del encabezado
 		const resSup = await fetch(
 			`http://localhost:3000/publicidad/activa/encabezado`,
 		);
 		const promosSup = await resSup.json();
 
-		const contenedorSup = document.getElementById("hero-promos-wrapper");
-		if (contenedorSup && promosSup.length > 0) {
-			const p = promosSup[0];
-			contenedorSup.innerHTML = `
-                <a href="${p.link_url}" target="_blank" class="block w-full overflow-hidden rounded-2xl shadow-lg hover:opacity-95 transition">
-                    <img src="${p.imagen_url}" alt="Promoción" class="w-full h-auto object-cover border-b-4 border-purple-main">
-                </a>
-            `;
-		}
+		const slidesContainer = document.getElementById("swiper-slides-container");
 
-		// 2. Cargamos la promo de abajo (si tienes)
-		const resInf = await fetch(
-			`http://localhost:3000/publicidad/activa/intermedia`,
-		);
-		const promosInf = await resInf.json();
+		if (slidesContainer && promosSup.length > 0) {
+			// 1. Limpiamos y generamos todos los slides
+			slidesContainer.innerHTML = promosSup
+				.map(
+					(p) => `
+                <div class="swiper-slide">
+                    <a href="${p.link_url}" target="_blank" class="block w-full overflow-hidden rounded-2xl shadow-lg hover:opacity-95 transition">
+                        <img src="${p.imagen_url}" alt="Promoción" class="w-full h-auto object-cover border-b-4 border-purple-main">
+                    </a>
+                </div>
+            `,
+				)
+				.join("");
 
-		const contenedorInf = document.getElementById("bottom-promos-wrapper");
-		if (contenedorInf && promosInf.length > 0) {
-			const p = promosInf[0];
-			contenedorInf.innerHTML = `
-                <a href="${p.link_url}" target="_blank" class="block w-full overflow-hidden rounded-2xl shadow-lg hover:opacity-95 transition">
-                    <img src="${p.imagen_url}" alt="Promoción" class="w-full h-auto object-cover border-t-4 border-pink-accent">
-                </a>
-            `;
+			// 2. Inicializamos Swiper después de insertar el HTML
+			new Swiper("#hero-promos-wrapper", {
+				loop: true,
+				autoplay: {
+					delay: 4000,
+					disableOnInteraction: false,
+				},
+				pagination: {
+					el: ".swiper-pagination",
+					clickable: true,
+				},
+				navigation: {
+					nextEl: ".swiper-button-next",
+					prevEl: ".swiper-button-prev",
+				},
+			});
 		}
 	} catch (error) {
 		console.error("Error cargando promos:", error);
 	}
+}
+const API = "http://localhost:3000";
 
-	const API = "http://localhost:3000";
+async function cargarMarquee() {
+	try {
+		const res = await fetch(`${API}/noticias`);
+		const noticias = await res.json();
 
-	async function cargarMarquee() {
-		try {
-			const res = await fetch(`${API}/noticias`);
-			const noticias = await res.json();
+		const contenedor = document.getElementById("marquee-container");
 
-			const contenedor = document.getElementById("marquee-container");
+		// Filtrar solo publicadas
+		const publicadas = noticias.filter((n) => n.estado === "publicado");
 
-			// Filtrar solo publicadas
-			const publicadas = noticias.filter((n) => n.estado === "publicado");
-
-			const htmlNoticias = publicadas
-				.map(
-					(n) => `
+		const htmlNoticias = publicadas
+			.map(
+				(n) => `
         <span class="mx-4 text-white/90 cursor-pointer hover:underline"
           onclick="window.location.href='articulo.html?slug=${n.slug}'">
           ${n.titulo}
         </span>
         <span class="mx-4 opacity-30">|</span>
       `,
-				)
-				.join("");
+			)
+			.join("");
 
-			contenedor.innerHTML += htmlNoticias;
-		} catch (error) {
-			console.error("Error cargando marquee:", error);
-		}
+		contenedor.innerHTML += htmlNoticias;
+	} catch (error) {
+		console.error("Error cargando marquee:", error);
 	}
-
-	// Ejecutar
-	cargarMarquee();
 }
+
+// Ejecutar
+cargarMarquee();

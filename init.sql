@@ -101,6 +101,21 @@ CREATE TABLE `programas` (
 
 -- --------------------------------------------------------
 
+-- Estructura de tabla para la tabla `Agenda`
+--
+
+CREATE TABLE `Agenda` (
+  `id` int(11) NOT NULL,
+  `titulo` varchar(255) NOT NULL,
+  `descripcion` text NOT NULL,
+  `fecha_evento` date NOT NULL,
+  `hora_evento` time NOT NULL,
+  `lugar` varchar(255) NOT NULL,
+  `imagen_url` varchar(255) DEFAULT NULL,
+  `createdAt` datetime NOT NULL,
+  `updatedAt` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
 --
 -- Estructura de tabla para la tabla `usuarios`
 --
@@ -152,6 +167,9 @@ ALTER TABLE `usuarios`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `nombre_unico` (`nombre`);
 
+  ALTER TABLE `Agenda`
+  ADD PRIMARY KEY (`id`);
+
 -- --------------------------------------------------------
 -- AUTO_INCREMENT
 -- --------------------------------------------------------
@@ -161,7 +179,7 @@ ALTER TABLE `noticias` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREME
 ALTER TABLE `noticias_imagenes` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `programas` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `usuarios` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
+ALTER TABLE `Agenda` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 -- --------------------------------------------------------
 -- Llaves Foráneas (Restricciones)
 -- --------------------------------------------------------
