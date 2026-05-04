@@ -26,10 +26,7 @@
 					transform: translateX(-50%);
 				}
 			}
-			.animate-marquee {
-				display: inline-flex;
-				animation: marquee 25s linear infinite;
-			}
+
 			body.menu-open {
 				overflow: hidden;
 			}
@@ -73,6 +70,31 @@
 			}
 			.text-green-light {
 				color: var(--green-light);
+			}
+			.animate-marquee {
+				display: flex;
+				width: max-content;
+				flex-wrap: nowrap;
+				/* Iniciamos la animación desde fuera de la pantalla a la derecha */
+				animation: marquee-derecha-izquierda 25s linear infinite;
+			}
+
+			@keyframes marquee-derecha-izquierda {
+				0% {
+					transform: translateX(
+						100vw
+					); /* Empieza totalmente a la derecha, fuera de vista */
+				}
+				100% {
+					/* Termina desplazándose hacia la izquierda */
+					/* Si duplicaste el contenido en JS, usa -50%. Si no, usa -100% */
+					transform: translateX(-100%);
+				}
+			}
+
+			/* Opcional: Pausa al tocar con el mouse */
+			.animate-marquee:hover {
+				animation-play-state: paused;
 			}
 		</style>
 	</head>
@@ -287,21 +309,12 @@
 				</div>
 			</div>
 		</aside>
+		<!-- El contenedor padre es la 'ventana' fija del tamaño de la pantalla -->
 		<div
-			class="bg-pink-accent text-white overflow-hidden py-2 shadow-inner border-y border-white/10"
+			class="w-full bg-pink-accent overflow-hidden py-3 shadow-inner border-y border-white/10"
 		>
-			<div
-				id="marquee-container"
-				class="flex whitespace-nowrap animate-marquee"
-			>
-				<span class="mx-4 font-bold flex items-center gap-2">
-					<span class="bg-yellow-neon text-black px-2 py-0.5 rounded text-xs">
-						VIVO
-					</span>
-					ÚLTIMO MOMENTO:
-				</span>
-
-				<!-- 🔥 Acá se cargan noticias dinámicamente -->
+			<div id="marquee-container" class="animate-marquee items-center">
+				<!-- El JS cargará el contenido duplicado aquí -->
 			</div>
 		</div>
 
@@ -309,15 +322,10 @@
 		<div id="hero-promos-wrapper" class="swiper">
 			<!-- Las diapositivas van aquí -->
 			<div class="swiper-wrapper" id="swiper-slides-container"></div>
-
-			<!-- Opcional: Controles de navegación -->
-			<div class="swiper-pagination"></div>
-			<div class="swiper-button-prev"></div>
-			<div class="swiper-button-next"></div>
 		</div>
 
 		<main class="container mx-auto px-4 py-8">
-			<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
+			<div class="grid grid-cols-1 gap-8 mb-16">
 				<div class="lg:col-span-2">
 					<div class="bg-black overflow-hidden shadow-2xl">
 						<iframe
@@ -329,36 +337,6 @@
 						</iframe>
 					</div>
 				</div>
-
-				<aside
-					class="bg-pink-accent text-white rounded-2xl shadow-xl p-6 border-t-8 border-yellow-neon h-fit"
-				>
-					<h2
-						class="text-xl font-black mb-6 flex items-center gap-2 tracking-tighter"
-					>
-						<span
-							class="w-3 h-3 bg-yellow-neon rounded-full animate-pulse"
-						></span>
-						PROGRAMACIÓN EN VIVO
-					</h2>
-					<div
-						id="programacion-container"
-						class="space-y-4 overflow-y-auto max-h-[300px]"
-					></div>
-					<!-- BOTÓN -->
-					<button
-						id="btn-ver-grilla"
-						class="w-full mt-4 bg-yellow-neon text-black font-bold overflow py-2 rounded-lg hover:scale-105 transition"
-					>
-						Ver programación completa
-					</button>
-
-					<!-- GRILLA COMPLETA (OCULTA) -->
-					<div
-						id="grilla-semanal"
-						class="hidden mt-6 bg-white text-black rounded-xl p-4 space-y-4 max-h-[400px] overflow-y-auto"
-					></div>
-				</aside>
 			</div>
 			<section class="mb-16" id="noticia-principal-section">
 				<h2

@@ -15,3 +15,8 @@ const storage = new CloudinaryStorage({
 		allowed_formats: ["jpg", "jpeg", "png", "webp"],
 	},
 });
+
+module.exports = {
+	cloudinary, // Para borrar fotos (cloudinary.uploader.destroy)
+	upload: multer({storage}), // El middleware para las rutas
+};

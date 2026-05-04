@@ -8,177 +8,6 @@ function obtenerProgramacion() {
 		});
 }
 
-function estaEnVivo(inicio, fin) {
-	if (!inicio || !fin) return false;
-
-	const ahora = new Date();
-	const actual = ahora.getHours() * 60 + ahora.getMinutes();
-
-	const [hi, mi] = inicio.split(":").map(Number);
-	const [hf, mf] = fin.split(":").map(Number);
-
-	const ini = hi * 60 + mi;
-	const finM = hf * 60 + mf;
-
-	return actual >= ini && actual <= finM;
-}
-async function renderProgramacion() {
-	const contenedor = document.getElementById("programacion-container");
-
-	try {
-		const res = await fetch("http://localhost:3000/programas/hoy");
-		const data = await res.json();
-
-		if (!data || data.length === 0) {
-			contenedor.innerHTML = "<p>No hay programación hoy</p>";
-			return;
-		}
-
-		// Cambiamos (p) por (programa) para que coincida con el resto de tu código
-		contenedor.innerHTML = data
-			.map((programa) => {
-				const vivo = estaEnVivo(programa.hora_inicio, programa.hora_fin);
-				const claseVivo = vivo ? "border-green-500" : "border-pink-500";
-
-				// Ahora 'programa.imagen_url' sí funcionará
-				const imagenSrc = programa.imagen_url
-					? programa.imagen_url
-					: "assets/img/default-programa.jpg";
-
-				return `
-        <div class="relative rounded-xl overflow-hidden shadow-lg cursor-pointer group h-28">
-
-    <!-- IMAGEN DE FONDO -->
-    <div 
-  class="absolute inset-0 bg-cover bg-center bg-no-repeat"
-  style="background-image: url('${imagenSrc}')"
-></div>
-
-
-    <!-- OVERLAY OSCURO -->
-    <div class="absolute inset-0 bg-black/50"></div>
-
-    <!-- CONTENIDO -->
-    <div class="absolute bottom-2 left-3 right-3 text-white z-10">
-      
-      <span class="text-[10px] font-bold ${
-				vivo ? "text-yellow-neon" : "text-white/80"
-			} uppercase">
-        ${
-					vivo
-						? "EN VIVO 🔴"
-						: `${programa.hora_inicio.substring(0, 5)} - ${programa.hora_fin.substring(0, 5)}`
-				}
-      </span>
-
-      <h3 class="font-bold text-sm leading-tight">
-        ${programa.nombre}
-      </h3>
-
-      <p class="text-[10px] text-white/80 italic">
-        ${programa.staff || ""}
-      </p>
-
-    </div>
-
-  </div>
-`;
-			})
-			.join("");
-	} catch (error) {
-		console.error("Error cargando programación:", error);
-		contenedor.innerHTML = "<p>Error cargando programación</p>";
-	}
-}
-async function cargarGrillaEnModal() {
-	try {
-		const res = await fetch("http://localhost:3000/programas");
-		const data = await res.json();
-
-		const diasNombres = [
-			"Domingo",
-			"Lunes",
-			"Martes",
-			"Miércoles",
-			"Jueves",
-			"Viernes",
-			"Sábado",
-		];
-
-		const horasSet = new Set();
-		data.forEach((p) => {
-			horasSet.add(p.hora_inicio.slice(0, 5));
-		});
-
-		const horas = Array.from(horasSet).sort();
-
-		const grilla = {};
-		horas.forEach((h) => {
-			grilla[h] = Array(7).fill(null);
-		});
-
-		data.forEach((p) => {
-			const hora = p.hora_inicio.slice(0, 5);
-			grilla[hora][p.dia_semana] = p;
-		});
-
-		contenedorModal.innerHTML = `
-      <table class="w-full text-sm border">
-        <thead>
-          <tr class="bg-purple-main text-white">
-            <th class="p-3">Hora</th>
-            ${diasNombres.map((d) => `<th class="p-3">${d}</th>`).join("")}
-          </tr>
-        </thead>
-        <tbody>
-          ${horas
-						.map(
-							(hora) => `
-            <tr class="border-t">
-              <td class="p-3 font-bold bg-gray-100">${hora}</td>
-              ${grilla[hora]
-								.map((p) => {
-									if (!p) return `<td></td>`;
-
-									return `
-                    <td class="p-2">
-                      <div class="bg-pink-accent text-white p-3 rounded-xl text-center font-bold">
-                        ${p.nombre}
-                      </div>
-                    </td>
-                  `;
-								})
-								.join("")}
-            </tr>
-          `,
-						)
-						.join("")}
-        </tbody>
-      </table>
-    `;
-	} catch (error) {
-		console.error(error);
-	}
-}
-
-const btnGrilla = document.getElementById("btn-ver-grilla");
-const modal = document.getElementById("modal-programacion");
-const cerrarModal = document.getElementById("cerrar-modal");
-const contenedorModal = document.getElementById("grilla-modal-contenido");
-
-btnGrilla.addEventListener("click", async () => {
-	modal.classList.remove("hidden");
-
-	// Cargar solo una vez
-	if (contenedorModal.innerHTML === "") {
-		await cargarGrillaEnModal();
-	}
-});
-
-cerrarModal.addEventListener("click", () => {
-	modal.classList.add("hidden");
-});
-
 // ===== NOTICIAS =====
 async function cargarNoticias() {
 	const contenedorNoticias = document.getElementById("noticias-container");
@@ -270,7 +99,6 @@ async function cargarNoticias() {
 // IMPORTANTE: Asegúrate de llamar a la función al cargar la página
 document.addEventListener("DOMContentLoaded", () => {
 	cargarNoticias();
-	renderProgramacion();
 	cargarPromos();
 });
 // LÓGICA DEL MENÚ
@@ -336,32 +164,93 @@ async function cargarPromos() {
 const API = "http://localhost:3000";
 
 async function cargarMarquee() {
+	const contenedor = document.getElementById("marquee-container");
+	const API = "http://localhost:3000";
+
+	function estaEnVivo(inicio, fin) {
+		if (!inicio || !fin) return false;
+		const ahora = new Date();
+		const actual = ahora.getHours() * 60 + ahora.getMinutes();
+		const [hi, mi] = inicio.split(":").map(Number);
+		const [hf, mf] = fin.split(":").map(Number);
+		const ini = hi * 60 + mi;
+		const finM = hf * 60 + mf;
+		return actual >= ini && actual <= finM;
+	}
+
 	try {
-		const res = await fetch(`${API}/noticias`);
-		const noticias = await res.json();
+		const res = await fetch(`${API}/programas/hoy`);
+		const data = await res.json();
 
-		const contenedor = document.getElementById("marquee-container");
+		if (!data || data.length === 0) {
+			contenedor.innerHTML = `<span class="mx-4 font-bold uppercase text-xs self-center text-white/50">Hoy no hay programación registrada</span>`;
+			// Removemos la animación si no hay contenido para que no "vibre" el texto
+			contenedor.classList.remove("animate-marquee");
+			return;
+		}
 
-		// Filtrar solo publicadas
-		const publicadas = noticias.filter((n) => n.estado === "publicado");
+		const htmlProgramacion = data
+			.map((programa) => {
+				const vivo = estaEnVivo(programa.hora_inicio, programa.hora_fin);
+				const claseVivo = vivo
+					? "border-green-500 shadow-lg"
+					: "border-white/20";
+				const imagenSrc =
+					programa.imagen_url || "assets/img/default-programa.jpg";
 
-		const htmlNoticias = publicadas
-			.map(
-				(n) => `
-        <span class="mx-4 text-white/90 cursor-pointer hover:underline"
-          onclick="window.location.href='articulo.html?slug=${n.slug}'">
-          ${n.titulo}
-        </span>
-        <span class="mx-4 opacity-30">|</span>
-      `,
-			)
+				return `
+            <div class="inline-flex items-center mx-2 flex-shrink-0">
+                <div class="relative w-64 h-16 rounded-lg overflow-hidden border-2 ${claseVivo}">
+                    <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('${imagenSrc}')"></div>
+                    <div class="absolute inset-0 bg-black/60"></div>
+                    <div class="absolute inset-0 p-2 flex flex-col justify-center">
+                        <span class="text-[8px] font-black uppercase ${vivo ? "text-yellow-neon animate-pulse" : "text-white/70"}">
+                            ${vivo ? "EN VIVO 🔴" : `${programa.hora_inicio.slice(0, 5)} - ${programa.hora_fin.slice(0, 5)}`}
+                        </span>
+                        <h3 class="text-[11px] font-bold text-white uppercase truncate">${programa.nombre}</h3>
+                    </div>
+                </div>
+            </div>`;
+			})
 			.join("");
 
-		contenedor.innerHTML += htmlNoticias;
+		// Definimos el bloque base
+		const contenidoBase = `
+            <span class="mx-4 font-bold flex items-center gap-2 flex-shrink-0">
+                <span class="bg-white text-pink-accent px-2 py-0.5 rounded text-[10px] font-black uppercase">HOY</span>
+                PROGRAMACIÓN:
+            </span>
+            ${htmlProgramacion}
+        `;
+
+		// CLAVE: Duplicamos el contenido para que el bucle sea infinito
+		contenedor.innerHTML = contenidoBase;
 	} catch (error) {
-		console.error("Error cargando marquee:", error);
+		console.error("Error en marquee:", error);
 	}
 }
+document.addEventListener("DOMContentLoaded", cargarMarquee);
 
-// Ejecutar
-cargarMarquee();
+async function chequearLive() {
+	const API_KEY = "TU_API_KEY";
+	const CHANNEL_ID = "UCwzH2mG2_f12S_LqYw1v6zA";
+	const frame = document.getElementById("main-video-frame");
+
+	try {
+		const resp = await fetch(
+			`https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${CHANNEL_ID}&type=video&eventType=live&key=${API_KEY}`,
+		);
+		const data = await resp.json();
+
+		if (data.items.length > 0) {
+			// ¡Hay un vivo!
+			const liveId = data.items[0].id.videoId;
+			frame.src = `https://www.youtube.com/embed/${liveId}`;
+		} else {
+			// No hay vivo, poner video de respaldo
+			frame.src = `https://www.youtube.com/embed/VIDEO_DE_RESPALDO_ID`;
+		}
+	} catch (error) {
+		console.error("Error consultando YouTube API", error);
+	}
+}
