@@ -46,6 +46,7 @@ function showSection(section) {
 	if (section === "programacion") cargarProgramacion();
 	if (section === "usuarios") cargarUsuarios();
 	if (section === "publicidad") cargarPublicidad();
+	if (section === "agenda") cargarAgenda();
 }
 
 // ===============================
@@ -531,7 +532,148 @@ function setupFormPublicidad() {
 		}
 	};
 }
+async function cargarAgenda() {
+	try {
+		const res = await fetch(`${API_BASE}/agenda`, {credentials: "include"});
+		const eventos = await res.json();
+		const lista = document.getElementById("tabla-agenda");
 
+		if (!lista) return;
+
+		lista.innerHTML = eventos
+			.map((e) => {
+				const fechaLimpia = e.fecha ? e.fecha.split("T")[0] : "";
+				return `
+            <tr class="border-b hover:bg-gray-50 transition">
+                <td class="p-3">
+                    <img src="${e.imagen_url || "https://via.placeholder.com/100"}" 
+                         class="w-16 h-16 object-cover rounded shadow-sm border">
+                </td>
+                <td class="p-3 font-bold text-gray-800">${e.titulo}</td>
+                <td class="p-3 text-sm">
+                    <span class="block font-semibold">${fechaLimpia}</span>
+                    <span class="text-gray-500">${e.hora} hs</span>
+                </td>
+                <td class="p-3 text-sm text-gray-600">${e.lugar}</td>
+                <td class="p-3 text-center">
+<td class="p-3 text-center space-x-2">
+    <button onclick="editarEvento(${e.id})" class="text-blue-500 hover:text-blue-700 font-bold">
+        Editar
+    </button>
+    <button onclick="eliminarEvento(${e.id})" class="text-red-500 hover:text-red-700 font-bold">
+        Eliminar
+    </button>
+</td>
+				</td>
+        </tr>
+        `;
+			})
+			.join("");
+	} catch (error) {
+		console.error("Error al cargar la agenda:", error);
+	}
+}
+async function editarEvento(id) {
+	const modal = document.getElementById("modal");
+	const content = document.getElementById("modal-content");
+
+	try {
+		// 1. Obtener datos del evento
+		// Asumiendo que tienes una ruta GET /agenda/:id en tu backend
+		const res = await fetch(`${API_BASE}/agenda/${id}`, {
+			credentials: "include",
+		});
+		const e = await res.json();
+
+		modal.classList.remove("hidden");
+
+		// 2. Cargar el formulario con los datos existentes
+		content.innerHTML = `
+            <h3 class="text-2xl font-black mb-4 text-blue-600">Editar Evento</h3>
+            <form id="form-editar-evento" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase">Título</label>
+                    <input name="titulo" value="${e.titulo}" class="w-full border p-2 rounded outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase">Descripción</label>
+                    <textarea name="descripcion" class="w-full border p-2 rounded h-20">${e.descripcion || ""}</textarea>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase">Fecha</label>
+                        <input type="date" name="fecha" value="${e.fecha}" class="w-full border p-2 rounded" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase">Hora</label>
+                        <input type="time" name="hora" value="${e.hora}" class="w-full border p-2 rounded" required>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase">Lugar</label>
+                    <input name="lugar" value="${e.lugar}" class="w-full border p-2 rounded" required>
+                </div>
+
+                <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                    <label class="block text-sm font-bold text-blue-700 mb-1">Cambiar Imagen (opcional)</label>
+                    <p class="text-[10px] text-blue-400 mb-2 font-mono truncate">Actual: ${e.imagen_url || "Ninguna"}</p>
+                    <input type="file" name="imagen" class="w-full bg-white p-1 rounded">
+                </div>
+
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold transition-all shadow-lg">
+                    GUARDAR CAMBIOS
+                </button>
+            </form>
+        `;
+
+		// 3. Manejar el envío de la edición
+		document.getElementById("form-editar-evento").onsubmit = async (event) => {
+			event.preventDefault();
+			const formData = new FormData(event.target);
+
+			try {
+				const updateRes = await fetch(`${API_BASE}/agenda/update/${id}`, {
+					method: "PUT", // O PATCH según tu backend
+					body: formData,
+					credentials: "include",
+				});
+
+				if (updateRes.ok) {
+					closeModal();
+					cargarAgenda();
+				} else {
+					alert("Error al actualizar el evento");
+				}
+			} catch (err) {
+				console.error("Error:", err);
+			}
+		};
+	} catch (error) {
+		console.error("Error al obtener el evento:", error);
+		alert("No se pudo cargar la información del evento");
+	}
+}
+async function eliminarEvento(id) {
+	if (!confirm("¿Seguro que querés eliminar este evento de la agenda?")) return;
+
+	try {
+		const res = await fetch(`${API_BASE}/agenda/delete/${id}`, {
+			method: "DELETE",
+			credentials: "include",
+		});
+
+		if (res.ok) {
+			cargarAgenda();
+		} else {
+			alert("Error al eliminar el evento");
+		}
+	} catch (error) {
+		console.error("Error:", error);
+	}
+}
 // ===============================
 // 📦 MODALES
 // ===============================
@@ -570,8 +712,6 @@ async function openModal(tipo) {
 				}
 			};
 		}
-
-		// ... dentro de openModal(tipo === 'noticia')
 
 		content.innerHTML = `
     <h3 class="text-2xl font-black mb-4 text-pink-600">Nueva Noticia</h3>
@@ -767,49 +907,68 @@ async function openModal(tipo) {
     `;
 
 		setupFormPublicidad();
-	}
-}
+	} else if (tipo === "agenda") {
+		content.innerHTML = `
+        <h3 class="text-2xl font-black mb-4 text-indigo-600">Nuevo Evento</h3>
+        <form id="form-agenda" class="space-y-4">
+            <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase">Título del Evento</label>
+                <input name="titulo" class="w-full border p-2 rounded focus:ring-2 focus:ring-indigo-500 outline-none" required>
+            </div>
+            
+            <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase">Descripción</label>
+                <textarea name="descripcion" class="w-full border p-2 rounded h-20"></textarea>
+            </div>
 
-async function cargarUsuarios() {
-	try {
-		const res = await fetch(`${API_BASE}/usuarios`, {
-			credentials: "include",
-		});
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase">Fecha</label>
+                    <input type="date" name="fecha" class="w-full border p-2 rounded" required>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase">Hora</label>
+                    <input type="time" name="hora" class="w-full border p-2 rounded" required>
+                </div>
+            </div>
 
-		const usuarios = await res.json();
-		const lista = document.getElementById("tabla-usuarios");
+            <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase">Lugar</label>
+                <input name="lugar" class="w-full border p-2 rounded" required>
+            </div>
 
-		if (!lista) return;
+            <div class="bg-gray-50 p-4 rounded-lg border-2 border-dashed border-gray-200">
+                <label class="block text-sm font-bold text-gray-700 mb-2">Flyer / Imagen del Evento</label>
+                <input type="file" name="imagen" class="w-full">
+            </div>
 
-		lista.innerHTML = usuarios
-			.map(
-				(u) => `
-    <tr class="border-b hover:bg-gray-50">
-      <td class="p-3">${u.id}</td>
-      <td class="p-3">${u.nombre}</td>
-      <td class="p-3">${u.rol}</td>
+            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-bold transition-all shadow-lg">
+                CREAR EVENTO
+            </button>
+        </form>
+    `;
 
-      <td class="p-3 text-center space-x-2">
-        <button 
-          onclick="editarUsuario(${u.id})"
-          class="text-blue-500 font-bold hover:underline"
-        >
-          Editar
-        </button>
+		document.getElementById("form-agenda").onsubmit = async (e) => {
+			e.preventDefault();
+			const formData = new FormData(e.target);
 
-        <button 
-          onclick="eliminarUsuario(${u.id})"
-          class="text-red-500 font-bold hover:underline"
-        >
-          Eliminar
-        </button>
-      </td>
-    </tr>
-  `,
-			)
-			.join("");
-	} catch (error) {
-		console.error("Error al cargar usuarios", error);
+			try {
+				const res = await fetch(`${API_BASE}/agenda/add`, {
+					method: "POST",
+					body: formData,
+					credentials: "include",
+				});
+
+				if (res.ok) {
+					closeModal();
+					cargarAgenda();
+				} else {
+					alert("Error al guardar el evento");
+				}
+			} catch (error) {
+				console.error("Error en la petición:", error);
+			}
+		};
 	}
 }
 

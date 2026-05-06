@@ -19,7 +19,7 @@ const Agenda = sequelize.define("Agenda", {
 		type: DataTypes.TEXT,
 	},
 	fecha: {
-		type: DataTypes.DATE,
+		type: DataTypes.DATEONLY,
 		allowNull: false,
 	},
 	hora: {

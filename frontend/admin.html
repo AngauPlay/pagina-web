@@ -58,6 +58,13 @@
 				>
 					📢 Publicidad
 				</button>
+				<!-- Dentro del <nav> en el <aside> -->
+				<button
+					onclick="showSection('agenda')"
+					class="w-full text-left p-3 rounded hover:bg-purple-500 font-bold"
+				>
+					📅 Agenda
+				</button>
 			</nav>
 			<button id="logoutBtn" class="p-4 bg-red-600 hover:bg-red-700 font-bold">
 				Cerrar Sesión
@@ -170,6 +177,35 @@
 							</tr>
 						</thead>
 						<tbody id="tabla-publicidad"></tbody>
+					</table>
+				</div>
+			</section>
+			<!-- Sección Agenda -->
+			<section id="sec-agenda" class="content-section hidden p-6">
+				<div class="flex justify-between items-center mb-6">
+					<h2 class="text-3xl font-black text-indigo-600">Agenda de Eventos</h2>
+					<button
+						onclick="openModal('agenda')"
+						class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-indigo-700 transition"
+					>
+						+ NUEVO EVENTO
+					</button>
+				</div>
+
+				<div class="bg-white rounded-xl shadow overflow-hidden">
+					<table class="w-full text-left">
+						<thead class="bg-gray-100 text-gray-600 uppercase text-xs">
+							<tr>
+								<th class="p-3">Imagen</th>
+								<th class="p-3">Evento</th>
+								<th class="p-3">Fecha/Hora</th>
+								<th class="p-3">Lugar</th>
+								<th class="p-3 text-center">Acciones</th>
+							</tr>
+						</thead>
+						<tbody id="tabla-agenda">
+							<!-- Se llena con JS -->
+						</tbody>
 					</table>
 				</div>
 			</section>

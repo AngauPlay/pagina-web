@@ -9,5 +9,7 @@ const uploadSingle = upload.single("imagen");
 router.get("/", agendaController.listEvents);
 // --- RUTAS PRIVADAS (Panel Admin) ---
 router.post("/add", auth, uploadSingle, agendaController.createEvent);
+router.get("/:id", auth, agendaController.getEventById);
+router.put("/update/:id", auth, uploadSingle, agendaController.updateEvent);
 router.delete("/delete/:id", auth, agendaController.deleteEvent);
 module.exports = router;
