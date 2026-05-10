@@ -73,7 +73,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 			)
 			.join("");
 	} catch (error) {
-		console.error("Error cargando categoría:", error);
+		document.getElementById("destacada").innerHTML = `
+			<div class="text-center py-10">
+				<p class="text-red-500 font-medium">Error al cargar las noticias.</p>
+				<button onclick="location.reload()" class="text-pink-accent underline mt-2">Reintentar</button>
+			</div>
+		`;
 	}
 });
 

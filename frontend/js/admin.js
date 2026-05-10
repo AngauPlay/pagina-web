@@ -4,6 +4,14 @@ const API_USUARIOS = `${API_BASE}/auth/usuarios`;
 const API_LOGOUT = `${API_BASE}/auth/logout`;
 const API_CATEGORIAS = `${API_BASE}/noticias/categorias`;
 
+function showToast(mensaje, tipo = "info") {
+	if (typeof Toast !== "undefined") {
+		Toast.show(mensaje, tipo);
+	} else {
+		alert(mensaje);
+	}
+}
+
 const dias = [
 	"Domingo",
 	"Lunes",
@@ -113,7 +121,12 @@ async function eliminarNoticia(id) {
 		credentials: "include",
 	});
 
-	if (res.ok) cargarNoticias();
+	if (res.ok) {
+		showToast("Noticia eliminada", "success");
+		cargarNoticias();
+	} else {
+		showToast("Error al eliminar la noticia", "error");
+	}
 }
 // Función global para generar slugs limpios en el Front
 function generarSlug(texto) {
@@ -231,12 +244,12 @@ async function editarNoticia(id) {
 				});
 
 				if (updateRes.ok) {
-					alert("Noticia actualizada con éxito");
+					showToast("Noticia actualizada con éxito", "success");
 					closeModal();
 					cargarNoticias();
 				} else {
 					const errData = await updateRes.json();
-					alert("Error: " + (errData.mensaje || "No se pudo actualizar"));
+					showToast(errData.mensaje || "No se pudo actualizar", "error");
 				}
 			} catch (error) {
 				console.error("Error al actualizar:", error);
@@ -248,7 +261,7 @@ async function editarNoticia(id) {
 		};
 	} catch (error) {
 		console.error("Error al cargar edición", error);
-		alert("No se pudo cargar la información para editar");
+		showToast("No se pudo cargar la información para editar", "error");
 	}
 }
 // ===============================
@@ -424,12 +437,13 @@ async function editarPrograma(id) {
 			});
 
 			if (updateRes.ok) {
+				showToast("Programa actualizado con éxito", "success");
 				closeModal();
-				cargarProgramacion(); // Recarga la tabla
+				cargarProgramacion();
 			} else {
 				const errorText = await updateRes.text();
 				console.error("Respuesta de error:", errorText);
-				alert("Error al actualizar el programa");
+				showToast("Error al actualizar el programa", "error");
 			}
 		};
 	} catch (error) {
@@ -450,12 +464,14 @@ async function eliminarPrograma(id) {
 		});
 
 		if (res.ok) {
-			cargarProgramacion(); // Recargar la grilla
+			showToast("Programa eliminado", "success");
+			cargarProgramacion();
 		} else {
-			alert("Error al eliminar el programa");
+			showToast("Error al eliminar el programa", "error");
 		}
 	} catch (error) {
 		console.error("Error al eliminar programa", error);
+		showToast("Error de conexión", "error");
 	}
 }
 // publicidad
@@ -498,12 +514,14 @@ async function eliminarPublicidad(id) {
 			credentials: "include",
 		});
 		if (res.ok) {
+			showToast("Publicidad eliminada", "success");
 			cargarPublicidad();
 		} else {
-			alert("Error al eliminar publicidad");
+			showToast("Error al eliminar publicidad", "error");
 		}
 	} catch (error) {
 		console.error("Error:", error);
+		showToast("Error de conexión", "error");
 	}
 }
 
@@ -517,18 +535,19 @@ function setupFormPublicidad() {
 			const res = await fetch(`${API_BASE}/publicidad/add`, {
 				method: "POST",
 				body: formData,
-				credentials: "include", // Importante para la sesión
+				credentials: "include",
 			});
 
 			if (res.ok) {
-				alert("Publicidad subida con éxito");
+				showToast("Publicidad creada con éxito", "success");
 				closeModal();
-				cargarPublicidad(); // Función para refrescar la lista
+				cargarPublicidad();
 			} else {
-				alert("Error al subir publicidad");
+				showToast("Error al crear publicidad", "error");
 			}
 		} catch (error) {
 			console.error("Error:", error);
+			showToast("Error de conexión", "error");
 		}
 	};
 }

@@ -77,7 +77,6 @@ const usersController = {
 
 			res.json(usuario);
 		} catch (error) {
-			console.error("ERROR REAL:", error); // Esto te dirá la verdad en la terminal
 			res.status(500).json({mensaje: "Error al obtener usuario por ID"});
 		}
 	},

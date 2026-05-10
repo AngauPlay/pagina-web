@@ -1,6 +1,5 @@
-const { Usuario } = require("../models/Usuario"); // Importación corregida
+const { Usuario } = require("../models/Usuario");
 const bcrypt = require("bcrypt");
-const { genSalt, hash } = bcrypt;
 const jwt = require("jsonwebtoken");
 
 const authController = {
