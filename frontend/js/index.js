@@ -208,7 +208,7 @@ async function cargarMarquee() {
 					? "border-green-500 shadow-lg"
 					: "border-white/20";
 				const imagenSrc =
-					programa.imagen_url || "assets/img/default-programa.jpg";
+					programa.imagen_url || "https://via.placeholder.com/300x150?text=Sin+imagen";
 
 				return `
             <div class="inline-flex items-center mx-2 flex-shrink-0">
@@ -244,9 +244,14 @@ async function cargarMarquee() {
 document.addEventListener("DOMContentLoaded", cargarMarquee);
 
 async function chequearLive() {
-	const API_KEY = "TU_API_KEY";
+	const API_KEY = ""; // Colocar acá la API Key de YouTube
 	const CHANNEL_ID = "UCwzH2mG2_f12S_LqYw1v6zA";
 	const frame = document.getElementById("main-video-frame");
+
+	if (!API_KEY) {
+		console.warn("chequearLive: API_KEY no configurada");
+		return;
+	}
 
 	try {
 		const resp = await fetch(
@@ -255,12 +260,8 @@ async function chequearLive() {
 		const data = await resp.json();
 
 		if (data.items.length > 0) {
-			// ¡Hay un vivo!
 			const liveId = data.items[0].id.videoId;
 			frame.src = `https://www.youtube.com/embed/${liveId}`;
-		} else {
-			// No hay vivo, poner video de respaldo
-			frame.src = `https://www.youtube.com/embed/VIDEO_DE_RESPALDO_ID`;
 		}
 	} catch (error) {
 		console.error("Error consultando YouTube API", error);

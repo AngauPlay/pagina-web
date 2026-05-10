@@ -1,6 +1,6 @@
 const API_BASE = "http://localhost:3000";
 const API_URL = `${API_BASE}/noticias`;
-const API_USUARIOS = `${API_BASE}/auth/usuarios`;
+const API_USUARIOS = `${API_BASE}/usuarios`;
 const API_LOGOUT = `${API_BASE}/auth/logout`;
 const API_CATEGORIAS = `${API_BASE}/noticias/categorias`;
 
