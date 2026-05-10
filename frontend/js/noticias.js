@@ -88,5 +88,3 @@ async function cargarNoticiasPorCategoria() {
     contenedor.innerHTML = "<p>Error cargando noticias</p>";
   }
 }
-
-document.addEventListener("DOMContentLoaded", cargarNoticiasPorCategoria);

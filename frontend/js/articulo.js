@@ -2,8 +2,6 @@
  * ANGAU PLAY - Lógica de Detalle de Artículo con Fullscreen
  */
 
-const PhotoSwipeLightbox = window.PhotoSwipeLightbox;
-
 const API_BASE = "http://localhost:3000";
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -278,4 +276,3 @@ async function cargarPromos() {
 		console.error("Error cargando promos:", error);
 	}
 }
-cargarPromos();
