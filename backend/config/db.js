@@ -20,10 +20,4 @@ const sequelize = new Sequelize(
 	},
 );
 
-// Probar la conexión
-sequelize
-	.authenticate()
-	.then(() => console.log(" Conectado a la base de datos de Angau"))
-	.catch((err) => console.error(" Error de conexión a la DB:", err));
-
 module.exports = sequelize;

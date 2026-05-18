@@ -69,9 +69,16 @@ document.addEventListener("DOMContentLoaded", async () => {
 		cargarSugeridas(slug); // Pasar slug para filtrar
 		cargarPromos();
 	} catch (error) {
-		console.error("Falla crítica:", error);
-		// Redirigir o mostrar error amigable
-		// window.location.href = "error.html";
+		document.getElementById("loading-state").classList.add("hidden");
+		document.getElementById("articulo-content").innerHTML = `
+			<div class="text-center py-20">
+				<h2 class="text-2xl font-black text-slate-800 mb-4">Ups! Algo salió mal</h2>
+				<p class="text-slate-500 mb-6">No pudimos cargar esta noticia.</p>
+				<a href="index.html" class="bg-pink-accent text-white px-6 py-3 rounded-full font-bold hover:opacity-90">
+					Volver al inicio
+				</a>
+			</div>
+		`;
 	}
 });
 

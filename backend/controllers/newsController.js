@@ -176,10 +176,12 @@ const newsController = {
 			if (!noticia) return res.status(404).json({mensaje: "No existe"});
 
 			if (noticia.imagen_url) {
-				// Extraemos el public_id de la URL
-				const publicId = noticia.imagen_url.split("/").pop().split(".")[0];
-				// Borramos de la carpeta 'noticias' en Cloudinary
-				await cloudinary.uploader.destroy(`noticias/${publicId}`);
+				const urlParts = noticia.imagen_url.split("/");
+				const uploadIndex = urlParts.indexOf("upload");
+				if (uploadIndex !== -1) {
+					const publicId = urlParts.slice(uploadIndex + 1).join("/").split(".")[0];
+					await cloudinary.uploader.destroy(publicId);
+				}
 			}
 
 			await noticia.destroy();

@@ -90,9 +90,21 @@ async function cargarNoticias() {
 		}
 	} catch (error) {
 		console.error("Error al cargar noticias:", error);
-		if (contenedorNoticias)
-			contenedorNoticias.innerHTML =
-				"<p>Error al conectar con el servidor.</p>";
+		if (contenedorHero) {
+			contenedorHero.innerHTML = `
+				<div class="bg-slate-800 rounded-3xl p-8 text-center">
+					<p class="text-white/70">No hay noticias destacadas disponibles.</p>
+				</div>`;
+		}
+		if (contenedorNoticias) {
+			contenedorNoticias.innerHTML = `
+				<div class="col-span-3 text-center py-10">
+					<p class="text-slate-500 mb-3">Error al conectar con el servidor.</p>
+					<button onclick="cargarNoticias()" class="text-pink-accent font-bold hover:underline">
+						Reintentar
+					</button>
+				</div>`;
+		}
 	}
 }
 

@@ -54,7 +54,6 @@ app.use("/noticias", newsRoutes);
 app.use("/auth", authRoutes);
 app.use("/programas", programasRoutes);
 app.use("/usuarios", usersRoutes);
-app.use("/public/uploads", express.static("public/uploads"));
 app.use("/publicidad", publicidadRoutes);
 app.use("/agenda", require("./routes/agendaRoutes"));
 // Ruta para generar el RSS de Angau
@@ -94,9 +93,10 @@ app.get("/rss", async (req, res) => {
 	}
 });
 
-// 4. EL FALLBACK SIEMPRE AL FINAL DE LAS RUTAS
-app.use("/noticias", (req, res) => {
-	res.status(404).json({error: "Endpoint de API no encontrado"});
+// Middleware de manejo de errores global
+app.use((err, req, res, next) => {
+	console.error("Error no manejado:", err.message);
+	res.status(500).json({error: "Error interno del servidor"});
 });
 
 app.get(/.*/, (req, res) => {
