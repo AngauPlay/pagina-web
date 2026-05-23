@@ -84,20 +84,41 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 async function cargarPromos() {
 	try {
-		// 1. Cargamos la promo del encabezado
 		const resSup = await fetch(
 			`http://localhost:3000/publicidad/activa/encabezado`,
 		);
 		const promosSup = await resSup.json();
 
-		const contenedorSup = document.getElementById("hero-promos-wrapper");
-		if (contenedorSup && promosSup.length > 0) {
-			const p = promosSup[0];
-			contenedorSup.innerHTML = `
-                <a href="${p.link_url}" target="_blank" class="block w-full overflow-hidden rounded-2xl shadow-lg hover:opacity-95 transition">
-                    <img src="${p.imagen_url}" alt="Promoción" class="w-full h-auto object-cover border-b-4 border-purple-main">
-                </a>
-            `;
+		const slidesContainer = document.getElementById("swiper-slides-container");
+
+		if (slidesContainer && promosSup && promosSup.length > 0) {
+			slidesContainer.innerHTML = promosSup
+				.map(
+					(p) => `
+                <div class="swiper-slide">
+                    <a href="${p.link_url || '#'}" target="_blank" class="block w-full overflow-hidden rounded-2xl shadow-lg hover:opacity-95 transition">
+                        <img src="${p.imagen_url}" alt="Promoción" class="w-full h-auto object-cover border-b-4 border-purple-main">
+                    </a>
+                </div>
+            `,
+				)
+				.join("");
+
+			new Swiper("#hero-promos-wrapper", {
+				loop: true,
+				autoplay: {
+					delay: 4000,
+					disableOnInteraction: false,
+				},
+				pagination: {
+					el: ".swiper-pagination",
+					clickable: true,
+				},
+				navigation: {
+					nextEl: ".swiper-button-next",
+					prevEl: ".swiper-button-prev",
+				},
+			});
 		}
 	} catch (error) {
 		console.error("Error cargando promos:", error);

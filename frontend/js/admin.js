@@ -110,35 +110,41 @@ async function cargarNoticias() {
 			.join("");
 	} catch (error) {
 		console.error("Error al cargar noticias", error);
+		showToast("Error al cargar el listado de noticias", "error");
 	}
 }
 
 async function eliminarNoticia(id) {
 	if (!confirm("¿Seguro que deseas eliminar esta noticia?")) return;
 
-	const res = await fetch(`${API_URL}/delete/${id}`, {
-		method: "DELETE",
-		credentials: "include",
-	});
+	try {
+		const res = await fetch(`${API_URL}/delete/${id}`, {
+			method: "DELETE",
+			credentials: "include",
+		});
 
-	if (res.ok) {
-		showToast("Noticia eliminada", "success");
-		cargarNoticias();
-	} else {
-		showToast("Error al eliminar la noticia", "error");
+		if (res.ok) {
+			showToast("Noticia eliminada con éxito", "success");
+			cargarNoticias();
+		} else {
+			showToast("Error al eliminar la noticia", "error");
+		}
+	} catch (error) {
+		console.error(error);
+		showToast("Error de conexión al eliminar noticia", "error");
 	}
 }
-// Función global para generar slugs limpios en el Front
+
 function generarSlug(texto) {
 	return texto
 		.toString()
-		.normalize("NFD") // Separa letras de acentos
-		.replace(/[\u0300-\u036f]/g, "") // Elimina los acentos
+		.normalize("NFD")
+		.replace(/[\u0300-\u036f]/g, "")
 		.toLowerCase()
 		.trim()
-		.replace(/[^a-z0-9 -]/g, "") // Quita caracteres especiales
-		.replace(/\s+/g, "-") // Espacios por guiones
-		.replace(/-+/g, "-"); // Quita guiones duplicados
+		.replace(/[^a-z0-9 -]/g, "")
+		.replace(/\s+/g, "-")
+		.replace(/-+/g, "-");
 }
 
 // ===============================
@@ -149,7 +155,6 @@ async function editarNoticia(id) {
 		const modal = document.getElementById("modal");
 		const content = document.getElementById("modal-content");
 
-		// 1. Carga paralela de datos
 		const [res, catRes] = await Promise.all([
 			fetch(`${API_URL}/${id}`),
 			fetch(API_CATEGORIAS),
@@ -163,7 +168,6 @@ async function editarNoticia(id) {
 
 		modal.classList.remove("hidden");
 
-		// 2. Renderizado del formulario
 		content.innerHTML = `
             <h3 class="text-2xl font-black mb-4 text-blue-600">Editar Noticia</h3>
             <form id="form-editar-noticia" class="space-y-4" enctype="multipart/form-data">
@@ -215,16 +219,13 @@ async function editarNoticia(id) {
             </form>
         `;
 
-		// 3. Lógica de Auto-Slug en Edición
 		const inputTitulo = document.getElementById("tit-noticia");
 		const inputSlug = document.getElementById("slug-noticia");
 
 		inputTitulo.addEventListener("input", () => {
-			// Actualiza el slug mientras escribes
 			inputSlug.value = generarSlug(inputTitulo.value);
 		});
 
-		// 4. Manejo del Submit
 		const formEditar = document.getElementById("form-editar-noticia");
 		formEditar.onsubmit = async (e) => {
 			e.preventDefault();
@@ -249,11 +250,14 @@ async function editarNoticia(id) {
 					cargarNoticias();
 				} else {
 					const errData = await updateRes.json();
-					showToast(errData.mensaje || "No se pudo actualizar", "error");
+					showToast(
+						errData.mensaje || "No se pudo actualizar la noticia",
+						"error",
+					);
 				}
 			} catch (error) {
 				console.error("Error al actualizar:", error);
-				alert("Falla de conexión con el servidor");
+				showToast("Falla de conexión con el servidor", "error");
 			} finally {
 				btnGuardar.innerText = textoOriginal;
 				btnGuardar.disabled = false;
@@ -264,10 +268,10 @@ async function editarNoticia(id) {
 		showToast("No se pudo cargar la información para editar", "error");
 	}
 }
+
 // ===============================
 //  GESTIÓN DE PROGRAMACIÓN
 // ===============================
-
 async function cargarProgramacion() {
 	try {
 		const res = await fetch(`${API_BASE}/programas`);
@@ -279,16 +283,14 @@ async function cargarProgramacion() {
 			return;
 		}
 
-		// 1. Extraer horas únicas de inicio (HH:mm)
 		const horasUnicas = [
 			...new Set(
 				programas
-					.filter((p) => p && p.hora_inicio) // Aseguramos que el objeto y la hora existan
+					.filter((p) => p && p.hora_inicio)
 					.map((p) => p.hora_inicio.substring(0, 5)),
 			),
 		].sort();
 
-		// 2. Renderizar filas
 		lista.innerHTML = horasUnicas
 			.map((hora) => {
 				return `
@@ -298,16 +300,13 @@ async function cargarProgramacion() {
           </td>
           ${[0, 1, 2, 3, 4, 5, 6]
 						.map((diaIndex) => {
-							// BUSQUEDA SEGURA:
 							const programa = programas.find((p) => {
 								if (!p || !p.hora_inicio) return false;
 								const hInicio = p.hora_inicio.substring(0, 5);
 								return p.dia_semana === diaIndex && hInicio === hora;
 							});
 
-							// ... dentro del find de programa ...
 							if (programa) {
-								// Definimos la imagen: si existe en la DB la usamos, si no, ponemos un placeholder
 								const imagenSrc = programa.imagen_url
 									? programa.imagen_url
 									: "https://via.placeholder.com/40";
@@ -348,18 +347,15 @@ async function cargarProgramacion() {
 			.join("");
 	} catch (error) {
 		console.error("Error al cargar programas:", error);
-		lista.innerHTML = `<tr><td colspan="8" class="p-4 text-red-500 text-center">Error crítico al renderizar la grilla.</td></tr>`;
+		showToast("Error crítico al renderizar la grilla de programación", "error");
 	}
 }
-// ===============================
-// ✏️ EDITAR PROGRAMA
-// ===============================
+
 async function editarPrograma(id) {
 	try {
 		const modal = document.getElementById("modal");
 		const content = document.getElementById("modal-content");
 
-		// Traer datos del programa desde tu API
 		const res = await fetch(`${API_BASE}/programas/${id}`);
 		const programa = await res.json();
 
@@ -409,10 +405,9 @@ async function editarPrograma(id) {
           </select>
         </div>
 		<div class="border-t pt-4 mt-4 bg-gray-50 p-3 rounded-lg">
-		<label class="block text-sm font-bold text-gray-700 mb-2">Imagen de Programa</label>
-		<input type="file" name="imagen" class="w-full border p-2 rounded mb-4 bg-white">
-  
-	</div>
+			<label class="block text-sm font-bold text-gray-700 mb-2">Imagen de Programa</label>
+			<input type="file" name="imagen" class="w-full border p-2 rounded mb-4 bg-white">
+		</div>
 
         <button class="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-xl font-bold transition-colors">
           GUARDAR CAMBIOS
@@ -422,16 +417,10 @@ async function editarPrograma(id) {
 
 		document.getElementById("form-editar-programa").onsubmit = async (e) => {
 			e.preventDefault();
-
-			// 1. Creamos el FormData a partir del formulario
 			const formData = new FormData(e.target);
-
-			// No es necesario crear un objeto 'data' ni usar JSON.stringify
-			// El navegador se encarga de empaquetar todo (incluida la imagen)
 
 			const updateRes = await fetch(`${API_BASE}/programas/${id}`, {
 				method: "PUT",
-				// IMPORTANTE: Al enviar FormData NO debes poner "Content-Type"
 				body: formData,
 				credentials: "include",
 			});
@@ -441,19 +430,15 @@ async function editarPrograma(id) {
 				closeModal();
 				cargarProgramacion();
 			} else {
-				const errorText = await updateRes.text();
-				console.error("Respuesta de error:", errorText);
 				showToast("Error al actualizar el programa", "error");
 			}
 		};
 	} catch (error) {
 		console.error("Error en la petición:", error);
-		alert("Falla de conexión con el servidor");
+		showToast("Falla de conexión con el servidor", "error");
 	}
 }
-// ===============================
-// 🗑️ ELIMINAR PROGRAMA
-// ===============================
+
 async function eliminarPrograma(id) {
 	if (!confirm("¿Seguro que deseas eliminar este programa?")) return;
 
@@ -464,7 +449,7 @@ async function eliminarPrograma(id) {
 		});
 
 		if (res.ok) {
-			showToast("Programa eliminado", "success");
+			showToast("Programa eliminado correctamente", "success");
 			cargarProgramacion();
 		} else {
 			showToast("Error al eliminar el programa", "error");
@@ -474,14 +459,17 @@ async function eliminarPrograma(id) {
 		showToast("Error de conexión", "error");
 	}
 }
-// publicidad
+
+// ===============================
+//  GESTIÓN DE PUBLICIDAD
+// ===============================
 async function cargarPublicidad() {
 	try {
 		const res = await fetch(`${API_BASE}/publicidad`, {
 			credentials: "include",
 		});
 		const datos = await res.json();
-		const lista = document.getElementById("tabla-publicidad"); // Asegúrate de que este ID exista en tu HTML
+		const lista = document.getElementById("tabla-publicidad");
 
 		if (!lista) return;
 
@@ -503,6 +491,7 @@ async function cargarPublicidad() {
 			.join("");
 	} catch (error) {
 		console.error("Error al cargar publicidades:", error);
+		showToast("Error al cargar banners de publicidad", "error");
 	}
 }
 
@@ -514,10 +503,10 @@ async function eliminarPublicidad(id) {
 			credentials: "include",
 		});
 		if (res.ok) {
-			showToast("Publicidad eliminada", "success");
+			showToast("Publicidad eliminada con éxito", "success");
 			cargarPublicidad();
 		} else {
-			showToast("Error al eliminar publicidad", "error");
+			showToast("Error al eliminar la publicidad", "error");
 		}
 	} catch (error) {
 		console.error("Error:", error);
@@ -547,10 +536,14 @@ function setupFormPublicidad() {
 			}
 		} catch (error) {
 			console.error("Error:", error);
-			showToast("Error de conexión", "error");
+			showToast("Error de conexión al guardar publicidad", "error");
 		}
 	};
 }
+
+// ===============================
+//  GESTIÓN DE AGENDA
+// ===============================
 async function cargarAgenda() {
 	try {
 		const res = await fetch(`${API_BASE}/agenda`, {credentials: "include"});
@@ -574,31 +567,29 @@ async function cargarAgenda() {
                     <span class="text-gray-500">${e.hora} hs</span>
                 </td>
                 <td class="p-3 text-sm text-gray-600">${e.lugar}</td>
-                <td class="p-3 text-center">
-<td class="p-3 text-center space-x-2">
-    <button onclick="editarEvento(${e.id})" class="text-blue-500 hover:text-blue-700 font-bold">
-        Editar
-    </button>
-    <button onclick="eliminarEvento(${e.id})" class="text-red-500 hover:text-red-700 font-bold">
-        Eliminar
-    </button>
-</td>
-				</td>
-        </tr>
+                <td class="p-3 text-center space-x-2">
+                    <button onclick="editarEvento(${e.id})" class="text-blue-500 hover:text-blue-700 font-bold">
+                        Editar
+                    </button>
+                    <button onclick="eliminarEvento(${e.id})" class="text-red-500 hover:text-red-700 font-bold">
+                        Eliminar
+                    </button>
+                </td>
+            </tr>
         `;
 			})
 			.join("");
 	} catch (error) {
 		console.error("Error al cargar la agenda:", error);
+		showToast("Error al cargar eventos de agenda", "error");
 	}
 }
+
 async function editarEvento(id) {
 	const modal = document.getElementById("modal");
 	const content = document.getElementById("modal-content");
 
 	try {
-		// 1. Obtener datos del evento
-		// Asumiendo que tienes una ruta GET /agenda/:id en tu backend
 		const res = await fetch(`${API_BASE}/agenda/${id}`, {
 			credentials: "include",
 		});
@@ -606,9 +597,8 @@ async function editarEvento(id) {
 
 		modal.classList.remove("hidden");
 
-		// 2. Cargar el formulario con los datos existentes
 		content.innerHTML = `
-            <h3 class="text-2xl font-black mb-4 text-blue-600">Editar Evento</h3>
+            <h3 class="text-2xlfont-black mb-4 text-blue-600">Editar Evento</h3>
             <form id="form-editar-evento" class="space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-gray-400 uppercase">Título</label>
@@ -648,33 +638,35 @@ async function editarEvento(id) {
             </form>
         `;
 
-		// 3. Manejar el envío de la edición
 		document.getElementById("form-editar-evento").onsubmit = async (event) => {
 			event.preventDefault();
 			const formData = new FormData(event.target);
 
 			try {
 				const updateRes = await fetch(`${API_BASE}/agenda/update/${id}`, {
-					method: "PUT", // O PATCH según tu backend
+					method: "PUT",
 					body: formData,
 					credentials: "include",
 				});
 
 				if (updateRes.ok) {
+					showToast("Evento actualizado con éxito", "success");
 					closeModal();
 					cargarAgenda();
 				} else {
-					alert("Error al actualizar el evento");
+					showToast("Error al actualizar el evento", "error");
 				}
 			} catch (err) {
 				console.error("Error:", err);
+				showToast("Error en el servidor al editar evento", "error");
 			}
 		};
 	} catch (error) {
 		console.error("Error al obtener el evento:", error);
-		alert("No se pudo cargar la información del evento");
+		showToast("No se pudo cargar la información del evento", "error");
 	}
 }
+
 async function eliminarEvento(id) {
 	if (!confirm("¿Seguro que querés eliminar este evento de la agenda?")) return;
 
@@ -685,16 +677,129 @@ async function eliminarEvento(id) {
 		});
 
 		if (res.ok) {
+			showToast("Evento eliminado correctamente", "success");
 			cargarAgenda();
 		} else {
-			alert("Error al eliminar el evento");
+			showToast("Error al eliminar el evento de la agenda", "error");
 		}
 	} catch (error) {
 		console.error("Error:", error);
+		showToast("Falla de red al eliminar evento", "error");
 	}
 }
+
 // ===============================
-// 📦 MODALES
+//  GESTIÓN DE USUARIOS
+// ===============================
+async function cargarUsuarios() {
+	try {
+		const res = await fetch(API_USUARIOS, {credentials: "include"});
+		const usuarios = await res.json();
+		const lista = document.getElementById("tabla-usuarios");
+
+		if (!lista) return;
+
+		lista.innerHTML = usuarios
+			.map(
+				(u) => `
+			<tr class="border-b hover:bg-gray-50">
+				<td class="p-4 font-bold text-gray-800">${u.nombre}</td>
+				<td class="p-4">
+					<span class="px-2 py-1 text-xs rounded font-bold uppercase ${u.rol === "admin" ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"}">
+						${u.rol}
+					</span>
+				</td>
+				<td class="p-4 text-center space-x-2">
+					<button onclick="editarUsuario(${u.id})" class="text-blue-500 font-bold hover:underline">Editar</button>
+					<button onclick="eliminarUsuario(${u.id})" class="text-red-500 font-bold hover:underline">Eliminar</button>
+				</td>
+			</tr>
+		`,
+			)
+			.join("");
+	} catch (error) {
+		console.error("Error al cargar usuarios:", error);
+		showToast("Error al cargar listado de usuarios", "error");
+	}
+}
+
+async function eliminarUsuario(id) {
+	if (!confirm("¿Seguro que querés eliminar este usuario?")) return;
+
+	try {
+		const res = await fetch(`${API_BASE}/usuarios/${id}`, {
+			method: "DELETE",
+			credentials: "include",
+		});
+
+		if (res.ok) {
+			showToast("Usuario eliminado con éxito", "success");
+			cargarUsuarios();
+		} else {
+			showToast("Error al eliminar usuario", "error");
+		}
+	} catch (error) {
+		console.error("Error:", error);
+		showToast("Error de conexión", "error");
+	}
+}
+
+async function editarUsuario(id) {
+	try {
+		const modal = document.getElementById("modal");
+		const content = document.getElementById("modal-content");
+
+		const res = await fetch(`${API_BASE}/usuarios/${id}`, {
+			credentials: "include",
+		});
+		const usuario = await res.json();
+
+		modal.classList.remove("hidden");
+
+		content.innerHTML = `
+		<h3 class="text-2xl font-black mb-4 text-blue-600">Editar Usuario</h3>
+		<form id="form-editar-usuario" class="space-y-4">
+		<input name="nombre" value="${usuario.nombre}" class="w-full border p-2 rounded" required>
+		<input type="password" name="password" placeholder="Nueva contraseña" class="w-full border p-2 rounded">
+		<select name="rol" class="w-full border p-2 rounded">
+			<option value="admin" ${usuario.rol === "admin" ? "selected" : ""}>Admin</option>
+			<option value="editor" ${usuario.rol === "editor" ? "selected" : ""}>Editor</option>
+		</select>
+		<button class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold">
+			GUARDAR CAMBIOS
+		</button>
+		</form>
+	`;
+
+		document.getElementById("form-editar-usuario").onsubmit = async (e) => {
+			e.preventDefault();
+
+			const data = Object.fromEntries(new FormData(e.target));
+			if (!data.password) delete data.password;
+
+			const updateRes = await fetch(`${API_BASE}/usuarios/${id}`, {
+				method: "PUT",
+				headers: {"Content-Type": "application/json"},
+				body: JSON.stringify(data),
+				credentials: "include",
+			});
+
+			if (updateRes.ok) {
+				showToast("Usuario actualizado con éxito", "success");
+				closeModal();
+				cargarUsuarios();
+			} else {
+				showToast("Error al actualizar usuario", "error");
+			}
+		};
+	} catch (error) {
+		console.error(error);
+		showToast("No se pudo obtener la información del usuario", "error");
+	}
+}
+
+// ===============================
+// 📦 MODALES (AGREGAR NUEVOS)
 // ===============================
 async function openModal(tipo) {
 	const modal = document.getElementById("modal");
@@ -704,80 +809,42 @@ async function openModal(tipo) {
 
 	if (tipo === "noticia") {
 		const catRes = await fetch(API_CATEGORIAS);
-		const categorias = await catRes.json();
-
-		// Dentro de openModal('noticia'), busca donde configuras el submit
-		function setupFormNoticia() {
-			const form = document.getElementById("form-noticia");
-			form.onsubmit = async (e) => {
-				e.preventDefault();
-				const formData = new FormData(form);
-
-				try {
-					const res = await fetch(`${API_URL}/add`, {
-						method: "POST",
-						body: formData, // FormData enviará 'portada' y el array 'galeria'
-						credentials: "include",
-					});
-
-					if (res.ok) {
-						closeModal();
-						cargarNoticias();
-					} else {
-						alert("Error al publicar noticia");
-					}
-				} catch (error) {
-					console.error("Error:", error);
-				}
-			};
-		}
+		const interracial = await catRes.json();
 
 		content.innerHTML = `
-    <h3 class="text-2xl font-black mb-4 text-pink-600">Nueva Noticia</h3>
-    <form id="form-noticia" class="space-y-4" enctype="multipart/form-data">
-        <div>
-            <label class="block text-xs font-bold text-gray-400 uppercase">Título</label>
-            <input name="titulo" id="tit-noticia" placeholder="Ej: Gran inauguración en el centro"
-                class="w-full border p-2 rounded focus:ring-2 focus:ring-pink-500 outline-none" required>
-        </div>
+		<h3 class="text-2xl font-black mb-4 text-pink-600">Nueva Noticia</h3>
+		<form id="form-noticia" class="space-y-4" enctype="multipart/form-data">
+			<div>
+				<label class="block text-xs font-bold text-gray-400 uppercase">Título</label>
+				<input name="titulo" id="tit-noticia" placeholder="Ej: Gran inauguración en el centro" class="w-full border p-2 rounded focus:ring-2 focus:ring-pink-500 outline-none" required>
+			</div>
+			<div>
+				<label class="block text-[10px] font-medium text-gray-500">URL Amigable (Slug):</label>
+				<input type="text" name="slug" id="slug-noticia" class="w-full bg-gray-50 border p-1 text-xs rounded text-gray-600 italic" readonly>
+			</div>
+			<textarea name="copete" placeholder="Resumen corto..." class="w-full border p-2 rounded h-20" required></textarea>
+			<select name="categoria_id" class="w-full border p-2 rounded" required>
+				<option value="">Seleccionar Categoría</option>
+				${interracial.map((c) => `<option value="${c.id}">${c.nombre}</option>`).join("")}
+			</select>
+			<textarea name="cuerpo" placeholder="Contenido de la noticia..." class="w-full border p-2 rounded h-40" required></textarea>
+			<input name="autor" placeholder="Nombre del Autor" class="w-full border p-2 rounded" required>
+			<div class="border-t pt-4 mt-4 bg-gray-50 p-3 rounded-lg">
+				<label class="block text-sm font-bold text-gray-700 mb-2">Imagen de Portada</label>
+				<input type="file" name="portada" class="w-full border p-2 rounded mb-4 bg-white">
+				<label class="block text-sm font-bold text-gray-700 mb-2">Galería (Múltiple)</label>
+				<input type="file" name="galeria" multiple class="w-full border p-2 rounded bg-white">
+			</div>
+			<select name="estado" class="w-full border p-2 rounded">
+				<option value="publicado">Publicado</option>
+				<option value="borrador">Borrador</option>
+			</select>
+			<button type="submit" id="btn-publicar" class="w-full bg-pink-600 hover:bg-pink-700 text-white py-3 rounded-xl font-bold transition-all">
+				PUBLICAR NOTICIA
+			</button>
+		</form>
+	`;
 
-        <div>
-            <label class="block text-[10px] font-medium text-gray-500">URL Amigable (Slug):</label>
-            <input type="text" name="slug" id="slug-noticia" 
-                class="w-full bg-gray-50 border p-1 text-xs rounded text-gray-600 italic" readonly>
-        </div>
-
-        <textarea name="copete" placeholder="Resumen corto..." class="w-full border p-2 rounded h-20" required></textarea>
-
-        <select name="categoria_id" class="w-full border p-2 rounded" required>
-            <option value="">Seleccionar Categoría</option>
-            ${categorias.map((c) => `<option value="${c.id}">${c.nombre}</option>`).join("")}
-        </select>
-
-        <textarea name="cuerpo" placeholder="Contenido de la noticia..." class="w-full border p-2 rounded h-40" required></textarea>
-
-        <input name="autor" placeholder="Nombre del Autor" class="w-full border p-2 rounded" required>
-
-        <div class="border-t pt-4 mt-4 bg-gray-50 p-3 rounded-lg">
-            <label class="block text-sm font-bold text-gray-700 mb-2">Imagen de Portada</label>
-            <input type="file" name="portada" class="w-full border p-2 rounded mb-4 bg-white">
-      
-            <label class="block text-sm font-bold text-gray-700 mb-2">Galería (Múltiple)</label>
-            <input type="file" name="galeria" multiple class="w-full border p-2 rounded bg-white">
-        </div>
-
-        <select name="estado" class="w-full border p-2 rounded">
-            <option value="publicado">Publicado</option>
-            <option value="borrador">Borrador</option>
-        </select>
-
-        <button type="submit" id="btn-publicar" class="w-full bg-pink-600 hover:bg-pink-700 text-white py-3 rounded-xl font-bold transition-all">
-            PUBLICAR NOTICIA
-        </button>
-    </form>
-`;
-
-		// Lógica de escucha para el Título
 		const inputTitulo = document.getElementById("tit-noticia");
 		const inputSlug = document.getElementById("slug-noticia");
 
@@ -785,17 +852,35 @@ async function openModal(tipo) {
 			inputSlug.value = generarSlug(inputTitulo.value);
 		});
 
-		setupFormNoticia();
-	}
+		document.getElementById("form-noticia").onsubmit = async (e) => {
+			e.preventDefault();
+			const formData = new FormData(e.target);
 
-	// ================= PROGRAMA =================
-	else if (tipo === "programa") {
+			try {
+				const res = await fetch(`${API_URL}/add`, {
+					method: "POST",
+					body: formData,
+					credentials: "include",
+				});
+
+				if (res.ok) {
+					showToast("¡Noticia publicada con éxito!", "success");
+					closeModal();
+					cargarNoticias();
+				} else {
+					showToast("Error al guardar la noticia", "error");
+				}
+			} catch (error) {
+				console.error(error);
+				showToast("Error de conexión al enviar noticia", "error");
+			}
+		};
+	} else if (tipo === "programa") {
 		content.innerHTML = `
     <h3 class="text-2xl font-black mb-4 text-purple-600">Nuevo Programa</h3>
     <form id="form-programa" class="space-y-4">
       <input name="nombre" placeholder="Nombre" class="w-full border p-2 rounded" required>
       <input name="staff" placeholder="Conductores" class="w-full border p-2 rounded">
-      
       <div class="grid grid-cols-2 gap-4">
         <div>
           <label class="text-xs font-bold text-gray-400">INICIO</label>
@@ -806,69 +891,51 @@ async function openModal(tipo) {
           <input type="time" name="hora_fin" class="w-full border p-2 rounded" required>
         </div>
       </div>
-
 	  <div class="border-t pt-4 mt-4 bg-gray-50 p-3 rounded-lg">
             <label class="block text-sm font-bold text-gray-700 mb-2">Imagen de Programa</label>
             <input type="file" name="imagen" class="w-full border p-2 rounded mb-4 bg-white">
         </div>
-
       <select name="dia_semana" class="w-full border p-2 rounded">
         ${dias.map((d, i) => `<option value="${i}">${d}</option>`).join("")}
       </select>
-  
       <button class="w-full bg-purple-600 text-white py-2 rounded font-bold">GUARDAR</button>
     </form>
   `;
 
 		document.getElementById("form-programa").onsubmit = async (e) => {
 			e.preventDefault();
-
-			// 1. Capturamos TODO el formulario (incluyendo el archivo 'imagen')
 			const formData = new FormData(e.target);
 
 			try {
 				const res = await fetch(`${API_BASE}/programas`, {
 					method: "POST",
-					// IMPORTANTE: NO pongas headers: { "Content-Type": "application/json" }
-					// Al pasarle el objeto formData directamente, el navegador configura
-					// automáticamente el Content-Type como 'multipart/form-data'
 					body: formData,
 					credentials: "include",
 				});
 
 				if (res.ok) {
+					showToast("Programa añadido con éxito", "success");
 					closeModal();
 					cargarProgramacion();
 				} else {
-					const errorMsg = await res.text();
-					console.error("Error del servidor:", errorMsg);
-					alert("Error al crear programa");
+					showToast("Error al crear el nuevo programa", "error");
 				}
 			} catch (error) {
-				console.error("Error en la petición:", error);
+				console.error(error);
+				showToast("Falla de red al crear programa", "error");
 			}
 		};
-	}
-
-	// ================= USUARIO (NUEVO) =================
-	else if (tipo === "usuario") {
+	} else if (tipo === "usuario") {
 		content.innerHTML = `
       <h3 class="text-2xl font-black mb-4 text-pink-600">Nuevo Usuario</h3>
-
       <form id="form-usuario" class="space-y-4">
-        <input name="username" placeholder="Nombre de usuario"
-          class="w-full border p-2 rounded" required>
-
-        <input type="password" name="password"
-          placeholder="Contraseña"
-          class="w-full border p-2 rounded" required>
-
+        <input name="username" placeholder="Nombre de usuario" class="w-full border p-2 rounded" required>
+        <input type="password" name="password" placeholder="Contraseña" class="w-full border p-2 rounded" required>
         <select name="rol" class="w-full border p-2 rounded" required>
           <option value="">Seleccionar rol</option>
           <option value="admin">Admin</option>
           <option value="editor">Editor</option>
         </select>
-
         <button class="w-full bg-pink-600 text-white py-3 rounded-xl font-bold">
           CREAR USUARIO
         </button>
@@ -877,7 +944,6 @@ async function openModal(tipo) {
 
 		document.getElementById("form-usuario").onsubmit = async (e) => {
 			e.preventDefault();
-
 			const formData = new FormData(e.target);
 
 			const data = {
@@ -886,18 +952,24 @@ async function openModal(tipo) {
 				rol: formData.get("rol"),
 			};
 
-			const res = await fetch(`${API_BASE}/usuarios`, {
-				method: "POST",
-				headers: {"Content-Type": "application/json"},
-				body: JSON.stringify(data),
-				credentials: "include",
-			});
+			try {
+				const res = await fetch(`${API_BASE}/usuarios`, {
+					method: "POST",
+					headers: {"Content-Type": "application/json"},
+					body: JSON.stringify(data),
+					credentials: "include",
+				});
 
-			if (res.ok) {
-				closeModal();
-				cargarUsuarios();
-			} else {
-				alert("Error al crear usuario");
+				if (res.ok) {
+					showToast("Usuario registrado correctamente", "success");
+					closeModal();
+					cargarUsuarios();
+				} else {
+					showToast("Error al registrar usuario", "error");
+				}
+			} catch (error) {
+				console.error(error);
+				showToast("Error de red al crear usuario", "error");
 			}
 		};
 	} else if (tipo === "publicidad") {
@@ -905,26 +977,21 @@ async function openModal(tipo) {
         <h3 class="text-2xl font-black mb-4 text-orange-600">Nueva Publicidad</h3>
         <form id="form-publicidad" class="space-y-4" enctype="multipart/form-data">
             <input name="nombre" placeholder="Nombre del Cliente/Campaña" class="w-full border p-2 rounded" required>
-            
             <input name="link_url" placeholder="URL de destino (https://...)" class="w-full border p-2 rounded">
-            
             <select name="ubicacion" class="w-full border p-2 rounded">
                 <option value="encabezado">Encabezado (Banner Superior)</option>
                 <option value="lateral">Lateral (Sidebar)</option>
                 <option value="intermedia">Intermedia (Entre noticias)</option>
             </select>
-
             <div class="bg-gray-50 p-4 rounded-lg border-2 border-dashed">
                 <label class="block text-sm font-bold mb-2">Banner Publicitario</label>
                 <input type="file" name="imagen" class="w-full" required>
             </div>
-
             <button type="submit" class="w-full bg-orange-600 text-white py-3 rounded-xl font-bold">
                 SUBIR PUBLICIDAD
             </button>
         </form>
     `;
-
 		setupFormPublicidad();
 	} else if (tipo === "agenda") {
 		content.innerHTML = `
@@ -934,12 +1001,10 @@ async function openModal(tipo) {
                 <label class="block text-xs font-bold text-gray-400 uppercase">Título del Evento</label>
                 <input name="titulo" class="w-full border p-2 rounded focus:ring-2 focus:ring-indigo-500 outline-none" required>
             </div>
-            
             <div>
                 <label class="block text-xs font-bold text-gray-400 uppercase">Descripción</label>
                 <textarea name="descripcion" class="w-full border p-2 rounded h-20"></textarea>
             </div>
-
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="block text-xs font-bold text-gray-400 uppercase">Fecha</label>
@@ -950,17 +1015,14 @@ async function openModal(tipo) {
                     <input type="time" name="hora" class="w-full border p-2 rounded" required>
                 </div>
             </div>
-
             <div>
                 <label class="block text-xs font-bold text-gray-400 uppercase">Lugar</label>
                 <input name="lugar" class="w-full border p-2 rounded" required>
             </div>
-
             <div class="bg-gray-50 p-4 rounded-lg border-2 border-dashed border-gray-200">
                 <label class="block text-sm font-bold text-gray-700 mb-2">Flyer / Imagen del Evento</label>
                 <input type="file" name="imagen" class="w-full">
             </div>
-
             <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-bold transition-all shadow-lg">
                 CREAR EVENTO
             </button>
@@ -979,13 +1041,15 @@ async function openModal(tipo) {
 				});
 
 				if (res.ok) {
+					showToast("Evento de agenda creado con éxito", "success");
 					closeModal();
 					cargarAgenda();
 				} else {
-					alert("Error al guardar el evento");
+					showToast("Error al guardar el evento en la agenda", "error");
 				}
 			} catch (error) {
 				console.error("Error en la petición:", error);
+				showToast("Falla de red en el servidor", "error");
 			}
 		};
 	}
@@ -1006,86 +1070,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 	if (logoutBtn) {
 		logoutBtn.addEventListener("click", async () => {
-			await fetch(API_LOGOUT, {
-				method: "POST",
-				credentials: "include",
-			});
-
-			window.location.href = "/login.html";
+			try {
+				await fetch(API_LOGOUT, {
+					method: "POST",
+					credentials: "include",
+				});
+				window.location.href = "/login.html";
+			} catch (error) {
+				showToast("Error al intentar cerrar sesión", "error");
+			}
 		});
 	}
 });
-
-async function eliminarUsuario(id) {
-	if (!confirm("¿Seguro que querés eliminar este usuario?")) return;
-
-	try {
-		const res = await fetch(`${API_BASE}/usuarios/${id}`, {
-			method: "DELETE",
-			credentials: "include",
-		});
-
-		if (res.ok) {
-			cargarUsuarios();
-		} else {
-			alert("Error al eliminar usuario");
-		}
-	} catch (error) {
-		console.error("Error:", error);
-	}
-}
-
-async function editarUsuario(id) {
-	const modal = document.getElementById("modal");
-	const content = document.getElementById("modal-content");
-
-	const res = await fetch(`${API_BASE}/usuarios/${id}`, {
-		credentials: "include",
-	});
-	const usuario = await res.json();
-
-	modal.classList.remove("hidden");
-
-	content.innerHTML = `
-  
-    <h3 class="text-2xl font-black mb-4 text-blue-600">Editar Usuario</h3>
-
-    <form id="form-editar-usuario" class="space-y-4">
-      <input name="nombre" value="${usuario.nombre}" class="w-full border p-2 rounded" required>
-
-      <input type="password" name="password"
-        placeholder="Nueva contraseña"
-        class="w-full border p-2 rounded">
-
-		<select name="rol" class="w-full border p-2 rounded">
-		<option value="admin" ${usuario.rol === "admin" ? "selected" : ""}>Admin</option>
-		<option value="editor" ${usuario.rol === "editor" ? "selected" : ""}>Editor</option>
-	</select>
-
-      <button class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold">
-        GUARDAR CAMBIOS
-      </button>
-    </form>
-  `;
-
-	document.getElementById("form-editar-usuario").onsubmit = async (e) => {
-		e.preventDefault();
-
-		const data = Object.fromEntries(new FormData(e.target));
-		if (!data.password) delete data.password;
-
-		const res = await fetch(`${API_BASE}/usuarios/${id}`, {
-			method: "PUT",
-			headers: {"Content-Type": "application/json"},
-			body: JSON.stringify(data),
-			credentials: "include",
-		});
-
-		if (res.ok) {
-			closeModal();
-			cargarUsuarios();
-		} else {
-			alert("Error al actualizar usuario");
-		}
-	};
-}

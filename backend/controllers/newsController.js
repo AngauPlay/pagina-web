@@ -83,29 +83,35 @@ const newsController = {
 		try {
 			const {titulo, copete, cuerpo, categoria_id, autor, estado} = req.body;
 
-			// El middleware ya subió la foto a Cloudinary.
-			// La URL está en req.files['portada'][0].path
+			if (!titulo) {
+				return res.status(400).json({error: "El título es obligatorio"});
+			}
+
 			let portadaUrl = null;
-			if (req.files && req.files["portada"]) {
+			if (req.files && req.files["portada"] && req.files["portada"][0]) {
 				portadaUrl = req.files["portada"][0].path;
 			}
 
-			const noticia = await Noticia.create({
+			const data = {
 				titulo,
 				copete,
 				cuerpo,
-				categoria_id,
-				autor,
-				estado,
+				autor: autor || "Anónimo",
+				estado: estado || "borrador",
 				imagen_url: portadaUrl,
-			});
+			};
 
-			// Procesar Galería
+			if (categoria_id && categoria_id !== "") {
+				data.categoria_id = parseInt(categoria_id);
+			}
+
+			const noticia = await Noticia.create(data);
+
 			if (req.files && req.files["galeria"]) {
 				const promesas = req.files["galeria"].map((file) =>
 					NoticiaImagen.create({
 						noticia_id: noticia.id,
-						url: file.path, // URL de Cloudinary
+						url: file.path,
 					}),
 				);
 				await Promise.all(promesas);
@@ -113,6 +119,7 @@ const newsController = {
 
 			res.status(201).json(noticia);
 		} catch (error) {
+			console.error("Error en create noticia:", error);
 			res.status(500).json({error: error.message});
 		}
 	},
