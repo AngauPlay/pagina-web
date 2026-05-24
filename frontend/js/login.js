@@ -40,7 +40,7 @@ form.addEventListener("submit", async (event) => {
 
     // Redirección según rol
     setTimeout(() => {
-      if (result.usuario.rol === "admin" || result.usuario.rol === "editor") {
+      if (result.usuario?.rol === "admin" || result.usuario?.rol === "editor") {
         console.log(result.usuario.rol, "rol del usuario");
         window.location.href = "admin.html";
       } else {

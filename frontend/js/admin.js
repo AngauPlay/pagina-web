@@ -82,7 +82,7 @@ async function cargarNoticias() {
           <td class="p-4 font-medium">${n.titulo}</td>
           <td class="p-4">${n.autor}</td>
           <td class="p-4">
-            ${new Date(n.createdAt || n.fecha_publicacion).toLocaleDateString()}
+            ${safeDate(n.createdAt || n.fecha_publicacion)}
           </td>
           <td class="p-4">
             <span class="bg-gray-100 px-2 py-1 rounded text-xs">
@@ -317,7 +317,7 @@ async function cargarProgramacion() {
 									<div class="flex items-center gap-2 mb-1">
 										<img src="${imagenSrc}" 
 											 class="w-8 h-8 rounded-md object-cover border border-gray-100 shadow-sm" 
-											 alt="${programa.nombre}">
+											 alt="${esc(programa.nombre)}" onerror="this.src='https://placehold.co/40'">
 											 
 										<div class="text-[9px] font-black text-gray-400 uppercase">
 										  ${programa.hora_inicio.substring(0, 5)} - ${programa.hora_fin ? programa.hora_fin.substring(0, 5) : "??"}
@@ -380,12 +380,12 @@ async function editarPrograma(id) {
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-bold mb-1">Hora Inicio</label>
-            <input type="time" name="hora_inicio" value="${programa.hora_inicio.substring(0, 5)}"
+            <input type="time" name="hora_inicio" value="${safeSlice(programa.hora_inicio, 0, 5)}"
               class="w-full border p-2 rounded" required>
           </div>
           <div>
             <label class="block text-sm font-bold mb-1">Hora Fin</label>
-            <input type="time" name="hora_fin" value="${programa.hora_fin.substring(0, 5)}"
+            <input type="time" name="hora_fin" value="${safeSlice(programa.hora_fin, 0, 5)}"
               class="w-full border p-2 rounded" required>
           </div>
         </div>
@@ -478,7 +478,7 @@ async function cargarPublicidad() {
 				(p) => `
 			<tr class="border-b hover:bg-gray-50">
 				<td class="p-3">
-					<img src="${p.imagen_url}" class="h-12 w-20 object-cover rounded border">
+					<img src="${p.imagen_url}" class="h-12 w-20 object-cover rounded border" onerror="this.src='https://placehold.co/80x48'">
 				</td>
 				<td class="p-3 font-bold">${p.nombre}</td>
 				<td class="p-3 text-xs text-gray-500">${p.ubicacion}</td>
@@ -558,8 +558,8 @@ async function cargarAgenda() {
 				return `
             <tr class="border-b hover:bg-gray-50 transition">
                 <td class="p-3">
-                    <img src="${e.imagen_url || "https://via.placeholder.com/100"}" 
-                         class="w-16 h-16 object-cover rounded shadow-sm border">
+                    <img src="${e.imagen_url || "https://placehold.co/100"}" 
+                         class="w-16 h-16 object-cover rounded shadow-sm border" onerror="this.src='https://placehold.co/100'">
                 </td>
                 <td class="p-3 font-bold text-gray-800">${e.titulo}</td>
                 <td class="p-3 text-sm">

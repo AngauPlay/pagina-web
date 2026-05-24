@@ -13,6 +13,10 @@
 			rel="stylesheet"
 			href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe.min.css"
 		/>
+		<link
+			rel="stylesheet"
+			href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
+		/>
 
   <style>
     :root {
@@ -132,6 +136,13 @@
 			></div>
 		</header>
 
+  <!-- PROMOS -->
+  <div class="container mx-auto px-4 mt-6">
+    <div id="hero-promos-wrapper" class="swiper w-full h-24 md:h-32 rounded-2xl overflow-hidden">
+      <div class="swiper-wrapper" id="swiper-slides-container"></div>
+    </div>
+  </div>
+
   <!-- HERO -->
   <section class="bg-gradient-to-r from-purple-600 to-pink-500 text-white py-16 text-center">
     <h1 class="text-4xl md:text-5xl font-black uppercase italic">
@@ -223,6 +234,8 @@
 			</div>
 		</footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <script src="js/notificaciones.js"></script>
   <script src="js/programacion.js"></script>
 </body>
 </html>

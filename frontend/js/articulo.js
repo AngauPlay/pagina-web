@@ -55,12 +55,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 			}
 		}
 
-		// --- Cuerpo del Artículo ---
 		if (noticia.cuerpo) {
 			document.getElementById("articulo-cuerpo").innerHTML = noticia.cuerpo
 				.split("\n")
 				.filter((p) => p.trim())
-				.map((p) => `<p class="mb-6">${p}</p>`)
+				.map((p) => `<p class="mb-6">${esc(p)}</p>`)
 				.join("");
 		}
 
@@ -118,7 +117,7 @@ function renderizarGaleriaExtra(fotos) {
 										(f) => `
                     <div class="min-w-full">
                         <a href="${f.url}" class="galeria-link block">
-                            <img src="${f.url}" class="w-full h-[300px] object-cover" loading="lazy">
+                            <img src="${f.url}" class="w-full h-[300px] object-cover" loading="lazy" onerror="this.src='https://placehold.co/600x300/1e293b/ffffff?text=ANG'">
                         </a>
                     </div>
                 `,
@@ -244,14 +243,14 @@ async function cargarSugeridas(slugActual) {
 			.map(
 				(n, i) => `
                 <div class="group cursor-pointer flex gap-4 items-start border-b border-slate-100 pb-4 last:border-0" 
-                     onclick="window.location.href='articulo.html?slug=${n.slug}'">
+                     onclick="window.location.href='articulo.html?slug=${esc(n.slug)}'">
                     <div class="text-2xl font-black text-slate-200 group-hover:text-pink-accent transition-colors">0${i + 1}</div>
                     <div>
                         <h5 class="font-bold text-sm leading-tight text-slate-800 group-hover:text-purple-main transition-colors line-clamp-2">
-                            ${n.titulo}
+                            ${esc(n.titulo)}
                         </h5>
                         <span class="text-[9px] uppercase font-black text-slate-400">
-                            ${new Date(n.fecha_publicacion).toLocaleDateString("es-AR")}
+                            ${safeDate(n.fecha_publicacion)}
                         </span>
                     </div>
                 </div>
@@ -277,8 +276,8 @@ async function cargarPromos() {
 				.map(
 					(p) => `
                 <div class="swiper-slide">
-                    <a href="${p.link_url}" target="_blank" class="block w-full overflow-hidden rounded-2xl shadow-lg hover:opacity-95 transition">
-                        <img src="${p.imagen_url}" alt="Promoción" class="w-full h-auto object-cover border-b-4 border-purple-main">
+                    <a href="${esc(p.link_url || '#')}" target="_blank" class="block w-full overflow-hidden rounded-2xl shadow-lg hover:opacity-95 transition">
+                        <img src="${esc(p.imagen_url)}" alt="Promoción" class="w-full h-auto object-cover border-b-4 border-purple-main" onerror="this.style.display='none'">
                     </a>
                 </div>
             `,
@@ -311,8 +310,8 @@ async function cargarPromos() {
 			contenedorAside.forEach((slot) => {
 				const p = promosAside[0];
 				slot.innerHTML = `
-                    <a href="${p.link_url || "#"}" target="_blank" class="block w-full h-full overflow-hidden hover:opacity-95 transition">
-                        <img src="${p.imagen_url}" alt="Patrocinador" class="w-full h-full object-cover ">
+                    <a href="${esc(p.link_url || '#')}" target="_blank" class="block w-full h-full overflow-hidden hover:opacity-95 transition">
+                        <img src="${esc(p.imagen_url)}" alt="Patrocinador" class="w-full h-full object-cover" onerror="this.style.display='none'">
                     </a>
                 `;
 			});
