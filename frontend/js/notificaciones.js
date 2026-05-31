@@ -60,3 +60,39 @@ const Toast = {
 };
 
 window.Toast = Toast;
+
+function esc(str) {
+	if (str === null || str === undefined) return "";
+	return String(str)
+		.replace(/&/g, "&amp;")
+		.replace(/</g, "&lt;")
+		.replace(/>/g, "&gt;")
+		.replace(/"/g, "&quot;")
+		.replace(/'/g, "&#039;");
+}
+
+function safeSlice(val, start, end) {
+	if (!val || typeof val !== "string") return "";
+	return val.slice(start, end);
+}
+
+function safeDate(val) {
+	if (!val) return "";
+	try {
+		const d = new Date(val);
+		if (isNaN(d.getTime())) return "";
+		return d.toLocaleDateString("es-AR");
+	} catch {
+		return "";
+	}
+}
+
+function safeStr(val) {
+	if (val === null || val === undefined) return "";
+	return String(val);
+}
+
+window.esc = esc;
+window.safeSlice = safeSlice;
+window.safeDate = safeDate;
+window.safeStr = safeStr;

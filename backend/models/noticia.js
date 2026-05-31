@@ -34,19 +34,24 @@ const Noticia = sequelize.define(
 		tableName: "noticias",
 		timestamps: false,
 		hooks: {
-			beforeValidate: async (noticia) => {
+			beforeValidate: async (noticia, options) => {
 				if (noticia.titulo && !noticia.slug) {
-					// Solo generamos slug si no viene uno del front o si es una noticia nueva
 					let baseSlug = slugify(noticia.titulo, {
 						lower: true,
 						strict: true,
 					});
 
-					// Verificar si ya existe en la DB y agregar sufijo solo si es necesario
-					const existe = await Noticia.findOne({where: {slug: baseSlug}});
-					if (existe && existe.id !== noticia.id) {
-						noticia.slug = `${baseSlug}-${Date.now().toString().slice(-4)}`;
-					} else {
+					try {
+						const existe = await Noticia.findOne({
+							where: {slug: baseSlug},
+							transaction: options.transaction,
+						});
+						if (existe && existe.id !== noticia.id) {
+							noticia.slug = `${baseSlug}-${Date.now().toString().slice(-4)}`;
+						} else {
+							noticia.slug = baseSlug;
+						}
+					} catch (e) {
 						noticia.slug = baseSlug;
 					}
 				}

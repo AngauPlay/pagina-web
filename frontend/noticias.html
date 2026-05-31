@@ -1,11 +1,11 @@
 <!doctype html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Noticias | ANGAU PLAY</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Noticias | ANGAU PLAY</title>
+		<script src="https://cdn.tailwindcss.com"></script>
+		<link
 			rel="stylesheet"
 			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
 		/>
@@ -14,7 +14,7 @@
 			href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe.min.css"
 		/>
 
-        <style>
+		<style>
 			:root {
 				--pink-accent: rgb(224, 35, 117);
 				--purple-main: rgb(104, 89, 165);
@@ -66,8 +66,6 @@
 				letter-spacing: 0.05em;
 			}
 
-	
-
 			#articulo-cuerpo p {
 				margin-bottom: 1.5rem;
 				line-height: 1.8;
@@ -98,12 +96,11 @@
 				cursor: zoom-in;
 			}
 		</style>
-</head>
+	</head>
 
-<body class="bg-gray-50 text-slate-900">
-
-  <!-- HEADER SIMPLE -->
-  <header
+	<body class="bg-gray-50 text-slate-900">
+		<!-- HEADER SIMPLE -->
+		<header
 			class="bg-purple-main text-white p-4 sticky top-0 z-[100] shadow-xl border-b border-white/10"
 		>
 			<div class="container mx-auto flex justify-between items-center">
@@ -206,21 +203,23 @@
 			></div>
 		</header>
 
+		<!-- HERO -->
+		<section
+			class="bg-gradient-to-r from-purple-600 to-pink-500 text-white py-16 text-center"
+		>
+			<h1 class="text-4xl font-black uppercase">Noticias</h1>
+			<p class="mt-2 text-white/80">Todas las categorías</p>
+		</section>
 
-  <!-- HERO -->
-  <section class="bg-gradient-to-r from-purple-600 to-pink-500 text-white py-16 text-center">
-    <h1 class="text-4xl font-black uppercase">Noticias</h1>
-    <p class="mt-2 text-white/80">Todas las categorías</p>
-  </section>
+		<!-- CONTENIDO -->
+		<main class="container mx-auto px-4 py-10">
+			<div id="contenedor-categorias" class="space-y-16">
+				<p class="text-gray-400">Cargando noticias...</p>
+			</div>
+			<div id="paginacion" class="flex justify-center gap-2 mt-10 flex-wrap"></div>
+		</main>
 
-  <!-- CONTENIDO -->
-  <main class="container mx-auto px-4 py-10">
-    <div id="contenedor-categorias" class="space-y-16">
-      <p class="text-gray-400">Cargando noticias...</p>
-    </div>
-  </main>
-
-  <!-- FOOTER -->
+		<!-- FOOTER -->
 		<footer
 			class="bg-gradient-to-r from-[rgb(198,29,102)] via-[rgb(104,89,165)] to-[rgb(68,99,174)] text-white mt-16"
 		>
@@ -292,7 +291,7 @@
 			</div>
 		</footer>
 
-
-  <script src="js/noticias.js"></script>
-</body>
+		<script src="js/notificaciones.js"></script>
+	<script src="js/noticias.js"></script>
+	</body>
 </html>

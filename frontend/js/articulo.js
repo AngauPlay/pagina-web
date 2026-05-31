@@ -3,6 +3,7 @@
  */
 
 const API_BASE = "http://localhost:3000";
+let galeriaAutoplayInterval = null; // Guardar referencia para evitar memory leaks
 
 document.addEventListener("DOMContentLoaded", async () => {
 	const urlParams = new URLSearchParams(window.location.search);
@@ -43,22 +44,27 @@ document.addEventListener("DOMContentLoaded", async () => {
 			// Obtener dimensiones de forma asíncrona
 			const imgTemp = new Image();
 			imgTemp.src = imgUrl;
-			await imgTemp.decode(); // Espera a que la imagen sea decodificable
-			linkElement.setAttribute("data-pswp-width", imgTemp.width);
-			linkElement.setAttribute("data-pswp-height", imgTemp.height);
+			try {
+				await imgTemp.decode(); // Espera a que la imagen sea decodificable
+				linkElement.setAttribute("data-pswp-width", imgTemp.width);
+				linkElement.setAttribute("data-pswp-height", imgTemp.height);
+			} catch (e) {
+				console.warn(
+					"No se pudo precargar las dimensiones de la imagen principal, PhotoSwipe usará el fallback.",
+				);
+			}
 		}
 
-		// --- Cuerpo del Artículo ---
 		if (noticia.cuerpo) {
 			document.getElementById("articulo-cuerpo").innerHTML = noticia.cuerpo
 				.split("\n")
 				.filter((p) => p.trim())
-				.map((p) => `<p class="mb-6">${p}</p>`)
+				.map((p) => `<p class="mb-6">${esc(p)}</p>`)
 				.join("");
 		}
 
 		// --- Galería y PhotoSwipe ---
-		if (noticia.galeria?.length > 0) {
+		if (noticia.galeria && noticia.galeria.length > 0) {
 			renderizarGaleriaExtra(noticia.galeria);
 		}
 
@@ -66,99 +72,126 @@ document.addEventListener("DOMContentLoaded", async () => {
 		inicializarPhotoSwipe();
 
 		// --- Cargas secundarias ---
-		cargarSugeridas(slug); // Pasar slug para filtrar
+		cargarSugeridas(slug);
 		cargarPromos();
 	} catch (error) {
+		console.error(error);
 		document.getElementById("loading-state").classList.add("hidden");
 		document.getElementById("articulo-content").innerHTML = `
-			<div class="text-center py-20">
-				<h2 class="text-2xl font-black text-slate-800 mb-4">Ups! Algo salió mal</h2>
-				<p class="text-slate-500 mb-6">No pudimos cargar esta noticia.</p>
-				<a href="index.html" class="bg-pink-accent text-white px-6 py-3 rounded-full font-bold hover:opacity-90">
-					Volver al inicio
-				</a>
-			</div>
-		`;
+            <div class="text-center py-20">
+                <h2 class="text-2xl font-black text-slate-800 mb-4">Ups! Algo salió mal</h2>
+                <p class="text-slate-500 mb-6">No pudimos cargar esta noticia.</p>
+                <a href="index.html" class="bg-pink-accent text-white px-6 py-3 rounded-full font-bold hover:opacity-90">
+                    Volver al inicio
+                </a>
+            </div>
+        `;
 	}
 });
 
 /**
  * Renderiza las fotos adicionales debajo del contenido
  */
-
 function renderizarGaleriaExtra(fotos) {
 	const cuerpo = document.getElementById("articulo-cuerpo");
+	if (!cuerpo) return;
+
+	// Eliminar galería previa si existiese para evitar duplicados
+	const galeriaPrevia = document.getElementById("articulo-galeria-dinamica");
+	if (galeriaPrevia) galeriaPrevia.remove();
 
 	const divGaleria = document.createElement("div");
+	divGaleria.id = "articulo-galeria-dinamica";
 	divGaleria.className = "mt-12 border-t pt-8";
 
 	divGaleria.innerHTML = `
-		<h3 class="text-xl font-black italic uppercase mb-4 text-purple-main">
-			Galería de imágenes
-		</h3>
+        <h3 class="text-xl font-black italic uppercase mb-4 text-purple-main">
+            Galería de imágenes
+        </h3>
 
-		<div class="relative overflow-hidden rounded-2xl">
-			
-			<!-- CONTENEDOR SLIDER -->
-			<div id="carousel-galeria" class="flex transition-transform duration-500">
-				${fotos
-					.map(
-						(f) => `
-					<div class="min-w-full">
-						<a href="${f.url}" class="galeria-link">
-							<img src="${f.url}" class="w-full h-[300px] object-cover">
-						</a>
-					</div>
-				`,
-					)
-					.join("")}
-			</div>
+        <div class="relative overflow-hidden rounded-2xl">
+            <!-- CONTENEDOR SLIDER -->
+            <div id="carousel-galeria" class="flex transition-transform duration-500">
+                ${fotos
+									.map(
+										(f) => `
+                    <div class="min-w-full">
+                        <a href="${f.url}" class="galeria-link block">
+                            <img src="${f.url}" class="w-full h-[300px] object-cover" loading="lazy" onerror="this.src='https://placehold.co/600x300/1e293b/ffffff?text=ANG'">
+                        </a>
+                    </div>
+                `,
+									)
+									.join("")}
+            </div>
 
-			<!-- BOTONES -->
-			<button id="prev-galeria" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white px-3 py-1 rounded-full">
-				‹
-			</button>
+            <!-- BOTONES -->
+            <button id="prev-galeria" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white px-3 py-1 rounded-full transition-colors z-10">
+                ‹
+            </button>
 
-			<button id="next-galeria" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white px-3 py-1 rounded-full">
-				›
-			</button>
-
-		</div>
-	`;
+            <button id="next-galeria" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white px-3 py-1 rounded-full transition-colors z-10">
+                ›
+            </button>
+        </div>
+    `;
 
 	cuerpo.appendChild(divGaleria);
-
 	inicializarCarruselGaleria();
 }
 
 function inicializarCarruselGaleria() {
 	const contenedor = document.getElementById("carousel-galeria");
+	if (!contenedor) return;
+
 	const slides = contenedor.children;
+	if (slides.length <= 1) {
+		// Si hay una sola foto, ocultamos los botones de navegación
+		document.getElementById("prev-galeria")?.remove();
+		document.getElementById("next-galeria")?.remove();
+		return;
+	}
 
 	let index = 0;
 
-	document.getElementById("next-galeria").onclick = () => {
-		index++;
-		if (index >= slides.length) index = 0;
+	const actualizar = () => {
+		contenedor.style.transform = `translateX(-${index * 100}%)`;
+	};
+
+	const siguienteSlide = () => {
+		index = (index + 1) % slides.length;
 		actualizar();
+	};
+
+	const anteriorSlide = () => {
+		index = (index - 1 + slides.length) % slides.length;
+		actualizar();
+	};
+
+	// Control de Autoplay Seguro
+	if (galeriaAutoplayInterval) clearInterval(galeriaAutoplayInterval);
+
+	const iniciarAutoplay = () => {
+		galeriaAutoplayInterval = setInterval(siguienteSlide, 4000);
+	};
+
+	const reiniciarAutoplay = () => {
+		clearInterval(galeriaAutoplayInterval);
+		iniciarAutoplay();
+	};
+
+	document.getElementById("next-galeria").onclick = () => {
+		siguienteSlide();
+		reiniciarAutoplay();
 	};
 
 	document.getElementById("prev-galeria").onclick = () => {
-		index--;
-		if (index < 0) index = slides.length - 1;
-		actualizar();
+		anteriorSlide();
+		reiniciarAutoplay();
 	};
 
-	function actualizar() {
-		contenedor.style.transform = `translateX(-${index * 100}%)`;
-	}
-
-	// autoplay opcional
-	setInterval(() => {
-		index++;
-		if (index >= slides.length) index = 0;
-		actualizar();
-	}, 4000);
+	// Iniciar el ciclo automático inicial
+	iniciarAutoplay();
 }
 
 /**
@@ -173,12 +206,11 @@ function inicializarPhotoSwipe() {
 				children: "#articulo-imagen-link, .galeria-link",
 				pswpModule: () =>
 					import("https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe.esm.min.js"),
-				// Añadimos estas opciones para mejor experiencia
 				padding: {top: 20, bottom: 20, left: 20, right: 20},
 				wheelToZoom: true,
 			});
 
-			// FILTRO CRÍTICO: Si la imagen no tiene tamaño definido, lo busca al vuelo
+			// FILTRO CRÍTICO: Si la imagen no tiene tamaño definido en atributos data-pswp, lo calcula del elemento renderizado
 			lightbox.addFilter("itemData", (itemData) => {
 				const img = itemData.element.querySelector("img");
 				if (img && (!itemData.width || !itemData.height)) {
@@ -192,20 +224,18 @@ function inicializarPhotoSwipe() {
 		})
 		.catch((err) => console.error("Error cargando PhotoSwipe:", err));
 }
+
 /**
  * Carga las noticias recomendadas en el sidebar
  */
-async function cargarSugeridas() {
+async function cargarSugeridas(slugActual) {
 	try {
-		const res = await fetch(`${API_BASE}/noticias`);
+		const res = await fetch(`${API_BASE}/noticias?limit=4`);
 		if (!res.ok) return;
 
 		const noticias = await res.json();
 		const sidebar = document.getElementById("sidebar-recientes");
 		if (!sidebar) return;
-
-		const urlParams = new URLSearchParams(window.location.search);
-		const slugActual = urlParams.get("slug");
 
 		sidebar.innerHTML = noticias
 			.filter((n) => n.slug !== slugActual)
@@ -213,14 +243,14 @@ async function cargarSugeridas() {
 			.map(
 				(n, i) => `
                 <div class="group cursor-pointer flex gap-4 items-start border-b border-slate-100 pb-4 last:border-0" 
-                     onclick="window.location.href='articulo.html?slug=${n.slug}'">
+                     onclick="window.location.href='articulo.html?slug=${esc(n.slug)}'">
                     <div class="text-2xl font-black text-slate-200 group-hover:text-pink-accent transition-colors">0${i + 1}</div>
                     <div>
                         <h5 class="font-bold text-sm leading-tight text-slate-800 group-hover:text-purple-main transition-colors line-clamp-2">
-                            ${n.titulo}
+                            ${esc(n.titulo)}
                         </h5>
                         <span class="text-[9px] uppercase font-black text-slate-400">
-                            ${new Date(n.fecha_publicacion).toLocaleDateString("es-AR")}
+                            ${safeDate(n.fecha_publicacion)}
                         </span>
                     </div>
                 </div>
@@ -232,51 +262,58 @@ async function cargarSugeridas() {
 	}
 }
 
+/**
+ * Carga de banners publicitarios y Swiper
+ */
 async function cargarPromos() {
 	try {
-		// 1. Cargamos la promo del encabezado
-		const resSup = await fetch(
-			`http://localhost:3000/publicidad/activa/encabezado`,
-		);
+		const resSup = await fetch(`${API_BASE}/publicidad/activa/encabezado`);
 		const promosSup = await resSup.json();
+		const slidesContainer = document.getElementById("swiper-slides-container");
 
-		const contenedorSup = document.getElementById("hero-promos-wrapper");
-		if (contenedorSup && promosSup.length > 0) {
-			const p = promosSup[0];
-			contenedorSup.innerHTML = `
-                <a href="${p.link_url}" target="_blank" class="block w-full overflow-hidden hover:opacity-95 transition">
-                    <img src="${p.imagen_url}" alt="Promoción" class="w-full h-auto object-cover">
-                </a>
-            `;
+		if (slidesContainer && promosSup.length > 0) {
+			slidesContainer.innerHTML = promosSup
+				.map(
+					(p) => `
+                <div class="swiper-slide">
+                    <a href="${esc(p.link_url || '#')}" target="_blank" class="block w-full overflow-hidden rounded-2xl shadow-lg hover:opacity-95 transition">
+                        <img src="${esc(p.imagen_url)}" alt="Promoción" class="w-full h-auto object-cover border-b-4 border-purple-main" onerror="this.style.display='none'">
+                    </a>
+                </div>
+            `,
+				)
+				.join("");
+
+			// Control de seguridad por si Swiper tarda en cargar de forma global
+			if (typeof Swiper !== "undefined") {
+				new Swiper("#hero-promos-wrapper", {
+					loop: true,
+					autoplay: {
+						delay: 4000,
+						disableOnInteraction: false,
+					},
+					pagination: {
+						el: ".swiper-pagination",
+						clickable: true,
+					},
+				});
+			} else {
+				console.warn("Swiper library no está disponible en el alcance global.");
+			}
 		}
 
-		// 2. Cargamos la promo de abajo (si tienes)
-		const resInf = await fetch(
-			`http://localhost:3000/publicidad/activa/intermedia`,
-		);
-		const promosInf = await resInf.json();
-
-		const contenedorInf = document.getElementById("footer-promos-wrapper");
-		if (contenedorInf && promosInf.length > 0) {
-			const p = promosInf[0];
-			contenedorInf.innerHTML = `
-                <a href="${p.link_url}" target="_blank" class="block w-full overflow-hidden hover:opacity-95 transition">
-                    <img src="${p.imagen_url}" alt="Promoción" class="w-full h-auto object-cover">
-                </a>
-            `;
-		}
-		const resAside = await fetch(
-			`http://localhost:3000/publicidad/activa/lateral`,
-		);
+		const resAside = await fetch(`${API_BASE}/publicidad/activa/lateral`);
 		const promosAside = await resAside.json();
 		const contenedorAside = document.querySelectorAll(".sponsor-slot");
-		if (contenedorAside) {
+
+		if (contenedorAside && promosAside && promosAside.length > 0) {
 			contenedorAside.forEach((slot) => {
+				const p = promosAside[0];
 				slot.innerHTML = `
-					<a href="${promosAside[0].link_url}" target="_blank" class="block w-full h-full overflow-hidden hover:opacity-95 transition">
-						<img src="${promosAside[0].imagen_url}" alt="Patrocinador" class="w-full h-full object-cover ">
-					</a>
-				`;
+                    <a href="${esc(p.link_url || '#')}" target="_blank" class="block w-full h-full overflow-hidden hover:opacity-95 transition">
+                        <img src="${esc(p.imagen_url)}" alt="Patrocinador" class="w-full h-full object-cover" onerror="this.style.display='none'">
+                    </a>
+                `;
 			});
 		}
 	} catch (error) {

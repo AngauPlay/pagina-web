@@ -1,80 +1,83 @@
 const API = "http://localhost:3000";
+let paginaActual = 1;
+const LIMITE = 30;
 
-document.addEventListener("DOMContentLoaded", cargarNoticias);
+document.addEventListener("DOMContentLoaded", () => {
+	cargarPagina(1);
+});
 
-async function cargarNoticias() {
-  const contenedor = document.getElementById("contenedor-categorias");
+async function cargarPagina(page) {
+	const contenedor = document.getElementById("contenedor-categorias");
+	const paginacion = document.getElementById("paginacion");
 
-  try {
-    const res = await fetch(`${API}/noticias`);
-    const noticias = await res.json();
+	try {
+		const res = await fetch(`${API}/noticias?page=${page}&limit=${LIMITE}`);
+		const json = await res.json();
 
-    if (!noticias || noticias.length === 0) {
-      contenedor.innerHTML = "<p>No hay noticias disponibles</p>";
-      return;
-    }
+		if (!json.data || json.data.length === 0) {
+			contenedor.innerHTML = "<p class='text-slate-500 text-center py-10'>No hay noticias disponibles.</p>";
+			if (paginacion) paginacion.innerHTML = "";
+			return;
+		}
 
-    // Ordenar por fecha más reciente primero
-    noticias.sort(
-      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-    );
+		paginaActual = json.page;
 
-    contenedor.innerHTML = `
+		contenedor.innerHTML = `
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        ${
-          noticias.map((n) => {
-            const categoria = n.Categorium
-              ? n.Categorium.nombre
-              : "General";
+        ${json.data.map((n) => `
+          <article class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all border group">
+            <div class="relative overflow-hidden">
+              <img src="${esc(n.imagen_url)}" alt="${esc(n.titulo)}"
+                   class="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500" onerror="this.src='https://placehold.co/400x300/1e293b/ffffff?text=ANG'"/>
+              <span class="absolute top-4 left-4 bg-pink-accent text-white text-[10px] font-black px-2 py-1 rounded uppercase">${esc(n.Categorium?.nombre || "General")}</span>
+            </div>
+            <div class="p-6">
+              <h3 class="text-xl font-black text-slate-800 group-hover:text-pink-accent transition">${esc(n.titulo)}</h3>
+              <p class="text-slate-500 mt-3 text-sm line-clamp-2">${esc(safeStr(n.copete))}</p>
+              <a href="articulo.html?slug=${esc(n.slug)}" class="inline-block mt-4 text-pink-accent font-black text-xs hover:translate-x-2 transition">LEER MÁS →</a>
+            </div>
+          </article>`
+		).join("")}
+      </div>`;
 
-            return `
-              <article class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all border group">
+		if (paginacion) {
+			paginacion.innerHTML = renderizarPaginacion(json);
+		}
 
-                <div class="relative overflow-hidden">
-                  
-                  <img 
-                    src="${n.imagen_url}" 
-                    alt="${n.titulo}"
-                    class="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
+		window.scrollTo({top: 0, behavior: "smooth"});
+	} catch (error) {
+		console.error(error);
+		if (contenedor) contenedor.innerHTML = "<p class='text-red-500 text-center py-10'>Error cargando noticias</p>";
+	}
+}
 
-                  <!-- ETIQUETA -->
-                  <span class="absolute top-4 left-4 bg-pink-accent text-white text-[10px] font-black px-2 py-1 rounded uppercase">
-                    ${categoria}
-                  </span>
+function renderizarPaginacion(json) {
+	const {page, totalPages} = json;
+	if (totalPages <= 1) return "";
 
-                </div>
+	const rango = 2;
+	let html = "";
 
-                <div class="p-6">
+	html += `<button onclick="cargarPagina(1)" class="px-3 py-2 rounded-lg font-bold text-sm transition ${page === 1 ? "bg-gray-200 text-gray-400 cursor-not-allowed" : "bg-white text-purple-main hover:bg-purple-main hover:text-white border border-purple-main"}">«</button>`;
 
-                  <p class="text-xs text-slate-400 mb-2">
-                    ${new Date(n.createdAt).toLocaleDateString("es-AR")}
-                  </p>
+	let inicio = Math.max(1, page - rango);
+	let fin = Math.min(totalPages, page + rango);
 
-                  <h3 class="text-xl font-black text-slate-800 group-hover:text-pink-accent transition">
-                    ${n.titulo}
-                  </h3>
+	if (inicio > 1) {
+		html += `<button onclick="cargarPagina(1)" class="px-3 py-2 rounded-lg font-bold text-sm bg-white text-purple-main hover:bg-purple-main hover:text-white border border-purple-main transition">1</button>`;
+		if (inicio > 2) html += `<span class="px-2 text-slate-400">...</span>`;
+	}
 
-                  <p class="text-slate-500 mt-3 text-sm line-clamp-2">
-                    ${n.copete || ""}
-                  </p>
+	for (let i = inicio; i <= fin; i++) {
+		html += `<button onclick="cargarPagina(${i})" class="px-3 py-2 rounded-lg font-bold text-sm transition ${i === page ? "bg-purple-main text-white" : "bg-white text-purple-main hover:bg-purple-main hover:text-white border border-purple-main"}">${i}</button>`;
+	}
 
-                  <a href="articulo.html?slug=${n.slug}" 
-                     class="inline-block mt-4 text-pink-accent font-black text-xs hover:translate-x-2 transition">
-                    LEER MÁS →
-                  </a>
+	if (fin < totalPages) {
+		if (fin < totalPages - 1) html += `<span class="px-2 text-slate-400">...</span>`;
+		html += `<button onclick="cargarPagina(${totalPages})" class="px-3 py-2 rounded-lg font-bold text-sm bg-white text-purple-main hover:bg-purple-main hover:text-white border border-purple-main transition">${totalPages}</button>`;
+	}
 
-                </div>
+	html += `<button onclick="cargarPagina(${totalPages})" class="px-3 py-2 rounded-lg font-bold text-sm transition ${page === totalPages ? "bg-gray-200 text-gray-400 cursor-not-allowed" : "bg-white text-purple-main hover:bg-purple-main hover:text-white border border-purple-main"}">»</button>`;
 
-              </article>
-            `;
-          }).join("")
-        }
-      </div>
-    `;
-
-  } catch (error) {
-    console.error(error);
-    contenedor.innerHTML = "<p>Error cargando noticias</p>";
-  }
+	return html;
 }

@@ -1,59 +1,41 @@
-// ===== PROGRAMACIÓN =====
 function obtenerProgramacion() {
 	return fetch("http://localhost:3000/programas/hoy")
 		.then((res) => res.json())
-		.catch((err) => {
-			console.error("Error al obtener programación:", err);
-			return [];
-		});
+		.catch(() => []);
 }
 
-// ===== NOTICIAS =====
 async function cargarNoticias() {
 	const contenedorNoticias = document.getElementById("noticias-container");
 	const contenedorHero = document.getElementById("hero-noticia");
 
 	try {
-		const respuesta = await fetch("http://localhost:3000/noticias");
+		const respuesta = await fetch("http://localhost:3000/noticias?limit=4");
 		const noticias = await respuesta.json();
 
 		if (!noticias || noticias.length === 0) {
-			contenedorHero.innerHTML =
-				"<p class='text-white italic'>No hay noticias destacadas.</p>";
+			contenedorHero.innerHTML = "<p class='text-white italic'>No hay noticias destacadas.</p>";
 			contenedorNoticias.innerHTML = "<p>No hay noticias publicadas.</p>";
 			return;
 		}
 
-		// 1. NOTICIA PRINCIPAL (Indice 0)
 		const principal = noticias[0];
-		// Accedemos a Categorium.nombre según tu JSON
 		const catPrincipal = principal.Categorium
 			? principal.Categorium.nombre
 			: "General";
 
 		contenedorHero.innerHTML = `
       <article class="relative group overflow-hidden rounded-3xl bg-slate-900 shadow-2xl cursor-pointer" 
-               onclick="window.location.href='articulo.html?slug=${principal.slug}'">
-        <img
-          src="${principal.imagen_url}"
+               onclick="window.location.href='articulo.html?slug=${esc(principal.slug)}'">
+        <img src="${esc(principal.imagen_url) || ''}"
           class="w-full h-[450px] object-cover opacity-60 group-hover:scale-105 transition-transform duration-1000"
-          alt="${principal.titulo}"
-        />
+          alt="${esc(principal.titulo)}" onerror="this.src='https://placehold.co/1200x600/1e293b/ffffff?text=ANG'"/>
         <div class="absolute bottom-0 left-0 p-8 w-full bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent">
-          <span class="bg-pink-accent text-white text-xs font-black px-4 py-1 rounded-full uppercase tracking-widest">
-            ${catPrincipal}
-          </span>
-          <h3 class="text-3xl md:text-5xl font-black text-white mt-4 leading-tight">
-            ${principal.titulo}
-          </h3>
-          <p class="text-gray-300 mt-4 text-lg max-w-2xl hidden md:block">
-            ${principal.copete}
-          </p>
+          <span class="bg-pink-accent text-white text-xs font-black px-4 py-1 rounded-full uppercase tracking-widest">${esc(catPrincipal)}</span>
+          <h3 class="text-3xl md:text-5xl font-black text-white mt-4 leading-tight">${esc(principal.titulo)}</h3>
+          <p class="text-gray-300 mt-4 text-lg max-w-2xl hidden md:block">${esc(safeStr(principal.copete))}</p>
         </div>
-      </article>
-    `;
+      </article>`;
 
-		// 2. RESTO DE NOTICIAS (Slice desde 1)
 		const restoNoticias = noticias.slice(1);
 
 		if (restoNoticias.length > 0) {
@@ -66,54 +48,36 @@ async function cargarNoticias() {
 					return `
           <article class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all border border-slate-100 group">
             <div class="relative overflow-hidden">
-              <img src="${noticia.imagen_url}" alt="${noticia.titulo}" class="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500" />
-              <span class="absolute top-4 left-4 bg-pink-accent text-white text-[10px] font-black px-2 py-1 rounded uppercase">
-                ${catNombre}
-              </span>
+              <img src="${esc(noticia.imagen_url) || ''}" alt="${esc(noticia.titulo)}" class="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500" onerror="this.src='https://placehold.co/400x300/1e293b/ffffff?text=ANG'" />
+              <span class="absolute top-4 left-4 bg-pink-accent text-white text-[10px] font-black px-2 py-1 rounded uppercase">${esc(catNombre)}</span>
             </div>
             <div class="p-6">
-              <h3 class="text-xl font-black leading-tight text-slate-800 group-hover:text-pink-accent transition-colors">
-                ${noticia.titulo}
-              </h3>
-              <p class="text-slate-500 mt-3 text-sm line-clamp-2">${noticia.copete}</p>
-              <a href="articulo.html?slug=${noticia.slug}" class="inline-block mt-4 text-pink-accent font-black text-xs tracking-widest hover:translate-x-2 transition-transform">
-                LEER MÁS →
-              </a>
+              <h3 class="text-xl font-black leading-tight text-slate-800 group-hover:text-pink-accent transition-colors">${esc(noticia.titulo)}</h3>
+              <p class="text-slate-500 mt-3 text-sm line-clamp-2">${esc(safeStr(noticia.copete))}</p>
+              <a href="articulo.html?slug=${esc(noticia.slug)}" class="inline-block mt-4 text-pink-accent font-black text-xs tracking-widest hover:translate-x-2 transition-transform">LEER MÁS →</a>
             </div>
-          </article>
-        `;
+          </article>`;
 				})
 				.join("");
 		} else {
-			contenedorNoticias.innerHTML =
-				"<p class='col-span-3 text-center text-slate-400'>No hay más noticias anteriores.</p>";
+			contenedorNoticias.innerHTML = "<p class='col-span-3 text-center text-slate-400'>No hay más noticias anteriores.</p>";
 		}
 	} catch (error) {
 		console.error("Error al cargar noticias:", error);
 		if (contenedorHero) {
-			contenedorHero.innerHTML = `
-				<div class="bg-slate-800 rounded-3xl p-8 text-center">
-					<p class="text-white/70">No hay noticias destacadas disponibles.</p>
-				</div>`;
+			contenedorHero.innerHTML = `<div class="bg-slate-800 rounded-3xl p-8 text-center"><p class="text-white/70">No hay noticias destacadas disponibles.</p></div>`;
 		}
 		if (contenedorNoticias) {
-			contenedorNoticias.innerHTML = `
-				<div class="col-span-3 text-center py-10">
-					<p class="text-slate-500 mb-3">Error al conectar con el servidor.</p>
-					<button onclick="cargarNoticias()" class="text-pink-accent font-bold hover:underline">
-						Reintentar
-					</button>
-				</div>`;
+			contenedorNoticias.innerHTML = `<div class="col-span-3 text-center py-10"><p class="text-slate-500 mb-3">Error al conectar con el servidor.</p><button onclick="cargarNoticias()" class="text-pink-accent font-bold hover:underline">Reintentar</button></div>`;
 		}
 	}
 }
 
-// IMPORTANTE: Asegúrate de llamar a la función al cargar la página
 document.addEventListener("DOMContentLoaded", () => {
 	cargarNoticias();
 	cargarPromos();
 });
-// LÓGICA DEL MENÚ
+
 const menuBtn = document.getElementById("menu-btn");
 const closeMenu = document.getElementById("close-menu");
 const mobileMenu = document.getElementById("mobile-menu");
@@ -131,49 +95,30 @@ overlay.addEventListener("click", toggleMenu);
 
 async function cargarPromos() {
 	try {
-		const resSup = await fetch(
-			`http://localhost:3000/publicidad/activa/encabezado`,
-		);
+		const resSup = await fetch("http://localhost:3000/publicidad/activa/encabezado");
 		const promosSup = await resSup.json();
-
 		const slidesContainer = document.getElementById("swiper-slides-container");
 
 		if (slidesContainer && promosSup.length > 0) {
-			// 1. Limpiamos y generamos todos los slides
-			slidesContainer.innerHTML = promosSup
-				.map(
-					(p) => `
+			slidesContainer.innerHTML = promosSup.map((p) => `
                 <div class="swiper-slide">
-                    <a href="${p.link_url}" target="_blank" class="block w-full overflow-hidden rounded-2xl shadow-lg hover:opacity-95 transition">
-                        <img src="${p.imagen_url}" alt="Promoción" class="w-full h-auto object-cover border-b-4 border-purple-main">
+                    <a href="${esc(p.link_url || '#')}" target="_blank" class="block w-full overflow-hidden rounded-2xl shadow-lg hover:opacity-95 transition">
+                        <img src="${esc(p.imagen_url)}" alt="Promoción" class="w-full h-auto object-cover border-b-4 border-purple-main" onerror="this.style.display='none'">
                     </a>
-                </div>
-            `,
-				)
-				.join("");
+                </div>`
+			).join("");
 
-			// 2. Inicializamos Swiper después de insertar el HTML
 			new Swiper("#hero-promos-wrapper", {
 				loop: true,
-				autoplay: {
-					delay: 4000,
-					disableOnInteraction: false,
-				},
-				pagination: {
-					el: ".swiper-pagination",
-					clickable: true,
-				},
-				navigation: {
-					nextEl: ".swiper-button-next",
-					prevEl: ".swiper-button-prev",
-				},
+				autoplay: { delay: 4000, disableOnInteraction: false },
+				pagination: { el: ".swiper-pagination", clickable: true },
+				navigation: { nextEl: ".swiper-button-next", prevEl: ".swiper-button-prev" },
 			});
 		}
 	} catch (error) {
 		console.error("Error cargando promos:", error);
 	}
 }
-const API = "http://localhost:3000";
 
 async function cargarMarquee() {
 	const contenedor = document.getElementById("marquee-container");
@@ -196,47 +141,38 @@ async function cargarMarquee() {
 
 		if (!data || data.length === 0) {
 			contenedor.innerHTML = `<span class="mx-4 font-bold uppercase text-xs self-center text-white/50">Hoy no hay programación registrada</span>`;
-			// Removemos la animación si no hay contenido para que no "vibre" el texto
 			contenedor.classList.remove("animate-marquee");
 			return;
 		}
 
-		const htmlProgramacion = data
-			.map((programa) => {
-				const vivo = estaEnVivo(programa.hora_inicio, programa.hora_fin);
-				const claseVivo = vivo
-					? "border-green-500 shadow-lg"
-					: "border-white/20";
-				const imagenSrc =
-					programa.imagen_url || "https://via.placeholder.com/300x150?text=Sin+imagen";
+		const htmlProgramacion = data.map((programa) => {
+			const vivo = estaEnVivo(programa.hora_inicio, programa.hora_fin);
+			const claseVivo = vivo ? "border-green-500 shadow-lg" : "border-white/20";
+			const imagenSrc = programa.imagen_url || "https://via.placeholder.com/300x150?text=Sin+imagen";
+			const inicio = safeSlice(programa.hora_inicio, 0, 5);
+			const fin = safeSlice(programa.hora_fin, 0, 5);
 
-				return `
+			return `
             <div class="inline-flex items-center mx-2 flex-shrink-0">
                 <div class="relative w-64 h-16 rounded-lg overflow-hidden border-2 ${claseVivo}">
-                    <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('${imagenSrc}')"></div>
+                    <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('${esc(imagenSrc)}')"></div>
                     <div class="absolute inset-0 bg-black/60"></div>
                     <div class="absolute inset-0 p-2 flex flex-col justify-center">
                         <span class="text-[8px] font-black uppercase ${vivo ? "text-yellow-neon animate-pulse" : "text-white/70"}">
-                            ${vivo ? "EN VIVO 🔴" : `${programa.hora_inicio.slice(0, 5)} - ${programa.hora_fin.slice(0, 5)}`}
+                            ${vivo ? "EN VIVO 🔴" : `${inicio} - ${fin}`}
                         </span>
-                        <h3 class="text-[11px] font-bold text-white uppercase truncate">${programa.nombre}</h3>
+                        <h3 class="text-[11px] font-bold text-white uppercase truncate">${esc(programa.nombre)}</h3>
                     </div>
                 </div>
             </div>`;
-			})
-			.join("");
+		}).join("");
 
-		// Definimos el bloque base
-		const contenidoBase = `
+		contenedor.innerHTML = `
             <span class="mx-4 font-bold flex items-center gap-2 flex-shrink-0">
                 <span class="bg-white text-pink-accent px-2 py-0.5 rounded text-[10px] font-black uppercase">HOY</span>
                 PROGRAMACIÓN:
             </span>
-            ${htmlProgramacion}
-        `;
-
-		// CLAVE: Duplicamos el contenido para que el bucle sea infinito
-		contenedor.innerHTML = contenidoBase;
+            ${htmlProgramacion}`;
 	} catch (error) {
 		console.error("Error en marquee:", error);
 	}
@@ -244,7 +180,7 @@ async function cargarMarquee() {
 document.addEventListener("DOMContentLoaded", cargarMarquee);
 
 async function chequearLive() {
-	const API_KEY = ""; // Colocar acá la API Key de YouTube
+	const API_KEY = "";
 	const CHANNEL_ID = "UCwzH2mG2_f12S_LqYw1v6zA";
 	const frame = document.getElementById("main-video-frame");
 
@@ -254,14 +190,10 @@ async function chequearLive() {
 	}
 
 	try {
-		const resp = await fetch(
-			`https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${CHANNEL_ID}&type=video&eventType=live&key=${API_KEY}`,
-		);
+		const resp = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${CHANNEL_ID}&type=video&eventType=live&key=${API_KEY}`);
 		const data = await resp.json();
-
 		if (data.items.length > 0) {
-			const liveId = data.items[0].id.videoId;
-			frame.src = `https://www.youtube.com/embed/${liveId}`;
+			frame.src = `https://www.youtube.com/embed/${data.items[0].id.videoId}`;
 		}
 	} catch (error) {
 		console.error("Error consultando YouTube API", error);
