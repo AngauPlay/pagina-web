@@ -36,10 +36,30 @@ const agendaController = {
 			res.status(400).json({error: error.message});
 		}
 	},
-	// Listar todas las agendas
 	listEvents: async (req, res) => {
 		try {
-			const agendas = await Agenda.findAll({order: [["fecha", "ASC"]]});
+			const page = parseInt(req.query.page) || null;
+			const limit = parseInt(req.query.limit) || null;
+
+			const options = {
+				order: [["fecha", "ASC"]],
+			};
+
+			if (limit) options.limit = limit;
+			if (page && limit) options.offset = (page - 1) * limit;
+
+			if (page && limit) {
+				const {count, rows} = await Agenda.findAndCountAll(options);
+				return res.json({
+					data: rows,
+					total: count,
+					page,
+					limit,
+					totalPages: Math.ceil(count / limit),
+				});
+			}
+
+			const agendas = await Agenda.findAll(options);
 			res.json(agendas);
 		} catch (error) {
 			res.status(500).json({error: "Error al obtener las agendas"});

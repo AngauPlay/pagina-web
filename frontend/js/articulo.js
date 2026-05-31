@@ -230,7 +230,7 @@ function inicializarPhotoSwipe() {
  */
 async function cargarSugeridas(slugActual) {
 	try {
-		const res = await fetch(`${API_BASE}/noticias`);
+		const res = await fetch(`${API_BASE}/noticias?limit=4`);
 		if (!res.ok) return;
 
 		const noticias = await res.json();

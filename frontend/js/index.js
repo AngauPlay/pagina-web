@@ -9,7 +9,7 @@ async function cargarNoticias() {
 	const contenedorHero = document.getElementById("hero-noticia");
 
 	try {
-		const respuesta = await fetch("http://localhost:3000/noticias");
+		const respuesta = await fetch("http://localhost:3000/noticias?limit=4");
 		const noticias = await respuesta.json();
 
 		if (!noticias || noticias.length === 0) {

@@ -1,21 +1,26 @@
+let lightbox = null;
+const DIAS = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+
 document.addEventListener("DOMContentLoaded", () => {
-	cargarGrilla();
+	cargarCarrusel();
 	cargarPromos();
 	crearLightbox();
 });
 
-let lightbox = null;
-
 function crearLightbox() {
 	const div = document.createElement("div");
 	div.id = "lightbox-programas";
-	div.className = "fixed inset-0 bg-black/80 z-[200] hidden items-center justify-center p-4 backdrop-blur-sm";
+	div.className = "fixed inset-0 bg-black/90 z-[200] hidden items-center justify-center p-4 backdrop-blur-sm";
 	div.style.display = "none";
 	div.innerHTML = `
 		<button id="cerrar-lightbox" class="absolute top-4 right-4 text-white text-4xl hover:text-pink-accent transition z-10">&times;</button>
-		<div class="flex flex-col items-center gap-4 max-w-4xl w-full">
-			<img id="lightbox-img" class="max-h-[80vh] w-auto max-w-full object-contain rounded-2xl shadow-2xl" src="" alt="">
-			<p id="lightbox-caption" class="text-white/80 text-sm font-medium text-center"></p>
+		<div class="flex flex-col md:flex-row items-center gap-6 max-w-4xl w-full">
+			<img id="lightbox-img" class="max-h-[70vh] w-full md:w-1/2 object-contain rounded-2xl shadow-2xl" src="" alt="">
+			<div class="text-white md:w-1/2 space-y-3 text-center md:text-left">
+				<h2 id="lightbox-nombre" class="text-2xl md:text-3xl font-black"></h2>
+				<p id="lightbox-horario" class="text-lg text-pink-accent font-bold"></p>
+				<p id="lightbox-staff" class="text-base text-white/70"></p>
+			</div>
 		</div>
 	`;
 	document.body.appendChild(div);
@@ -31,10 +36,12 @@ function crearLightbox() {
 	lightbox = div;
 }
 
-function abrirLightbox(src, nombre) {
+function abrirLightbox(programa) {
 	if (!lightbox) return;
-	document.getElementById("lightbox-img").src = src;
-	document.getElementById("lightbox-caption").textContent = nombre || "";
+	document.getElementById("lightbox-img").src = programa.imagen_url || "https://placehold.co/600x400/1e293b/ffffff?text=ANG";
+	document.getElementById("lightbox-nombre").textContent = programa.nombre || "";
+	document.getElementById("lightbox-horario").textContent = `${safeSlice(programa.hora_inicio, 0, 5)} — ${safeSlice(programa.hora_fin, 0, 5)}`;
+	document.getElementById("lightbox-staff").textContent = programa.staff ? `Conductores: ${programa.staff}` : "";
 	lightbox.style.display = "flex";
 	document.body.style.overflow = "hidden";
 }
@@ -54,83 +61,84 @@ function estaAlAire(inicio, fin) {
 	return actual >= hi * 60 + mi && actual <= hf * 60 + mf;
 }
 
-async function cargarGrilla() {
+async function cargarCarrusel() {
 	try {
 		const res = await fetch("http://localhost:3000/programas");
 		const data = await res.json();
 
-		const contenedor = document.getElementById("grilla-semanal");
-		const diasNombres = [
-			"Domingo", "Lunes", "Martes", "Miércoles",
-			"Jueves", "Viernes", "Sábado",
-		];
-
-		const horasSet = new Set();
+		const porDia = [[], [], [], [], [], [], []];
 		data.forEach((p) => {
-			const h = safeSlice(p.hora_inicio, 0, 5);
-			if (h) horasSet.add(h);
-		});
-
-		const horas = Array.from(horasSet).sort();
-		const grilla = {};
-		horas.forEach((h) => { grilla[h] = Array(7).fill(null); });
-
-		data.forEach((p) => {
-			const hora = safeSlice(p.hora_inicio, 0, 5);
-			if (hora && p.dia_semana !== undefined && p.dia_semana !== null) {
-				grilla[hora][p.dia_semana] = p;
+			if (p.dia_semana !== undefined && p.dia_semana !== null) {
+				porDia[p.dia_semana].push(p);
 			}
 		});
 
+		porDia.forEach((dia) =>
+			dia.sort((a, b) => (a.hora_inicio || "").localeCompare(b.hora_inicio || ""))
+		);
+
+		const hoy = new Date().getDay();
+
+		const contenedor = document.getElementById("grilla-semanal");
 		contenedor.innerHTML = `
-      <div class="overflow-x-auto">
-        <table class="w-full text-sm border-collapse min-w-[800px]">
-          <thead>
-            <tr class="bg-purple-main text-white">
-              <th class="p-3 sticky left-0 bg-purple-main z-10 text-left">Hora</th>
-              ${diasNombres.map((d) => `<th class="p-3 text-center">${d.substring(0, 3)}</th>`).join("")}
-            </tr>
-          </thead>
-          <tbody>
-            ${horas.map((hora) => `
-              <tr class="border-t hover:bg-gray-50 transition">
-                <td class="p-3 font-bold text-slate-700 sticky left-0 bg-gray-50 border-r z-10">${hora}</td>
-                ${grilla[hora].map((p) => {
-                  if (!p) return `<td class="p-2 border-r border-gray-100"></td>`;
+			<div class="swiper" id="swiper-programacion">
+				<div class="swiper-wrapper">
+					${porDia.map((programas, index) => {
+						const esHoy = index === hoy;
+						return `
+							<div class="swiper-slide">
+								<div class="flex items-center gap-3 mb-4">
+									<h2 class="text-xl font-black ${esHoy ? "text-pink-accent" : "text-slate-500"} uppercase">${DIAS[index]}</h2>
+									${esHoy ? '<span class="bg-pink-accent text-white text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wider">HOY</span>' : ""}
+								</div>
+								${programas.length === 0
+									? '<p class="text-slate-400 italic text-sm">Sin programación</p>'
+									: `<div class="flex gap-3 overflow-x-auto pb-3" style="scrollbar-width: thin;">
+										${programas.map((p) => {
+											const alAire = esHoy && estaAlAire(p.hora_inicio, p.hora_fin);
+											const imgSrc = p.imagen_url || "https://placehold.co/200x150/1e293b/ffffff?text=ANG";
+											const encoded = esc(JSON.stringify(p).replace(/"/g, "&quot;"));
+											return `
+												<div class="flex-shrink-0 w-36 md:w-44 cursor-pointer group" onclick='abrirLightbox(${encoded})'>
+													<div class="relative rounded-xl overflow-hidden ${alAire ? "ring-2 ring-green-500 ring-offset-2" : "shadow-md"} hover:shadow-xl transition">
+														<img src="${esc(imgSrc)}" alt="${esc(p.nombre)}" class="w-full h-28 md:h-36 object-cover group-hover:scale-105 transition duration-300" onerror="this.src='https://placehold.co/200x150/1e293b/ffffff?text=ANG'">
+														${alAire ? '<span class="absolute top-1 left-1 bg-green-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded animate-pulse">🔴 EN VIVO</span>' : ""}
+													</div>
+													<p class="text-xs font-bold text-slate-700 mt-1.5 truncate text-center">${esc(p.nombre)}</p>
+												</div>
+											`;
+										}).join("")}
+									</div>`
+								}
+							</div>
+						`;
+					}).join("")}
+				</div>
 
-                  const alAire = estaAlAire(p.hora_inicio, p.hora_fin);
-                  const imgSrc = p.imagen_url || "https://placehold.co/150x80/1e293b/ffffff?text=ANG";
-                  const inicio = safeSlice(p.hora_inicio, 0, 5);
-                  const fin = safeSlice(p.hora_fin, 0, 5);
+				<div class="flex justify-center gap-3 mt-8">
+					<button class="btn-prev-programacion cursor-pointer bg-purple-main hover:opacity-90 text-white px-5 py-2 rounded-lg font-bold text-sm transition">&larr; Anterior</button>
+					<button class="btn-next-programacion cursor-pointer bg-purple-main hover:opacity-90 text-white px-5 py-2 rounded-lg font-bold text-sm transition">Siguiente &rarr;</button>
+				</div>
+			</div>
+		`;
 
-                  return `
-                    <td class="p-2 border-r border-gray-100 align-top">
-                      <div class="${alAire ? "ring-2 ring-green-500 ring-offset-1" : ""} bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition">
-                        <img src="${esc(imgSrc)}" alt="${esc(p.nombre)}" class="w-full h-20 object-cover cursor-pointer" onclick="abrirLightbox('${esc(imgSrc)}', '${esc(p.nombre)}')" onerror="this.src='https://placehold.co/150x80/1e293b/ffffff?text=ANG'">
-                        <div class="p-2 text-center">
-                          <div class="text-xs font-bold text-slate-800 leading-tight truncate">${esc(p.nombre)}</div>
-                          <div class="text-[9px] text-gray-500 mt-0.5 truncate">${esc(safeStr(p.staff))}</div>
-                          <div class="text-[8px] text-gray-400 font-semibold mt-1">${inicio} a ${fin}</div>
-                        </div>
-                      </div>
-                    </td>
-                  `;
-                }).join("")}
-              </tr>
-            `).join("")}
-          </tbody>
-        </table>
-      </div>
-    `;
+		new Swiper("#swiper-programacion", {
+			initialSlide: hoy,
+			slidesPerView: 1,
+			navigation: {
+				nextEl: ".btn-next-programacion",
+				prevEl: ".btn-prev-programacion",
+			},
+		});
 	} catch (error) {
-		console.error("Error cargando grilla:", error);
+		console.error("Error cargando programación:", error);
 		const cont = document.getElementById("grilla-semanal");
 		if (cont) {
 			cont.innerHTML = `
-        <div class="text-center py-10 text-red-500 font-bold">
-          Error al cargar la programación.
-          <button onclick="cargarGrilla()" class="block mx-auto mt-2 text-pink-accent underline">Reintentar</button>
-        </div>`;
+				<div class="text-center py-10 text-red-500 font-bold">
+					Error al cargar la programación.
+					<button onclick="cargarCarrusel()" class="block mx-auto mt-2 text-pink-accent underline">Reintentar</button>
+				</div>`;
 		}
 	}
 }
@@ -144,12 +152,12 @@ async function cargarPromos() {
 
 		if (slides && promos && promos.length > 0) {
 			slides.innerHTML = promos.map((p) => `
-            <div class="swiper-slide">
-              <a href="${esc(p.link_url || "#")}" target="_blank" class="block w-full overflow-hidden rounded-2xl shadow-lg hover:opacity-95 transition">
-                <img src="${esc(p.imagen_url)}" alt="Promoción" class="w-full h-auto object-cover border-b-4 border-purple-main" onerror="this.style.display='none'">
-              </a>
-            </div>`
-			).join("");
+					<div class="swiper-slide">
+						<a href="${esc(p.link_url || "#")}" target="_blank" class="block w-full overflow-hidden rounded-2xl shadow-lg hover:opacity-95 transition">
+							<img src="${esc(p.imagen_url)}" alt="Promoción" class="w-full h-auto object-cover border-b-4 border-purple-main" onerror="this.style.display='none'">
+						</a>
+					</div>`
+				).join("");
 
 			new Swiper("#hero-promos-wrapper", {
 				loop: true,

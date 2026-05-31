@@ -4,14 +4,31 @@ const Categoria = require("../models/Categoria");
 const cloudinary = require("../config/cloudinaryNoticias"); // Configuración de Cloudinary para noticias
 const NoticiaImagen = require("../models/NoticiaImagen"); // Modelo para imágenes adicionales
 const newsController = {
-	// Listar todas las noticias publicadas
 	getAll: async (req, res) => {
 		try {
-			const noticias = await Noticia.findAll({
-				// Quitamos el filtro de "publicado" para que el admin vea sus borradores
+			const page = parseInt(req.query.page) || null;
+			const limit = parseInt(req.query.limit) || null;
+
+			const options = {
 				include: [{model: Categoria, attributes: ["nombre"]}],
 				order: [["fecha_publicacion", "DESC"]],
-			});
+			};
+
+			if (limit) options.limit = limit;
+			if (page && limit) options.offset = (page - 1) * limit;
+
+			if (page && limit) {
+				const {count, rows} = await Noticia.findAndCountAll(options);
+				return res.json({
+					data: rows,
+					total: count,
+					page,
+					limit,
+					totalPages: Math.ceil(count / limit),
+				});
+			}
+
+			const noticias = await Noticia.findAll(options);
 			res.json(noticias);
 		} catch (error) {
 			res
